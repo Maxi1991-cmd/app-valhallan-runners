@@ -101,3 +101,208 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "App per coach runner con gestione profili atleti, programmazione allenamenti con schede condivisibili (PDF), dati biometrici (FC, VO2max), tracciamento pagamenti mensili e certificato medico con notifiche scadenze. Compatibilità futura con Garmin, Polar, Suunto, Strava, Fitbit. Autenticazione email/password."
+
+backend:
+  - task: "User Authentication (JWT)"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Implemented JWT auth with register/login endpoints. Tested successfully with curl."
+
+  - task: "Athlete Profile CRUD"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Full CRUD for athletes with biometrics, payments, certificate tracking."
+
+  - task: "Training Program CRUD"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Full CRUD for training programs with workouts."
+
+  - task: "Payment Management"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Add/update payment records for athletes with paid status toggle."
+
+  - task: "Notifications System"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "In-app notifications between coach and athletes."
+
+  - task: "Expiry Check API"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "API to check payment dues and certificate expiries with warnings."
+
+  - task: "Analytics API"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Analytics endpoint for athlete data analysis."
+
+frontend:
+  - task: "Authentication Screens"
+    implemented: true
+    working: true
+    file: "app/login.tsx, app/register.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Login and register screens with form validation."
+
+  - task: "Athletes List & Management"
+    implemented: true
+    working: true
+    file: "app/(tabs)/index.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Athletes list with warning badges for expiries."
+
+  - task: "Athlete Detail & Edit"
+    implemented: true
+    working: true
+    file: "app/athlete/[id].tsx, app/athlete/edit/[id].tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Full athlete profile with biometrics, payments, certificate tabs."
+
+  - task: "Training Programs"
+    implemented: true
+    working: true
+    file: "app/(tabs)/programs.tsx, app/program/[id].tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Programs list and detail with workout management."
+
+  - task: "PDF Export"
+    implemented: true
+    working: true
+    file: "app/program/[id].tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "PDF generation and sharing for training programs."
+
+  - task: "Analytics Dashboard"
+    implemented: true
+    working: true
+    file: "app/(tabs)/analytics.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Analytics view with biometrics, HR zones, pace trends."
+
+  - task: "Notifications"
+    implemented: true
+    working: true
+    file: "app/(tabs)/notifications.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Notifications list with expiry warnings."
+
+  - task: "Profile & Settings"
+    implemented: true
+    working: true
+    file: "app/(tabs)/profile.tsx"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "User profile with platform connections (mocked) and logout."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "User Authentication (JWT)"
+    - "Athlete Profile CRUD"
+    - "Training Program CRUD"
+    - "Payment Management"
+    - "Expiry Check API"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+    - message: "MVP implementation complete. Backend APIs implemented: auth, athletes, programs, payments, notifications, analytics, expiry checks. Frontend: full navigation with tabs, all CRUD screens, PDF export. Please test all backend endpoints with various scenarios."
