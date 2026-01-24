@@ -35,17 +35,25 @@ class RunCoachAPITester:
             headers["Authorization"] = f"Bearer {self.auth_token}"
             
         try:
+            # Add timeout and verify SSL
+            kwargs = {
+                "headers": headers,
+                "timeout": 30,
+                "verify": True
+            }
+            
             if method == "GET":
-                response = self.session.get(url, headers=headers)
+                response = self.session.get(url, **kwargs)
             elif method == "POST":
-                response = self.session.post(url, headers=headers, json=data)
+                response = self.session.post(url, json=data, **kwargs)
             elif method == "PUT":
-                response = self.session.put(url, headers=headers, json=data)
+                response = self.session.put(url, json=data, **kwargs)
             elif method == "DELETE":
-                response = self.session.delete(url, headers=headers)
+                response = self.session.delete(url, **kwargs)
             else:
                 raise ValueError(f"Unsupported method: {method}")
                 
+            self.log(f"Request {method} {url} -> {response.status_code}")
             return response
         except Exception as e:
             self.log(f"Request failed: {e}", "ERROR")
