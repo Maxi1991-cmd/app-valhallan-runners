@@ -42,6 +42,8 @@ export default function NotificationsTab() {
         return 'chatbubble';
       case 'reminder':
         return 'alarm';
+      case 'workout_completed':
+        return 'checkmark-circle';
       default:
         return 'notifications';
     }
@@ -56,6 +58,8 @@ export default function NotificationsTab() {
         return '#9C27B0';
       case 'message':
         return '#2196F3';
+      case 'workout_completed':
+        return '#4CAF50';
       default:
         return '#FF6B35';
     }
