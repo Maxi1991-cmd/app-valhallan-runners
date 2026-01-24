@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primary: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#8B1A1A',
   },
   secondary: {
     backgroundColor: '#2A2A2A',
