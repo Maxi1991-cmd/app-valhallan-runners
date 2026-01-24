@@ -168,12 +168,14 @@ class RunCoachAPITester:
         # Test protected route without token
         self.log("Testing protected route without token...")
         response = self.make_request("GET", "/auth/me", auth=False)
-        if response and response.status_code in [401, 403]:
+        if response is None:
+            self.log("❌ No response received for protected route test", "ERROR")
+            return False
+        elif response.status_code in [401, 403]:
             self.log("✅ Protected route correctly requires authentication")
         else:
-            self.log(f"❌ Protected route should require auth but got: {response.status_code if response else 'No response'}", "ERROR")
-            if response:
-                self.log(f"Response: {response.text}", "ERROR")
+            self.log(f"❌ Protected route should require auth but got: {response.status_code}", "ERROR")
+            self.log(f"Response: {response.text}", "ERROR")
             return False
             
         return True
