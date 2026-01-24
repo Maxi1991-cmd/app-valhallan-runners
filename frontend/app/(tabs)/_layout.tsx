@@ -28,12 +28,15 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: '#1A1A1A',
           borderTopColor: '#333',
-          height: 90,
-          paddingBottom: 30,
-          paddingTop: 10,
+          height: 85,
+          paddingBottom: 25,
+          paddingTop: 8,
         },
         tabBarActiveTintColor: '#FF6B35',
         tabBarInactiveTintColor: '#666',
+        tabBarLabelStyle: {
+          fontSize: 10,
+        },
         headerStyle: {
           backgroundColor: '#0F0F0F',
         },
@@ -53,11 +56,29 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="calendar"
+        options={{
+          title: 'Calendario',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="calendar" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="programs"
         options={{
           title: 'Programmi',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar" size={size} color={color} />
+            <Ionicons name="fitness" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="compare"
+        options={{
+          title: 'Confronta',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="git-compare" size={size} color={color} />
           ),
         }}
       />
