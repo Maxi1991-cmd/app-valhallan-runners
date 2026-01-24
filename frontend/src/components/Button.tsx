@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#FF6B35',
+    borderColor: '#8B1A1A',
   },
   disabled: {
     opacity: 0.5,
