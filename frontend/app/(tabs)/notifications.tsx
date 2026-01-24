@@ -101,42 +101,78 @@ export default function NotificationsTab() {
     </Card>
   );
 
-  const renderNotification = ({ item }: { item: Notification }) => (
-    <TouchableOpacity
-      onPress={() => !item.read && markNotificationRead(item.id)}
-      activeOpacity={0.8}
-    >
-      <Card style={[styles.notificationCard, !item.read && styles.unreadCard]}>
-        <View style={styles.notificationContent}>
-          <View
-            style={[
-              styles.iconContainer,
-              { backgroundColor: `${getNotificationColor(item.notification_type)}20` },
-            ]}
-          >
-            <Ionicons
-              name={getNotificationIcon(item.notification_type)}
-              size={20}
-              color={getNotificationColor(item.notification_type)}
-            />
+  const renderNotification = ({ item }: { item: Notification }) => {
+    const relatedData = (item as any).related_data;
+    const isWorkoutCompleted = item.notification_type === 'workout_completed';
+
+    return (
+      <TouchableOpacity
+        onPress={() => !item.read && markNotificationRead(item.id)}
+        activeOpacity={0.8}
+      >
+        <Card style={[styles.notificationCard, !item.read && styles.unreadCard]}>
+          <View style={styles.notificationContent}>
+            <View
+              style={[
+                styles.iconContainer,
+                { backgroundColor: `${getNotificationColor(item.notification_type)}20` },
+              ]}
+            >
+              <Ionicons
+                name={getNotificationIcon(item.notification_type)}
+                size={20}
+                color={getNotificationColor(item.notification_type)}
+              />
+            </View>
+            <View style={styles.notificationText}>
+              <Text style={styles.notificationTitle}>{item.title}</Text>
+              <Text style={styles.notificationMessage} numberOfLines={2}>
+                {item.message}
+              </Text>
+              
+              {isWorkoutCompleted && relatedData?.actual_data && (
+                <View style={styles.workoutDetails}>
+                  {relatedData.actual_data.duration_minutes && (
+                    <Text style={styles.workoutDetailText}>
+                      Durata: {relatedData.actual_data.duration_minutes} min
+                    </Text>
+                  )}
+                  {relatedData.actual_data.distance_km && (
+                    <Text style={styles.workoutDetailText}>
+                      Distanza: {relatedData.actual_data.distance_km} km
+                    </Text>
+                  )}
+                  {relatedData.actual_data.avg_pace && (
+                    <Text style={styles.workoutDetailText}>
+                      Passo: {relatedData.actual_data.avg_pace}
+                    </Text>
+                  )}
+                  {relatedData.actual_data.avg_heart_rate && (
+                    <Text style={styles.workoutDetailText}>
+                      FC media: {relatedData.actual_data.avg_heart_rate} bpm
+                    </Text>
+                  )}
+                  {relatedData.actual_data.feeling && (
+                    <Text style={styles.workoutDetailText}>
+                      Sensazione: {relatedData.actual_data.feeling}
+                    </Text>
+                  )}
+                </View>
+              )}
+              
+              <Text style={styles.notificationTime}>
+                {formatDistanceToNow(new Date(item.created_at), {
+                  addSuffix: true,
+                  locale: it,
+                })}
+              </Text>
+            </View>
+            {!item.read && <View style={styles.unreadDot} />}
           </View>
-          <View style={styles.notificationText}>
-            <Text style={styles.notificationTitle}>{item.title}</Text>
-            <Text style={styles.notificationMessage} numberOfLines={2}>
-              {item.message}
-            </Text>
-            <Text style={styles.notificationTime}>
-              {formatDistanceToNow(new Date(item.created_at), {
-                addSuffix: true,
-                locale: it,
-              })}
-            </Text>
-          </View>
-          {!item.read && <View style={styles.unreadDot} />}
-        </View>
-      </Card>
-    </TouchableOpacity>
-  );
+        </Card>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
