@@ -306,7 +306,7 @@ export default function ProgramDetail() {
           <Card key={workout.id || index} style={styles.workoutCard}>
             <TouchableOpacity
               style={styles.workoutHeader}
-              onPress={() => !workout.completed && handleCompleteWorkout(workout.id)}
+              onPress={() => !workout.completed && openCompleteModal(workout)}
             >
               <View style={styles.checkboxContainer}>
                 <Ionicons
@@ -379,13 +379,201 @@ export default function ProgramDetail() {
             )}
 
             {workout.completed && workout.completed_date && (
-              <Text style={styles.completedDate}>
-                Completato il {workout.completed_date}
-              </Text>
+              <View style={styles.completedSection}>
+                <Text style={styles.completedDate}>
+                  Completato il {workout.completed_date}
+                </Text>
+                {workout.actual_data && (
+                  <View style={styles.actualDataContainer}>
+                    {workout.actual_data.duration_minutes && (
+                      <Text style={styles.actualDataText}>
+                        Durata: {workout.actual_data.duration_minutes} min
+                      </Text>
+                    )}
+                    {workout.actual_data.distance_km && (
+                      <Text style={styles.actualDataText}>
+                        Distanza: {workout.actual_data.distance_km} km
+                      </Text>
+                    )}
+                    {workout.actual_data.avg_pace && (
+                      <Text style={styles.actualDataText}>
+                        Passo: {workout.actual_data.avg_pace}
+                      </Text>
+                    )}
+                    {workout.actual_data.avg_heart_rate && (
+                      <Text style={styles.actualDataText}>
+                        FC media: {workout.actual_data.avg_heart_rate} bpm
+                      </Text>
+                    )}
+                    {workout.actual_data.feeling && (
+                      <Text style={styles.actualDataText}>
+                        Sensazione: {workout.actual_data.feeling}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {!workout.completed && (
+              <Button
+                title="Segna come completato"
+                onPress={() => openCompleteModal(workout)}
+                variant="outline"
+                size="small"
+                style={styles.completeButton}
+              />
             )}
           </Card>
         ))}
       </ScrollView>
+
+      {/* Complete Workout Modal */}
+      <Modal
+        visible={completeModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setCompleteModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Completa Allenamento</Text>
+              <TouchableOpacity onPress={() => setCompleteModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.modalSubtitle}>
+                {selectedWorkout?.title}
+              </Text>
+
+              <View style={styles.modalRow}>
+                <Input
+                  label="Durata (min)"
+                  value={completionData.duration_minutes}
+                  onChangeText={(text) =>
+                    setCompletionData({ ...completionData, duration_minutes: text })
+                  }
+                  placeholder="45"
+                  keyboardType="numeric"
+                  containerStyle={styles.halfInput}
+                />
+                <Input
+                  label="Distanza (km)"
+                  value={completionData.distance_km}
+                  onChangeText={(text) =>
+                    setCompletionData({ ...completionData, distance_km: text })
+                  }
+                  placeholder="8.5"
+                  keyboardType="decimal-pad"
+                  containerStyle={styles.halfInput}
+                />
+              </View>
+
+              <Input
+                label="Passo Medio"
+                value={completionData.avg_pace}
+                onChangeText={(text) =>
+                  setCompletionData({ ...completionData, avg_pace: text })
+                }
+                placeholder="5:30 min/km"
+              />
+
+              <View style={styles.modalRow}>
+                <Input
+                  label="FC Media (bpm)"
+                  value={completionData.avg_heart_rate}
+                  onChangeText={(text) =>
+                    setCompletionData({ ...completionData, avg_heart_rate: text })
+                  }
+                  placeholder="145"
+                  keyboardType="numeric"
+                  containerStyle={styles.halfInput}
+                />
+                <Input
+                  label="FC Max (bpm)"
+                  value={completionData.max_heart_rate}
+                  onChangeText={(text) =>
+                    setCompletionData({ ...completionData, max_heart_rate: text })
+                  }
+                  placeholder="175"
+                  keyboardType="numeric"
+                  containerStyle={styles.halfInput}
+                />
+              </View>
+
+              <Input
+                label="Calorie"
+                value={completionData.calories}
+                onChangeText={(text) =>
+                  setCompletionData({ ...completionData, calories: text })
+                }
+                placeholder="450"
+                keyboardType="numeric"
+              />
+
+              <Text style={styles.feelingLabel}>Come ti sei sentito?</Text>
+              <View style={styles.feelingContainer}>
+                {[
+                  { value: 'great', label: 'Ottimo', icon: 'happy' },
+                  { value: 'good', label: 'Bene', icon: 'happy-outline' },
+                  { value: 'ok', label: 'Ok', icon: 'remove' },
+                  { value: 'tired', label: 'Stanco', icon: 'sad-outline' },
+                  { value: 'exhausted', label: 'Esausto', icon: 'sad' },
+                ].map((feeling) => (
+                  <TouchableOpacity
+                    key={feeling.value}
+                    style={[
+                      styles.feelingButton,
+                      completionData.feeling === feeling.value && styles.feelingButtonActive,
+                    ]}
+                    onPress={() =>
+                      setCompletionData({ ...completionData, feeling: feeling.value })
+                    }
+                  >
+                    <Ionicons
+                      name={feeling.icon as any}
+                      size={24}
+                      color={completionData.feeling === feeling.value ? '#FFF' : '#999'}
+                    />
+                    <Text
+                      style={[
+                        styles.feelingText,
+                        completionData.feeling === feeling.value && styles.feelingTextActive,
+                      ]}
+                    >
+                      {feeling.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Input
+                label="Note"
+                value={completionData.notes}
+                onChangeText={(text) =>
+                  setCompletionData({ ...completionData, notes: text })
+                }
+                placeholder="Come è andato l'allenamento..."
+                multiline
+                numberOfLines={3}
+              />
+
+              <Button
+                title="Completa e Notifica Coach"
+                onPress={handleCompleteWorkout}
+                size="large"
+                style={styles.submitButton}
+              />
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
