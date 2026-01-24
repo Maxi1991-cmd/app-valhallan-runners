@@ -37,6 +37,7 @@ export default function RootLayout() {
         <Stack.Screen name="program/[id]" options={{ title: 'Programma' }} />
         <Stack.Screen name="program/create" options={{ title: 'Nuovo Programma' }} />
         <Stack.Screen name="program/edit/[id]" options={{ title: 'Modifica Programma' }} />
+        <Stack.Screen name="activity/upload" options={{ title: 'Carica Attività' }} />
       </Stack>
     </View>
   );
