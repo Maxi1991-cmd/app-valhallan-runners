@@ -184,7 +184,7 @@ class RunCoachAPITester:
         self.log("Testing athlete creation...")
         athlete_data = {
             "name": "Giuseppe Verdi",
-            "email": f"athlete_{uuid.uuid4().hex[:8]}@runcoach.test",
+            "email": f"athlete_{uuid.uuid4().hex[:8]}@example.com",
             "phone": "+39 123 456 7890",
             "birth_date": "1990-05-15",
             "notes": "Maratoneta esperto, obiettivo sub 3:00",
