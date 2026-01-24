@@ -85,7 +85,7 @@ class RunCoachAPITester:
         self.log("=== Testing Authentication ===")
         
         # Generate unique test data
-        test_email = f"coach_{uuid.uuid4().hex[:8]}@runcoach.test"
+        test_email = f"coach_{uuid.uuid4().hex[:8]}@example.com"
         test_password = "SecurePass123!"
         test_name = "Marco Rossi"
         
