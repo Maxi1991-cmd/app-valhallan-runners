@@ -217,13 +217,22 @@ export default function AthleteDetail() {
               ) : (
                 <Text style={styles.emptyText}>Nessun programma assegnato</Text>
               )}
-              <Button
-                title="Nuovo Programma"
-                onPress={() => router.push('/program/create')}
-                variant="outline"
-                size="small"
-                style={styles.newProgramButton}
-              />
+              <View style={styles.buttonsRow}>
+                <Button
+                  title="Nuovo Programma"
+                  onPress={() => router.push('/program/create')}
+                  variant="outline"
+                  size="small"
+                  style={styles.actionButtonSmall}
+                />
+                <Button
+                  title="Carica Attività"
+                  onPress={() => router.push(`/activity/upload?athleteId=${id}`)}
+                  variant="secondary"
+                  size="small"
+                  style={styles.actionButtonSmall}
+                />
+              </View>
             </Card>
 
             {athlete.notes && (
