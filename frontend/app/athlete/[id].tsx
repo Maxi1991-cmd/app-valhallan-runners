@@ -500,6 +500,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: 16,
   },
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
+  },
+  actionButtonSmall: {
+    flex: 1,
+  },
   newProgramButton: {
     marginTop: 12,
   },
