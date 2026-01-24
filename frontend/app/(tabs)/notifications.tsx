@@ -297,6 +297,17 @@ const styles = StyleSheet.create({
     color: '#999',
     lineHeight: 18,
   },
+  workoutDetails: {
+    marginTop: 8,
+    backgroundColor: '#252525',
+    padding: 10,
+    borderRadius: 8,
+  },
+  workoutDetailText: {
+    fontSize: 12,
+    color: '#CCC',
+    marginBottom: 4,
+  },
   notificationTime: {
     fontSize: 11,
     color: '#666',
