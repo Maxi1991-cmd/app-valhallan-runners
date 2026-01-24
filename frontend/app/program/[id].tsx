@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, Modal, KeyboardAvoidingView, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
 import { programAPI } from '../../src/services/api';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
+import { Input } from '../../src/components/Input';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,14 +14,30 @@ import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
 export default function ProgramDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { athletes, deleteProgram } = useDataStore();
+  const { athletes, deleteProgram, fetchNotifications } = useDataStore();
   const [program, setProgram] = useState<TrainingProgram | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [completeModalVisible, setCompleteModalVisible] = useState(false);
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutSession | null>(null);
+  const [completionData, setCompletionData] = useState({
+    duration_minutes: '',
+    distance_km: '',
+    avg_pace: '',
+    avg_heart_rate: '',
+    max_heart_rate: '',
+    calories: '',
+    feeling: 'good',
+    notes: '',
+  });
 
   const loadProgram = async () => {
     try {
@@ -71,10 +88,47 @@ export default function ProgramDetail() {
     );
   };
 
-  const handleCompleteWorkout = async (workoutId: string) => {
+  const openCompleteModal = (workout: WorkoutSession) => {
+    setSelectedWorkout(workout);
+    setCompletionData({
+      duration_minutes: workout.duration_minutes?.toString() || '',
+      distance_km: workout.distance_km?.toString() || '',
+      avg_pace: workout.target_pace || '',
+      avg_heart_rate: '',
+      max_heart_rate: '',
+      calories: '',
+      feeling: 'good',
+      notes: '',
+    });
+    setCompleteModalVisible(true);
+  };
+
+  const handleCompleteWorkout = async () => {
+    if (!selectedWorkout) return;
+
     try {
-      await programAPI.completeWorkout(id!, workoutId);
+      const token = await AsyncStorage.getItem('token');
+      const data = {
+        duration_minutes: completionData.duration_minutes ? parseInt(completionData.duration_minutes) : null,
+        distance_km: completionData.distance_km ? parseFloat(completionData.distance_km) : null,
+        avg_pace: completionData.avg_pace || null,
+        avg_heart_rate: completionData.avg_heart_rate ? parseInt(completionData.avg_heart_rate) : null,
+        max_heart_rate: completionData.max_heart_rate ? parseInt(completionData.max_heart_rate) : null,
+        calories: completionData.calories ? parseInt(completionData.calories) : null,
+        feeling: completionData.feeling,
+        notes: completionData.notes || null,
+      };
+
+      await axios.put(
+        `${BASE_URL}/api/programs/${id}/workouts/${selectedWorkout.id}/complete`,
+        data,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setCompleteModalVisible(false);
       loadProgram();
+      fetchNotifications(); // Refresh notifications
+      Alert.alert('Successo', 'Allenamento completato! Il coach è stato notificato.');
     } catch (error) {
       Alert.alert('Errore', 'Impossibile completare allenamento');
     }
