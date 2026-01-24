@@ -730,9 +730,101 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontStyle: 'italic',
   },
+  completedSection: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
   completedDate: {
     fontSize: 11,
     color: '#4CAF50',
+  },
+  actualDataContainer: {
+    backgroundColor: '#252525',
+    padding: 10,
+    borderRadius: 8,
     marginTop: 8,
+  },
+  actualDataText: {
+    fontSize: 12,
+    color: '#CCC',
+    marginBottom: 4,
+  },
+  completeButton: {
+    marginTop: 12,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#1A1A1A',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '90%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  modalBody: {
+    padding: 20,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#FF6B35',
+    fontWeight: '600',
+    marginBottom: 20,
+  },
+  modalRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  halfInput: {
+    flex: 1,
+  },
+  feelingLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#CCC',
+    marginBottom: 12,
+  },
+  feelingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  feelingButton: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    backgroundColor: '#252525',
+  },
+  feelingButtonActive: {
+    backgroundColor: '#FF6B35',
+  },
+  feelingText: {
+    fontSize: 10,
+    color: '#999',
+    marginTop: 4,
+  },
+  feelingTextActive: {
+    color: '#FFF',
+  },
+  submitButton: {
+    marginTop: 8,
+    marginBottom: 40,
   },
 });
