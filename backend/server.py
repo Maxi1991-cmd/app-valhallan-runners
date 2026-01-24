@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from bson import ObjectId
+import gpxpy
+import io
+import base64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -131,6 +134,7 @@ class AthleteProfileUpdate(BaseModel):
 class WorkoutSession(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     day: str  # Day of the week or date
+    date: Optional[str] = None  # Specific date YYYY-MM-DD for calendar
     title: str
     description: str
     workout_type: str  # easy, tempo, interval, long_run, recovery, etc.
@@ -175,16 +179,18 @@ class TrainingProgramUpdate(BaseModel):
 class NotificationBase(BaseModel):
     title: str
     message: str
-    notification_type: str  # payment_due, certificate_expiry, message, reminder
+    notification_type: str  # payment_due, certificate_expiry, message, reminder, workout_completed
 
 class NotificationCreate(NotificationBase):
     recipient_id: str
+    related_data: Optional[dict] = None  # Additional data like workout details
 
 class Notification(NotificationBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     sender_id: str
     recipient_id: str
     read: bool = False
+    related_data: Optional[dict] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 # Activity Data Models (for analytics)
@@ -201,8 +207,9 @@ class ActivityData(BaseModel):
     calories: Optional[int] = None
     elevation_gain: Optional[int] = None
     avg_power: Optional[int] = None
-    source: str = "manual"  # manual, garmin, polar, suunto, strava, fitbit
+    source: str = "manual"  # manual, gpx, fit, garmin, polar, suunto, strava, fitbit
     raw_data: Optional[dict] = None
+    gpx_points: Optional[List[dict]] = None  # GPS track points
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class ActivityDataCreate(BaseModel):
@@ -218,6 +225,17 @@ class ActivityDataCreate(BaseModel):
     elevation_gain: Optional[int] = None
     avg_power: Optional[int] = None
     source: str = "manual"
+
+# Workout Completion Model
+class WorkoutCompletionData(BaseModel):
+    duration_minutes: Optional[int] = None
+    distance_km: Optional[float] = None
+    avg_pace: Optional[str] = None
+    avg_heart_rate: Optional[int] = None
+    max_heart_rate: Optional[int] = None
+    calories: Optional[int] = None
+    notes: Optional[str] = None
+    feeling: Optional[str] = None  # great, good, ok, tired, exhausted
 
 # ==================== AUTH HELPERS ====================
 
@@ -253,6 +271,138 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     if user is None:
         raise credentials_exception
     return user
+
+# ==================== GPX/FIT PARSING HELPERS ====================
+
+def parse_gpx_file(gpx_content: str) -> dict:
+    """Parse GPX file and extract activity data"""
+    try:
+        gpx = gpxpy.parse(gpx_content)
+        
+        total_distance = 0
+        total_time = 0
+        elevation_gain = 0
+        points = []
+        heart_rates = []
+        
+        for track in gpx.tracks:
+            for segment in track.segments:
+                prev_point = None
+                for point in segment.points:
+                    points.append({
+                        "lat": point.latitude,
+                        "lon": point.longitude,
+                        "ele": point.elevation,
+                        "time": point.time.isoformat() if point.time else None
+                    })
+                    
+                    if prev_point:
+                        total_distance += point.distance_3d(prev_point) or point.distance_2d(prev_point) or 0
+                        if point.elevation and prev_point.elevation:
+                            ele_diff = point.elevation - prev_point.elevation
+                            if ele_diff > 0:
+                                elevation_gain += ele_diff
+                    
+                    # Extract heart rate from extensions if available
+                    if point.extensions:
+                        for ext in point.extensions:
+                            hr_elem = ext.find('.//{http://www.garmin.com/xmlschemas/TrackPointExtension/v1}hr')
+                            if hr_elem is not None:
+                                heart_rates.append(int(hr_elem.text))
+                    
+                    prev_point = point
+        
+        # Calculate duration
+        if gpx.tracks and gpx.tracks[0].segments:
+            seg = gpx.tracks[0].segments[0]
+            if seg.points and len(seg.points) > 1:
+                start_time = seg.points[0].time
+                end_time = seg.points[-1].time
+                if start_time and end_time:
+                    total_time = (end_time - start_time).total_seconds() / 60
+        
+        # Calculate pace (min/km)
+        distance_km = total_distance / 1000
+        avg_pace = None
+        if distance_km > 0 and total_time > 0:
+            pace_min = total_time / distance_km
+            pace_sec = (pace_min % 1) * 60
+            avg_pace = f"{int(pace_min)}:{int(pace_sec):02d}"
+        
+        # Get activity date
+        activity_date = None
+        if gpx.tracks and gpx.tracks[0].segments and gpx.tracks[0].segments[0].points:
+            first_point = gpx.tracks[0].segments[0].points[0]
+            if first_point.time:
+                activity_date = first_point.time.strftime("%Y-%m-%d")
+        
+        return {
+            "distance_km": round(distance_km, 2),
+            "duration_minutes": int(total_time),
+            "elevation_gain": int(elevation_gain),
+            "avg_pace": avg_pace,
+            "avg_heart_rate": int(sum(heart_rates) / len(heart_rates)) if heart_rates else None,
+            "max_heart_rate": max(heart_rates) if heart_rates else None,
+            "date": activity_date or datetime.utcnow().strftime("%Y-%m-%d"),
+            "gpx_points": points[:500]  # Limit points to reduce storage
+        }
+    except Exception as e:
+        logger.error(f"Error parsing GPX: {e}")
+        raise HTTPException(status_code=400, detail=f"Error parsing GPX file: {str(e)}")
+
+def parse_fit_file(fit_content: bytes) -> dict:
+    """Parse FIT file and extract activity data"""
+    try:
+        from fitparse import FitFile
+        
+        fitfile = FitFile(io.BytesIO(fit_content))
+        
+        total_distance = 0
+        total_time = 0
+        elevation_gain = 0
+        heart_rates = []
+        speeds = []
+        activity_date = None
+        
+        for record in fitfile.get_messages('record'):
+            for data in record:
+                if data.name == 'heart_rate' and data.value:
+                    heart_rates.append(data.value)
+                elif data.name == 'distance' and data.value:
+                    total_distance = data.value
+                elif data.name == 'enhanced_speed' and data.value:
+                    speeds.append(data.value)
+                elif data.name == 'total_ascent' and data.value:
+                    elevation_gain = data.value
+        
+        for record in fitfile.get_messages('session'):
+            for data in record:
+                if data.name == 'total_elapsed_time' and data.value:
+                    total_time = data.value / 60  # Convert to minutes
+                elif data.name == 'start_time' and data.value:
+                    activity_date = data.value.strftime("%Y-%m-%d")
+        
+        distance_km = total_distance / 1000 if total_distance else 0
+        
+        # Calculate pace
+        avg_pace = None
+        if distance_km > 0 and total_time > 0:
+            pace_min = total_time / distance_km
+            pace_sec = (pace_min % 1) * 60
+            avg_pace = f"{int(pace_min)}:{int(pace_sec):02d}"
+        
+        return {
+            "distance_km": round(distance_km, 2),
+            "duration_minutes": int(total_time),
+            "elevation_gain": int(elevation_gain) if elevation_gain else None,
+            "avg_pace": avg_pace,
+            "avg_heart_rate": int(sum(heart_rates) / len(heart_rates)) if heart_rates else None,
+            "max_heart_rate": max(heart_rates) if heart_rates else None,
+            "date": activity_date or datetime.utcnow().strftime("%Y-%m-%d"),
+        }
+    except Exception as e:
+        logger.error(f"Error parsing FIT: {e}")
+        raise HTTPException(status_code=400, detail=f"Error parsing FIT file: {str(e)}")
 
 # ==================== AUTH ROUTES ====================
 
@@ -558,15 +708,35 @@ async def delete_program(program_id: str, current_user: dict = Depends(get_curre
     await db.programs.delete_one({"id": program_id})
     return {"message": "Program deleted successfully"}
 
-# ==================== WORKOUT COMPLETION ====================
+# ==================== WORKOUT COMPLETION (with notification to coach) ====================
 
 @api_router.put("/programs/{program_id}/workouts/{workout_id}/complete")
-async def complete_workout(program_id: str, workout_id: str, actual_data: Optional[dict] = None, current_user: dict = Depends(get_current_user)):
+async def complete_workout(
+    program_id: str,
+    workout_id: str,
+    completion_data: Optional[WorkoutCompletionData] = None,
+    current_user: dict = Depends(get_current_user)
+):
     program = await db.programs.find_one({"id": program_id})
     if not program:
         raise HTTPException(status_code=404, detail="Program not found")
     
+    # Find the workout
+    workout = None
+    for w in program.get("workouts", []):
+        if w.get("id") == workout_id:
+            workout = w
+            break
+    
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    
     completed_date = datetime.utcnow().strftime("%Y-%m-%d")
+    
+    # Prepare actual data
+    actual_data = {}
+    if completion_data:
+        actual_data = {k: v for k, v in completion_data.dict().items() if v is not None}
     
     await db.programs.update_one(
         {"id": program_id, "workouts.id": workout_id},
@@ -577,7 +747,128 @@ async def complete_workout(program_id: str, workout_id: str, actual_data: Option
         }}
     )
     
-    return {"message": "Workout marked as complete"}
+    # Get athlete info
+    athlete = await db.athletes.find_one({"id": program["athlete_id"]})
+    athlete_name = athlete["name"] if athlete else "Atleta"
+    
+    # Send notification to coach
+    notification = {
+        "id": str(uuid.uuid4()),
+        "sender_id": current_user["id"],
+        "recipient_id": program["coach_id"],
+        "title": f"Allenamento completato - {athlete_name}",
+        "message": f"{athlete_name} ha completato '{workout.get('title', 'Allenamento')}'",
+        "notification_type": "workout_completed",
+        "read": False,
+        "related_data": {
+            "program_id": program_id,
+            "program_name": program.get("name"),
+            "workout_id": workout_id,
+            "workout_title": workout.get("title"),
+            "workout_type": workout.get("workout_type"),
+            "athlete_id": program["athlete_id"],
+            "athlete_name": athlete_name,
+            "completed_date": completed_date,
+            "actual_data": actual_data
+        },
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.notifications.insert_one(notification)
+    
+    return {"message": "Workout marked as complete", "notification_sent": True}
+
+# ==================== CALENDAR ROUTES ====================
+
+@api_router.get("/calendar/workouts")
+async def get_calendar_workouts(
+    athlete_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all workouts for calendar view"""
+    query = {}
+    
+    if current_user["role"] == "coach":
+        query["coach_id"] = current_user["id"]
+        if athlete_id:
+            query["athlete_id"] = athlete_id
+    else:
+        athlete = await db.athletes.find_one({"user_id": current_user["id"]})
+        if athlete:
+            query["athlete_id"] = athlete["id"]
+        else:
+            return {"workouts": []}
+    
+    programs = await db.programs.find(query).to_list(1000)
+    
+    calendar_workouts = []
+    for program in programs:
+        athlete = await db.athletes.find_one({"id": program["athlete_id"]})
+        athlete_name = athlete["name"] if athlete else "Atleta"
+        
+        for workout in program.get("workouts", []):
+            # Use workout date if available, otherwise use day field
+            workout_date = workout.get("date") or workout.get("day")
+            
+            # Filter by date range if provided
+            if start_date and workout_date and workout_date < start_date:
+                continue
+            if end_date and workout_date and workout_date > end_date:
+                continue
+            
+            calendar_workouts.append({
+                "id": workout.get("id"),
+                "program_id": program["id"],
+                "program_name": program.get("name"),
+                "athlete_id": program["athlete_id"],
+                "athlete_name": athlete_name,
+                "date": workout_date,
+                "title": workout.get("title"),
+                "description": workout.get("description"),
+                "workout_type": workout.get("workout_type"),
+                "duration_minutes": workout.get("duration_minutes"),
+                "distance_km": workout.get("distance_km"),
+                "target_pace": workout.get("target_pace"),
+                "heart_rate_zone": workout.get("heart_rate_zone"),
+                "completed": workout.get("completed", False),
+                "completed_date": workout.get("completed_date"),
+                "actual_data": workout.get("actual_data")
+            })
+    
+    # Sort by date
+    calendar_workouts.sort(key=lambda x: x.get("date") or "")
+    
+    return {"workouts": calendar_workouts}
+
+@api_router.get("/calendar/activities")
+async def get_calendar_activities(
+    athlete_id: str,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all activities for calendar view"""
+    athlete = await db.athletes.find_one({"id": athlete_id})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] == "coach" and athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    query = {"athlete_id": athlete_id}
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in query:
+            query["date"]["$lte"] = end_date
+        else:
+            query["date"] = {"$lte": end_date}
+    
+    activities = await db.activities.find(query).sort("date", -1).to_list(1000)
+    
+    return {"activities": [ActivityData(**a).dict() for a in activities]}
 
 # ==================== NOTIFICATION ROUTES ====================
 
@@ -647,6 +938,81 @@ async def create_activity(activity: ActivityDataCreate, current_user: dict = Dep
     
     return ActivityData(**activity_dict)
 
+@api_router.post("/activities/upload-gpx")
+async def upload_gpx_activity(
+    athlete_id: str,
+    activity_type: str = "running",
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload and parse GPX file to create activity"""
+    athlete = await db.athletes.find_one({"id": athlete_id})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] == "coach" and athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    content = await file.read()
+    gpx_data = parse_gpx_file(content.decode('utf-8'))
+    
+    activity_dict = {
+        "id": str(uuid.uuid4()),
+        "athlete_id": athlete_id,
+        "date": gpx_data["date"],
+        "activity_type": activity_type,
+        "duration_minutes": gpx_data["duration_minutes"],
+        "distance_km": gpx_data["distance_km"],
+        "avg_pace": gpx_data["avg_pace"],
+        "avg_heart_rate": gpx_data.get("avg_heart_rate"),
+        "max_heart_rate": gpx_data.get("max_heart_rate"),
+        "elevation_gain": gpx_data.get("elevation_gain"),
+        "source": "gpx",
+        "gpx_points": gpx_data.get("gpx_points"),
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.activities.insert_one(activity_dict)
+    
+    return ActivityData(**activity_dict)
+
+@api_router.post("/activities/upload-fit")
+async def upload_fit_activity(
+    athlete_id: str,
+    activity_type: str = "running",
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Upload and parse FIT file to create activity"""
+    athlete = await db.athletes.find_one({"id": athlete_id})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] == "coach" and athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    content = await file.read()
+    fit_data = parse_fit_file(content)
+    
+    activity_dict = {
+        "id": str(uuid.uuid4()),
+        "athlete_id": athlete_id,
+        "date": fit_data["date"],
+        "activity_type": activity_type,
+        "duration_minutes": fit_data["duration_minutes"],
+        "distance_km": fit_data["distance_km"],
+        "avg_pace": fit_data["avg_pace"],
+        "avg_heart_rate": fit_data.get("avg_heart_rate"),
+        "max_heart_rate": fit_data.get("max_heart_rate"),
+        "elevation_gain": fit_data.get("elevation_gain"),
+        "source": "fit",
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.activities.insert_one(activity_dict)
+    
+    return ActivityData(**activity_dict)
+
 @api_router.get("/activities", response_model=List[ActivityData])
 async def get_activities(
     athlete_id: str,
@@ -675,7 +1041,7 @@ async def get_activities(
     
     return [ActivityData(**a) for a in activities]
 
-# ==================== ANALYTICS ROUTES ====================
+# ==================== ANALYTICS & COMPARISON ROUTES ====================
 
 @api_router.get("/analytics/athlete/{athlete_id}")
 async def get_athlete_analytics(
@@ -747,6 +1113,105 @@ async def get_athlete_analytics(
         "pace_trend": pace_trend,
         "biometrics": athlete.get("biometrics", {})
     }
+
+@api_router.get("/analytics/compare/{athlete_id}")
+async def compare_athlete_data(
+    athlete_id: str,
+    period1_start: str,
+    period1_end: str,
+    period2_start: str,
+    period2_end: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Compare athlete performance between two time periods"""
+    athlete = await db.athletes.find_one({"id": athlete_id})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] == "coach" and athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get activities for period 1
+    activities1 = await db.activities.find({
+        "athlete_id": athlete_id,
+        "date": {"$gte": period1_start, "$lte": period1_end}
+    }).to_list(1000)
+    
+    # Get activities for period 2
+    activities2 = await db.activities.find({
+        "athlete_id": athlete_id,
+        "date": {"$gte": period2_start, "$lte": period2_end}
+    }).to_list(1000)
+    
+    def calculate_period_stats(activities):
+        if not activities:
+            return {
+                "total_distance_km": 0,
+                "total_duration_minutes": 0,
+                "total_activities": 0,
+                "avg_distance_per_activity": 0,
+                "avg_pace": None,
+                "avg_heart_rate": None,
+                "total_elevation": 0
+            }
+        
+        total_distance = sum(a.get("distance_km", 0) or 0 for a in activities)
+        total_duration = sum(a.get("duration_minutes", 0) or 0 for a in activities)
+        total_elevation = sum(a.get("elevation_gain", 0) or 0 for a in activities)
+        heart_rates = [a.get("avg_heart_rate") for a in activities if a.get("avg_heart_rate")]
+        
+        # Calculate average pace
+        avg_pace = None
+        if total_distance > 0 and total_duration > 0:
+            pace_min = total_duration / total_distance
+            pace_sec = (pace_min % 1) * 60
+            avg_pace = f"{int(pace_min)}:{int(pace_sec):02d}"
+        
+        return {
+            "total_distance_km": round(total_distance, 2),
+            "total_duration_minutes": total_duration,
+            "total_activities": len(activities),
+            "avg_distance_per_activity": round(total_distance / len(activities), 2),
+            "avg_pace": avg_pace,
+            "avg_heart_rate": int(sum(heart_rates) / len(heart_rates)) if heart_rates else None,
+            "total_elevation": total_elevation
+        }
+    
+    period1_stats = calculate_period_stats(activities1)
+    period2_stats = calculate_period_stats(activities2)
+    
+    # Calculate differences
+    def calc_diff(v1, v2):
+        if v1 is None or v2 is None:
+            return None
+        if v2 == 0:
+            return None
+        return round(((v1 - v2) / v2) * 100, 1)
+    
+    comparison = {
+        "period1": {
+            "start": period1_start,
+            "end": period1_end,
+            "stats": period1_stats
+        },
+        "period2": {
+            "start": period2_start,
+            "end": period2_end,
+            "stats": period2_stats
+        },
+        "differences": {
+            "distance_change_pct": calc_diff(period1_stats["total_distance_km"], period2_stats["total_distance_km"]),
+            "duration_change_pct": calc_diff(period1_stats["total_duration_minutes"], period2_stats["total_duration_minutes"]),
+            "activities_change_pct": calc_diff(period1_stats["total_activities"], period2_stats["total_activities"]),
+            "elevation_change_pct": calc_diff(period1_stats["total_elevation"], period2_stats["total_elevation"]),
+        },
+        "summary": {
+            "improved_distance": period1_stats["total_distance_km"] > period2_stats["total_distance_km"],
+            "improved_volume": period1_stats["total_activities"] > period2_stats["total_activities"],
+        }
+    }
+    
+    return comparison
 
 # ==================== EXPIRY CHECK ROUTES ====================
 
