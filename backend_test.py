@@ -141,10 +141,14 @@ class RunCoachAPITester:
         }
         
         response = self.make_request("POST", "/auth/login", wrong_login_data, auth=False)
-        if response and response.status_code == 401:
+        if response is None:
+            self.log("❌ No response received for invalid login", "ERROR")
+            return False
+        elif response.status_code == 401:
             self.log("✅ Login correctly rejected invalid credentials")
         else:
-            self.log(f"❌ Login should reject invalid credentials: {response.status_code if response else 'No response'}", "ERROR")
+            self.log(f"❌ Login should reject invalid credentials but got: {response.status_code}", "ERROR")
+            self.log(f"Response: {response.text}", "ERROR")
             return False
         
         # Test /auth/me endpoint
