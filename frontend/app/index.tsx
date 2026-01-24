@@ -20,28 +20,31 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.iconContainer}>
-          <Ionicons name="fitness" size={80} color="#FF6B35" />
-        </View>
-        <Text style={styles.title}>RunCoach Pro</Text>
+        <Image
+          source={require('../assets/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>VALHALLAN</Text>
+        <Text style={styles.titleRed}>RUNNERS</Text>
         <Text style={styles.subtitle}>Gestisci i tuoi atleti, crea programmi di allenamento e monitora i progressi</Text>
       </View>
 
       <View style={styles.features}>
         <View style={styles.featureItem}>
-          <Ionicons name="people" size={24} color="#FF6B35" />
+          <Ionicons name="people" size={24} color="#8B1A1A" />
           <Text style={styles.featureText}>Profili Atleti</Text>
         </View>
         <View style={styles.featureItem}>
-          <Ionicons name="calendar" size={24} color="#FF6B35" />
+          <Ionicons name="calendar" size={24} color="#8B1A1A" />
           <Text style={styles.featureText}>Programmazione</Text>
         </View>
         <View style={styles.featureItem}>
-          <Ionicons name="analytics" size={24} color="#FF6B35" />
+          <Ionicons name="analytics" size={24} color="#8B1A1A" />
           <Text style={styles.featureText}>Analisi Dati</Text>
         </View>
         <View style={styles.featureItem}>
-          <Ionicons name="notifications" size={24} color="#FF6B35" />
+          <Ionicons name="notifications" size={24} color="#8B1A1A" />
           <Text style={styles.featureText}>Notifiche</Text>
         </View>
       </View>
@@ -71,40 +74,44 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#0A0A0A',
     padding: 24,
     justifyContent: 'center',
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255, 107, 53, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
+  logo: {
+    width: 180,
+    height: 180,
+    marginBottom: 16,
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: '800',
-    color: '#FFF',
-    marginBottom: 12,
+    color: '#D4B896',
+    letterSpacing: 4,
+  },
+  titleRed: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#8B1A1A',
+    letterSpacing: 3,
+    marginBottom: 16,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#999',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
+    paddingHorizontal: 20,
   },
   features: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 16,
+    gap: 12,
     marginBottom: 40,
   },
   featureItem: {
@@ -112,13 +119,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#1A1A1A',
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     borderRadius: 20,
     gap: 8,
+    borderWidth: 1,
+    borderColor: '#2A2A2A',
   },
   featureText: {
-    color: '#FFF',
-    fontSize: 14,
+    color: '#D4B896',
+    fontSize: 13,
     fontWeight: '500',
   },
   buttons: {
