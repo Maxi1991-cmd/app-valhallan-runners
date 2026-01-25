@@ -245,7 +245,7 @@ export default function AthleteDetail() {
                     <View>
                       <Text style={styles.programName}>{program.name}</Text>
                       <Text style={styles.programDates}>
-                        {safeFormatDate(program.start_date, 'd MMM')} - {safeFormatDate(program.end_date, 'd MMM yyyy')}
+                        {safeFormatDate(program.start_date, 'short')} - {safeFormatDate(program.end_date, 'long')}
                       </Text>
                     </View>
                     <Ionicons name="chevron-forward" size={20} color="#666" />
