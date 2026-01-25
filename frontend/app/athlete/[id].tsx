@@ -207,8 +207,9 @@ export default function AthleteDetail() {
                     <View>
                       <Text style={styles.programName}>{program.name}</Text>
                       <Text style={styles.programDates}>
-                        {format(new Date(program.start_date), 'd MMM', { locale: it })} -{' '}
-                        {format(new Date(program.end_date), 'd MMM yyyy', { locale: it })}
+                        {program.start_date && program.end_date
+                          ? `${format(new Date(program.start_date), 'd MMM', { locale: it })} - ${format(new Date(program.end_date), 'd MMM yyyy', { locale: it })}`
+                          : 'Date non disponibili'}
                       </Text>
                     </View>
                     <Ionicons name="chevron-forward" size={20} color="#666" />
