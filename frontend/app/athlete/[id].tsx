@@ -13,28 +13,36 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
 const safeFormatDate = (dateString?: string | null) => {
-  if (!dateString) return '--';
+  try {
+    if (!dateString || dateString === '') return '--';
 
-  const date = new Date(dateString);
+    const date = new Date(dateString);
 
-  if (isNaN(date.getTime())) {
+    if (isNaN(date.getTime())) {
+      return '--';
+    }
+
+    return date.toLocaleDateString('it-IT');
+  } catch (e) {
     return '--';
   }
-
-  return date.toLocaleDateString('it-IT');
 };
 
 // Funzione per verificare se una data è scaduta
 const isDateExpired = (dateString?: string | null): boolean => {
-  if (!dateString) return false;
-  
-  const date = new Date(dateString);
-  
-  if (isNaN(date.getTime())) {
+  try {
+    if (!dateString || dateString === '') return false;
+    
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) {
+      return false;
+    }
+    
+    return date < new Date();
+  } catch (e) {
     return false;
   }
-  
-  return date < new Date();
 };
 
 export default function AthleteDetail() {
