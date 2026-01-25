@@ -12,44 +12,29 @@ import { AthleteProfile } from '../../src/types';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
-// Funzione sicura per formattare le date
-const safeFormatDate = (dateString: string | undefined | null, formatType: 'short' | 'long' = 'short'): string => {
-  if (!dateString || dateString === '' || dateString === 'undefined' || dateString === 'null') {
+const safeFormatDate = (dateString?: string | null) => {
+  if (!dateString) return '--';
+
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) {
     return '--';
   }
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return '--';
-    }
-    const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
-    const day = date.getDate();
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-    
-    if (formatType === 'long') {
-      return `${day} ${month} ${year}`;
-    }
-    return `${day} ${month}`;
-  } catch (e) {
-    return '--';
-  }
+
+  return date.toLocaleDateString('it-IT');
 };
 
 // Funzione per verificare se una data è scaduta
-const isDateExpired = (dateString: string | undefined | null): boolean => {
-  if (!dateString || dateString === '' || dateString === 'undefined' || dateString === 'null') {
+const isDateExpired = (dateString?: string | null): boolean => {
+  if (!dateString) return false;
+  
+  const date = new Date(dateString);
+  
+  if (isNaN(date.getTime())) {
     return false;
   }
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return false;
-    }
-    return date < new Date();
-  } catch (e) {
-    return false;
-  }
+  
+  return date < new Date();
 };
 
 export default function AthleteDetail() {
