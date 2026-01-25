@@ -9,10 +9,22 @@ import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AthleteProfile } from '../../src/types';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+
+// Funzione sicura per formattare le date
+const safeFormatDate = (dateString: string | undefined | null, formatStr: string): string => {
+  if (!dateString) return '--';
+  try {
+    const date = parseISO(dateString);
+    if (!isValid(date)) return '--';
+    return format(date, formatStr, { locale: it });
+  } catch {
+    return '--';
+  }
+};
 
 export default function AthleteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
