@@ -1225,38 +1225,52 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
     warnings = []
     today = datetime.utcnow().date()
     
+    # Helper function per parsare date in vari formati
+    def parse_date_safe(date_string):
+        if not date_string:
+            return None
+        formats = ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d"]
+        for fmt in formats:
+            try:
+                return datetime.strptime(date_string, fmt).date()
+            except ValueError:
+                continue
+        return None
+    
     for athlete in athletes:
         # Check medical certificate
         cert = athlete.get("medical_certificate", {})
         if cert.get("expiry_date"):
-            expiry = datetime.strptime(cert["expiry_date"], "%Y-%m-%d").date()
-            days_until = (expiry - today).days
-            if days_until <= 30:
-                warnings.append({
-                    "type": "certificate_expiry",
-                    "athlete_id": athlete["id"],
-                    "athlete_name": athlete["name"],
-                    "days_until": days_until,
-                    "expiry_date": cert["expiry_date"],
-                    "urgent": days_until <= 7
-                })
+            expiry = parse_date_safe(cert["expiry_date"])
+            if expiry:
+                days_until = (expiry - today).days
+                if days_until <= 30:
+                    warnings.append({
+                        "type": "certificate_expiry",
+                        "athlete_id": athlete["id"],
+                        "athlete_name": athlete["name"],
+                        "days_until": days_until,
+                        "expiry_date": cert["expiry_date"],
+                        "urgent": days_until <= 7
+                    })
         
         # Check unpaid payments
         for payment in athlete.get("payments", []):
             if not payment.get("paid"):
-                due_date = datetime.strptime(payment["due_date"], "%Y-%m-%d").date()
-                days_overdue = (today - due_date).days
-                if days_overdue >= 0:
-                    warnings.append({
-                        "type": "payment_due",
-                        "athlete_id": athlete["id"],
-                        "athlete_name": athlete["name"],
-                        "payment_id": payment["id"],
-                        "month": payment["month"],
-                        "amount": payment["amount"],
-                        "days_overdue": days_overdue,
-                        "urgent": days_overdue >= 7
-                    })
+                due_date = parse_date_safe(payment.get("due_date"))
+                if due_date:
+                    days_overdue = (today - due_date).days
+                    if days_overdue >= 0:
+                        warnings.append({
+                            "type": "payment_due",
+                            "athlete_id": athlete["id"],
+                            "athlete_name": athlete["name"],
+                            "payment_id": payment["id"],
+                            "month": payment["month"],
+                            "amount": payment["amount"],
+                            "days_overdue": days_overdue,
+                            "urgent": days_overdue >= 7
+                        })
     
     return {"warnings": warnings}
 
