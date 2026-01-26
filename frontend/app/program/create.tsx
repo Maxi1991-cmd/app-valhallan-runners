@@ -74,13 +74,14 @@ export default function CreateProgram() {
   ];
 
   const addWorkout = () => {
-    if (!newWorkout.day || !newWorkout.title || !newWorkout.description) {
-      Alert.alert('Errore', 'Compila giorno, titolo e descrizione');
+    if (!newWorkout.date || !newWorkout.title || !newWorkout.description) {
+      Alert.alert('Errore', 'Compila data, titolo e descrizione');
       return;
     }
 
     setWorkouts([...workouts, {
       ...newWorkout,
+      date: newWorkout.date, // Data per il calendario (YYYY-MM-DD)
       duration_minutes: newWorkout.duration_minutes ? parseInt(newWorkout.duration_minutes) : undefined,
       distance_km: newWorkout.distance_km ? parseFloat(newWorkout.distance_km) : undefined,
       completed: false,
