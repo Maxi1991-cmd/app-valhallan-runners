@@ -148,6 +148,19 @@ export const useDataStore = create<DataState>((set, get) => ({
     }));
   },
 
+  deleteNotification: async (id: string) => {
+    await notificationAPI.delete(id);
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== id),
+      unreadCount: Math.max(0, state.unreadCount - (state.notifications.find(n => n.id === id && !n.read) ? 1 : 0)),
+    }));
+  },
+
+  deleteAllNotifications: async () => {
+    await notificationAPI.deleteAll();
+    set({ notifications: [], unreadCount: 0 });
+  },
+
   // Warnings
   checkExpiries: async () => {
     try {
