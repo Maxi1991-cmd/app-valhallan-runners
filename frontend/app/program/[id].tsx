@@ -19,6 +19,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
+// Funzione safe per formattare date con date-fns
+const safeFormatDate = (dateString?: string | null, formatStr: string = 'd MMM yyyy'): string => {
+  try {
+    if (!dateString || dateString === '') return '--';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '--';
+    return format(date, formatStr, { locale: it });
+  } catch (e) {
+    console.warn('Errore formattazione data:', dateString, e);
+    return '--';
+  }
+};
+
 export default function ProgramDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
