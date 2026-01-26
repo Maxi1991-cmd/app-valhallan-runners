@@ -233,10 +233,17 @@ export default function CreateProgram() {
 
           <Card title="Nuovo Allenamento" style={styles.newWorkoutCard}>
             <Input
-              label="Giorno/Data *"
+              label="Data Allenamento (YYYY-MM-DD) *"
+              value={newWorkout.date}
+              onChangeText={(text) => setNewWorkout({ ...newWorkout, date: text })}
+              placeholder="2025-01-27"
+            />
+
+            <Input
+              label="Settimana / Giorno / Ora"
               value={newWorkout.day}
               onChangeText={(text) => setNewWorkout({ ...newWorkout, day: text })}
-              placeholder="Lunedì / 2024-01-15"
+              placeholder="Settimana 1 - Lunedì 08:00"
             />
 
             <Input
