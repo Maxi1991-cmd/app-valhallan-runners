@@ -27,6 +27,8 @@ interface DataState {
   createNotification: (data: any) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
   markAllNotificationsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
+  deleteAllNotifications: () => Promise<void>;
   
   // Warnings
   checkExpiries: () => Promise<void>;
