@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
@@ -10,6 +11,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
 export default function NotificationsTab() {
+  const router = useRouter();
   const {
     notifications,
     warnings,
@@ -17,6 +19,7 @@ export default function NotificationsTab() {
     fetchNotifications,
     markNotificationRead,
     markAllNotificationsRead,
+    deleteNotification,
     checkExpiries,
   } = useDataStore();
   const [refreshing, setRefreshing] = useState(false);
@@ -65,49 +68,107 @@ export default function NotificationsTab() {
     }
   };
 
+  // Navigazione al contenuto correlato per i warning
+  const handleWarningPress = (item: any) => {
+    if (item.athlete_id) {
+      // Naviga al profilo atleta con il tab certificato se è scadenza certificato
+      if (item.type === 'certificate_expiry') {
+        router.push(`/athlete/${item.athlete_id}?tab=certificate`);
+      } else if (item.type === 'payment_due') {
+        router.push(`/athlete/${item.athlete_id}?tab=payments`);
+      } else {
+        router.push(`/athlete/${item.athlete_id}`);
+      }
+    }
+  };
+
+  // Navigazione al contenuto correlato per le notifiche
+  const handleNotificationPress = (item: Notification) => {
+    // Segna come letta se non lo è
+    if (!item.read) {
+      markNotificationRead(item.id);
+    }
+
+    const relatedData = (item as any).related_data;
+    
+    // Naviga in base al tipo di notifica
+    if (item.notification_type === 'workout_completed' && relatedData?.program_id) {
+      router.push(`/program/${relatedData.program_id}`);
+    } else if (item.notification_type === 'certificate_expiry' && relatedData?.athlete_id) {
+      router.push(`/athlete/${relatedData.athlete_id}?tab=certificate`);
+    } else if (item.notification_type === 'payment_due' && relatedData?.athlete_id) {
+      router.push(`/athlete/${relatedData.athlete_id}?tab=payments`);
+    } else if (relatedData?.athlete_id) {
+      router.push(`/athlete/${relatedData.athlete_id}`);
+    } else if (relatedData?.program_id) {
+      router.push(`/program/${relatedData.program_id}`);
+    }
+  };
+
+  // Elimina singola notifica
+  const handleDeleteNotification = (id: string) => {
+    Alert.alert(
+      'Elimina Notifica',
+      'Vuoi eliminare questa notifica?',
+      [
+        { text: 'Annulla', style: 'cancel' },
+        {
+          text: 'Elimina',
+          style: 'destructive',
+          onPress: () => deleteNotification(id),
+        },
+      ]
+    );
+  };
+
   const renderWarning = ({ item }: { item: any }) => (
-    <Card style={[styles.notificationCard, item.urgent && styles.urgentCard]}>
-      <View style={styles.notificationContent}>
-        <View
-          style={[
-            styles.iconContainer,
-            { backgroundColor: `${getNotificationColor(item.type, item.urgent)}20` },
-          ]}
-        >
-          <Ionicons
-            name={getNotificationIcon(item.type)}
-            size={20}
-            color={getNotificationColor(item.type, item.urgent)}
-          />
-        </View>
-        <View style={styles.notificationText}>
-          <Text style={styles.notificationTitle}>
-            {item.type === 'payment_due'
-              ? `Pagamento in sospeso - ${item.athlete_name}`
-              : `Certificato in scadenza - ${item.athlete_name}`}
-          </Text>
-          <Text style={styles.notificationMessage}>
-            {item.type === 'payment_due'
-              ? `Mese: ${item.month} - €${item.amount}${item.days_overdue > 0 ? ` (${item.days_overdue} giorni di ritardo)` : ''}`
-              : `Scade il ${item.expiry_date}${item.days_until <= 7 ? ` (${item.days_until} giorni)` : ''}`}
-          </Text>
-        </View>
-        {item.urgent && (
-          <View style={styles.urgentBadge}>
-            <Text style={styles.urgentText}>Urgente</Text>
+    <TouchableOpacity onPress={() => handleWarningPress(item)} activeOpacity={0.8}>
+      <Card style={[styles.notificationCard, item.urgent && styles.urgentCard]}>
+        <View style={styles.notificationContent}>
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: `${getNotificationColor(item.type, item.urgent)}20` },
+            ]}
+          >
+            <Ionicons
+              name={getNotificationIcon(item.type)}
+              size={20}
+              color={getNotificationColor(item.type, item.urgent)}
+            />
           </View>
-        )}
-      </View>
-    </Card>
+          <View style={styles.notificationText}>
+            <Text style={styles.notificationTitle}>
+              {item.type === 'payment_due'
+                ? `Pagamento in sospeso - ${item.athlete_name}`
+                : `Certificato in scadenza - ${item.athlete_name}`}
+            </Text>
+            <Text style={styles.notificationMessage}>
+              {item.type === 'payment_due'
+                ? `Mese: ${item.month} - €${item.amount}${item.days_overdue > 0 ? ` (${item.days_overdue} giorni di ritardo)` : ''}`
+                : `Scade il ${item.expiry_date}${item.days_until <= 7 ? ` (${item.days_until} giorni)` : ''}`}
+            </Text>
+            <Text style={styles.tapHint}>Tocca per visualizzare</Text>
+          </View>
+          {item.urgent && (
+            <View style={styles.urgentBadge}>
+              <Text style={styles.urgentText}>Urgente</Text>
+            </View>
+          )}
+          <Ionicons name="chevron-forward" size={20} color="#666" style={styles.chevron} />
+        </View>
+      </Card>
+    </TouchableOpacity>
   );
 
   const renderNotification = ({ item }: { item: Notification }) => {
     const relatedData = (item as any).related_data;
     const isWorkoutCompleted = item.notification_type === 'workout_completed';
+    const hasNavigation = relatedData?.program_id || relatedData?.athlete_id;
 
     return (
       <TouchableOpacity
-        onPress={() => !item.read && markNotificationRead(item.id)}
+        onPress={() => handleNotificationPress(item)}
         activeOpacity={0.8}
       >
         <Card style={[styles.notificationCard, !item.read && styles.unreadCard]}>
@@ -160,14 +221,32 @@ export default function NotificationsTab() {
                 </View>
               )}
               
-              <Text style={styles.notificationTime}>
-                {formatDistanceToNow(new Date(item.created_at), {
-                  addSuffix: true,
-                  locale: it,
-                })}
-              </Text>
+              <View style={styles.notificationFooter}>
+                <Text style={styles.notificationTime}>
+                  {formatDistanceToNow(new Date(item.created_at), {
+                    addSuffix: true,
+                    locale: it,
+                  })}
+                </Text>
+                {hasNavigation && (
+                  <Text style={styles.tapHint}>Tocca per visualizzare</Text>
+                )}
+              </View>
             </View>
-            {!item.read && <View style={styles.unreadDot} />}
+            
+            <View style={styles.rightActions}>
+              {!item.read && <View style={styles.unreadDot} />}
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleDeleteNotification(item.id);
+                }}
+                style={styles.deleteButton}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="trash-outline" size={18} color="#DC3545" />
+              </TouchableOpacity>
+            </View>
           </View>
         </Card>
       </TouchableOpacity>
@@ -308,23 +387,48 @@ const styles = StyleSheet.create({
     color: '#CCC',
     marginBottom: 4,
   },
+  notificationFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 6,
+  },
   notificationTime: {
     fontSize: 11,
     color: '#666',
-    marginTop: 6,
+  },
+  tapHint: {
+    fontSize: 10,
+    color: '#FF6B35',
+    fontStyle: 'italic',
+  },
+  rightActions: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 8,
+    marginLeft: 8,
   },
   unreadDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
     backgroundColor: '#FF6B35',
+  },
+  deleteButton: {
+    padding: 6,
+    borderRadius: 6,
+    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+  },
+  chevron: {
     marginLeft: 8,
+    alignSelf: 'center',
   },
   urgentBadge: {
     backgroundColor: '#DC3545',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 10,
+    marginRight: 8,
   },
   urgentText: {
     color: '#FFF',
