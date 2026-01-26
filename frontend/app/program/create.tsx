@@ -86,7 +86,7 @@ export default function CreateProgram() {
     }]);
 
     setNewWorkout({
-      day: '',
+      day: 'Settimana 1 - Lunedì 08:00',
       title: '',
       description: '',
       workout_type: 'easy',
