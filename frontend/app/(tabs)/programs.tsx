@@ -84,8 +84,8 @@ export default function ProgramsTab() {
           <View style={styles.dateItem}>
             <Ionicons name="calendar-outline" size={14} color="#666" />
             <Text style={styles.dateText}>
-              {format(new Date(item.start_date), 'd MMM', { locale: it })} -{' '}
-              {format(new Date(item.end_date), 'd MMM yyyy', { locale: it })}
+              {safeFormatDate(item.start_date, 'd MMM')} -{' '}
+              {safeFormatDate(item.end_date, 'd MMM yyyy')}
             </Text>
           </View>
         </View>
