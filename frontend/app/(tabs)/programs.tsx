@@ -12,6 +12,19 @@ import { TrainingProgram } from '../../src/types';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 
+// Funzione safe per formattare date
+const safeFormatDate = (dateString?: string | null, formatStr: string = 'd MMM yyyy'): string => {
+  try {
+    if (!dateString || dateString === '') return '--';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '--';
+    return format(date, formatStr, { locale: it });
+  } catch (e) {
+    console.warn('Errore formattazione data:', dateString, e);
+    return '--';
+  }
+};
+
 export default function ProgramsTab() {
   const router = useRouter();
   const { user } = useAuthStore();
