@@ -263,8 +263,8 @@ export default function ProgramDetail() {
           </Text>
           <Text style={styles.dates}>
             <Ionicons name="calendar" size={14} color="#999" />{' '}
-            {format(new Date(program.start_date), 'd MMM', { locale: it })} -{' '}
-            {format(new Date(program.end_date), 'd MMM yyyy', { locale: it })}
+            {safeFormatDate(program.start_date, 'd MMM')} -{' '}
+            {safeFormatDate(program.end_date, 'd MMM yyyy')}
           </Text>
           {program.goal && (
             <View style={styles.goalContainer}>
