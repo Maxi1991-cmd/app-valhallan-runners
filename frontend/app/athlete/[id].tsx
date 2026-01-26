@@ -48,22 +48,7 @@ const safeCheckExpired = (dateString?: string | null): boolean => {
   }
 };
 
-// Funzione per verificare se una data è scaduta
-const isDateExpired = (dateString?: string | null): boolean => {
-  try {
-    if (!dateString || dateString === '') return false;
-    
-    const date = new Date(dateString);
-    
-    if (isNaN(date.getTime())) {
-      return false;
-    }
-    
-    return date < new Date();
-  } catch (e) {
-    return false;
-  }
-};
+// Funzione rimossa - usiamo safeCheckExpired
 
 export default function AthleteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
