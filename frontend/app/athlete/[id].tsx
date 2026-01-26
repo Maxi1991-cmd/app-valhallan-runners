@@ -342,7 +342,9 @@ export default function AthleteDetail() {
               <View style={styles.certRow}>
                 <Text style={styles.certLabel}>Data Rilascio:</Text>
                 <Text style={styles.certValue}>
-                  {athlete.medical_certificate?.issue_date || 'Non inserito'}
+                  {safeFormatDate(athlete.medical_certificate?.issue_date) !== '--' 
+                    ? safeFormatDate(athlete.medical_certificate?.issue_date, 'long')
+                    : 'Non inserito'}
                 </Text>
               </View>
               <View style={styles.certRow}>
@@ -350,32 +352,32 @@ export default function AthleteDetail() {
                 <Text
                   style={[
                     styles.certValue,
-                    athlete.medical_certificate?.expiry_date &&
-                      new Date(athlete.medical_certificate.expiry_date) < new Date() &&
-                      styles.expiredText,
+                    safeCheckExpired(athlete.medical_certificate?.expiry_date) && styles.expiredText,
                   ]}
                 >
-                  {athlete.medical_certificate?.expiry_date || 'Non inserito'}
+                  {safeFormatDate(athlete.medical_certificate?.expiry_date) !== '--'
+                    ? safeFormatDate(athlete.medical_certificate?.expiry_date, 'long')
+                    : 'Non inserito'}
                 </Text>
               </View>
-              {athlete.medical_certificate?.expiry_date && (
+              {athlete.medical_certificate?.expiry_date && safeFormatDate(athlete.medical_certificate?.expiry_date) !== '--' && (
                 <View
                   style={[
                     styles.statusBadge,
-                    new Date(athlete.medical_certificate.expiry_date) < new Date()
+                    safeCheckExpired(athlete.medical_certificate.expiry_date)
                       ? styles.expiredBadge
                       : styles.validBadge,
                   ]}
                 >
                   <Ionicons
                     name={
-                      new Date(athlete.medical_certificate.expiry_date) < new Date()
+                      safeCheckExpired(athlete.medical_certificate.expiry_date)
                         ? 'close-circle'
                         : 'checkmark-circle'
                     }
                     size={16}
                     color={
-                      new Date(athlete.medical_certificate.expiry_date) < new Date()
+                      safeCheckExpired(athlete.medical_certificate.expiry_date)
                         ? '#DC3545'
                         : '#4CAF50'
                     }
@@ -383,12 +385,12 @@ export default function AthleteDetail() {
                   <Text
                     style={[
                       styles.statusText,
-                      new Date(athlete.medical_certificate.expiry_date) < new Date()
+                      safeCheckExpired(athlete.medical_certificate.expiry_date)
                         ? styles.expiredStatusText
                         : styles.validStatusText,
                     ]}
                   >
-                    {new Date(athlete.medical_certificate.expiry_date) < new Date()
+                    {safeCheckExpired(athlete.medical_certificate.expiry_date)
                       ? 'Scaduto'
                       : 'Valido'}
                   </Text>
