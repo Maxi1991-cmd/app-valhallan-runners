@@ -9,6 +9,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WorkoutSession } from '../../src/types';
 
+// Funzione helper per formattare data in YYYY-MM-DD
+const formatDateToISO = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Calcola data default: oggi
+const getDefaultStartDate = (): string => {
+  return formatDateToISO(new Date());
+};
+
+// Calcola data fine default: +4 settimane
+const getDefaultEndDate = (): string => {
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 28); // 4 settimane
+  return formatDateToISO(endDate);
+};
+
 export default function CreateProgram() {
   const router = useRouter();
   const { athletes, fetchAthletes, createProgram } = useDataStore();
@@ -17,8 +37,8 @@ export default function CreateProgram() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    start_date: '',
-    end_date: '',
+    start_date: getDefaultStartDate(),
+    end_date: getDefaultEndDate(),
     goal: '',
     athlete_id: '',
   });
@@ -26,7 +46,7 @@ export default function CreateProgram() {
   const [workouts, setWorkouts] = useState<Partial<WorkoutSession>[]>([]);
 
   const [newWorkout, setNewWorkout] = useState({
-    day: '',
+    day: 'Settimana 1 - Lunedì 08:00',
     title: '',
     description: '',
     workout_type: 'easy',
