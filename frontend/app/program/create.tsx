@@ -47,6 +47,7 @@ export default function CreateProgram() {
 
   const [newWorkout, setNewWorkout] = useState({
     day: 'Settimana 1 - Lunedì 08:00',
+    date: getDefaultStartDate(), // Data reale per il calendario
     title: '',
     description: '',
     workout_type: 'easy',
