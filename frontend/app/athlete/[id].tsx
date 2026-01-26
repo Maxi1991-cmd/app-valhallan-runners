@@ -12,7 +12,7 @@ import { AthleteProfile } from '../../src/types';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
-const safeFormatDate = (dateString?: string | null) => {
+const safeFormatDate = (dateString?: string | null, format?: string) => {
   try {
     if (!dateString || dateString === '') return '--';
 
@@ -22,9 +22,29 @@ const safeFormatDate = (dateString?: string | null) => {
       return '--';
     }
 
+    // Formattazione in italiano
+    if (format === 'short') {
+      return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+    } else if (format === 'long') {
+      return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+    
     return date.toLocaleDateString('it-IT');
   } catch (e) {
+    console.warn('Errore formattazione data:', dateString, e);
     return '--';
+  }
+};
+
+// Funzione helper per verificare in modo sicuro le date del certificato
+const safeCheckExpired = (dateString?: string | null): boolean => {
+  try {
+    if (!dateString || dateString === '') return false;
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return false;
+    return date < new Date();
+  } catch (e) {
+    return false;
   }
 };
 
