@@ -916,6 +916,23 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
     )
     return {"message": "All notifications marked as read"}
 
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(notification_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a single notification"""
+    result = await db.notifications.delete_one({
+        "id": notification_id,
+        "recipient_id": current_user["id"]
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return {"message": "Notification deleted"}
+
+@api_router.delete("/notifications")
+async def delete_all_notifications(current_user: dict = Depends(get_current_user)):
+    """Delete all notifications for current user"""
+    await db.notifications.delete_many({"recipient_id": current_user["id"]})
+    return {"message": "All notifications deleted"}
+
 # ==================== ACTIVITY DATA ROUTES ====================
 
 @api_router.post("/activities", response_model=ActivityData)
