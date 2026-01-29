@@ -25,19 +25,25 @@ export default function ProfileTab() {
         text: 'Esci',
         style: 'destructive',
         onPress: async () => {
-          // 1. Pulisci tutto lo storage
-          await AsyncStorage.clear();
-          
-          // 2. Reset dello state auth
-          await logout();
-          
-          // 3. Reset completo navigazione - torna alla root
-          while (router.canGoBack()) {
-            router.back();
+          try {
+            // 1. Pulisci tutto lo storage
+            await AsyncStorage.clear();
+            
+            // 2. Reset dello state auth
+            await logout();
+            
+            // 3. Forza redirect alla root con dismissAll se disponibile
+            if (router.canDismiss()) {
+              router.dismissAll();
+            }
+            
+            // 4. Redirect forzato alla schermata iniziale
+            router.replace('/');
+          } catch (error) {
+            console.error('Logout error:', error);
+            // Fallback: redirect comunque
+            router.replace('/');
           }
-          
-          // 4. Redirect forzato alla schermata iniziale
-          router.replace('/');
         },
       },
     ]);
