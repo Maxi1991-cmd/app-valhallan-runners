@@ -419,7 +419,7 @@ def parse_fit_file(fit_content: bytes) -> dict:
 # ==================== AUTH ROUTES ====================
 
 # Email del proprietario dell'app - accesso gratuito illimitato
-OWNER_EMAILS = ["owner@valhallanrunners.com"]  # Aggiungi qui la tua email
+OWNER_EMAILS = ["maxi1991@hotmail.it"]  # Proprietario: accesso lifetime gratuito
 
 # Helper function per verificare se l'abbonamento è attivo
 def check_subscription_active(user: dict) -> bool:
