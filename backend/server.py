@@ -585,6 +585,56 @@ async def login(credentials: UserLogin):
         )
     )
 
+@api_router.post("/auth/athlete-login", response_model=Token)
+async def athlete_login(credentials: AthleteLoginRequest):
+    """Login per atleti con email e codice accesso"""
+    # Trova l'atleta con email e codice accesso
+    athlete = await db.athletes.find_one({
+        "email": credentials.email,
+        "access_code": credentials.access_code
+    })
+    
+    if not athlete:
+        raise HTTPException(status_code=401, detail="Email o codice accesso non valido")
+    
+    # Crea o trova l'utente atleta
+    user = await db.users.find_one({"email": credentials.email, "role": "athlete"})
+    
+    if not user:
+        # Crea un nuovo utente atleta
+        user = {
+            "id": str(uuid.uuid4()),
+            "email": credentials.email,
+            "name": athlete["name"],
+            "role": "athlete",
+            "coach_id": athlete["coach_id"],
+            "athlete_profile_id": athlete["id"],
+            "password": "",  # Atleti usano codice accesso, non password
+            "created_at": datetime.utcnow()
+        }
+        await db.users.insert_one(user)
+        
+        # Collega l'atleta all'utente
+        await db.athletes.update_one(
+            {"id": athlete["id"]},
+            {"$set": {"user_id": user["id"]}}
+        )
+    
+    access_token = create_access_token(data={"sub": user["id"]})
+    
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserResponse(
+            id=user["id"],
+            email=user["email"],
+            name=user["name"],
+            role="athlete",
+            coach_id=user.get("coach_id"),
+            subscription=None  # Atleti non hanno abbonamento
+        )
+    )
+
 @api_router.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
     subscription_data = get_subscription_info(current_user)
