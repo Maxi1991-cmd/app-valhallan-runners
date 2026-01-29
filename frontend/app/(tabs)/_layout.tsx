@@ -1,28 +1,33 @@
 import React, { useEffect } from 'react';
-import { Tabs, Redirect } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
 import { useAuthStore } from '../../src/store/authStore';
 import { useDataStore } from '../../src/store/dataStore';
 
 export default function TabLayout() {
+  const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
   const { unreadCount, fetchNotifications, checkExpiries } = useDataStore();
 
-  // Se non autenticato, redirect immediato - non montare nulla
-  if (!isAuthenticated) {
-    return <Redirect href="/" />;
-  }
-
   useEffect(() => {
+    // Se non autenticato, vai alla home
+    if (!isAuthenticated) {
+      router.replace('/');
+      return;
+    }
+    
     // Solo se autenticato, carica dati
-    if (isAuthenticated) {
-      fetchNotifications();
-      if (user?.role === 'coach') {
-        checkExpiries();
-      }
+    fetchNotifications();
+    if (user?.role === 'coach') {
+      checkExpiries();
     }
   }, [isAuthenticated]);
+
+  // Non renderizzare nulla se non autenticato
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <Tabs
