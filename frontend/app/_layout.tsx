@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, Redirect } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
@@ -7,35 +7,25 @@ import { LoadingScreen } from '../src/components/LoadingScreen';
 
 export default function RootLayout() {
   const { loadUser, isLoading, isAuthenticated, user } = useAuthStore();
-  const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
     loadUser();
   }, []);
 
-  // Gestione navigazione basata su autenticazione
-  useEffect(() => {
-    if (isLoading) return;
-
-    const inAuthGroup = segments[0] === '(tabs)' || segments[0] === 'athlete-home';
-    const inLoginScreen = segments[0] === 'index' || segments[0] === 'login' || segments[0] === 'register';
-
-    if (!isAuthenticated && inAuthGroup) {
-      // Non autenticato ma in area protetta -> vai a login
-      router.replace('/');
-    } else if (isAuthenticated && inLoginScreen) {
-      // Autenticato ma in login -> vai alla home appropriata
-      if (user?.role === 'athlete') {
-        router.replace('/athlete-home');
-      } else {
-        router.replace('/(tabs)');
-      }
-    }
-  }, [isAuthenticated, segments, isLoading, user]);
-
   if (isLoading) {
     return <LoadingScreen message="Caricamento..." />;
+  }
+
+  // Determina se siamo in un'area protetta
+  const inProtectedArea = segments[0] === '(tabs)' || 
+                          segments[0] === 'athlete-home' ||
+                          segments[0] === 'athlete' ||
+                          segments[0] === 'program';
+
+  // Se non autenticato e in area protetta, redirect immediato
+  if (!isAuthenticated && inProtectedArea) {
+    return <Redirect href="/" />;
   }
 
   return (
