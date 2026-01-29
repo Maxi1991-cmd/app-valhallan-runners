@@ -595,7 +595,7 @@ async def get_subscription(current_user: dict = Depends(get_current_user)):
 # ==================== ATHLETE PROFILE ROUTES ====================
 
 @api_router.post("/athletes", response_model=AthleteProfile)
-async def create_athlete(athlete: AthleteProfileCreate, current_user: dict = Depends(get_current_user)):
+async def create_athlete(athlete: AthleteProfileCreate, current_user: dict = Depends(require_active_subscription)):
     if current_user["role"] != "coach":
         raise HTTPException(status_code=403, detail="Only coaches can create athletes")
     
