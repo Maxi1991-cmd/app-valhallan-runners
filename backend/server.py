@@ -89,6 +89,10 @@ class Token(BaseModel):
     token_type: str
     user: UserResponse
 
+class AthleteLoginRequest(BaseModel):
+    email: EmailStr
+    access_code: str
+
 # Athlete Profile Models
 class BiometricData(BaseModel):
     heart_rate_max: Optional[int] = None
@@ -126,6 +130,7 @@ class AthleteProfile(AthleteProfileBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     coach_id: str
     user_id: Optional[str] = None  # Linked user account if athlete has login
+    access_code: Optional[str] = None  # Codice accesso per login atleta
     biometrics: BiometricData = Field(default_factory=BiometricData)
     medical_certificate: MedicalCertificate = Field(default_factory=MedicalCertificate)
     payments: List[PaymentRecord] = []
