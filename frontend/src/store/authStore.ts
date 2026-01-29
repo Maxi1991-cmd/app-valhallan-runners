@@ -11,6 +11,7 @@ interface AuthState {
   subscription: Subscription | null;
   isSubscriptionActive: boolean;
   login: (email: string, password: string) => Promise<void>;
+  athleteLogin: (email: string, accessCode: string) => Promise<void>;
   register: (name: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => Promise<void>;
   loadUser: () => Promise<void>;
@@ -36,6 +37,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user, token: access_token, isAuthenticated: true, subscription, isSubscriptionActive });
     } catch (error: any) {
       throw new Error(error.response?.data?.detail || 'Login failed');
+    }
+  },
+
+  athleteLogin: async (email: string, accessCode: string) => {
+    try {
+      const response = await authAPI.athleteLogin({ email, access_code: accessCode });
+      const { access_token, user } = response.data;
+      await AsyncStorage.setItem('token', access_token);
+      set({ user, token: access_token, isAuthenticated: true, subscription: null, isSubscriptionActive: true });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || 'Codice accesso non valido');
     }
   },
 
