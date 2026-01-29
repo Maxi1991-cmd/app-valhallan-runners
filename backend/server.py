@@ -468,6 +468,23 @@ def get_subscription_info(user: dict) -> Optional[dict]:
         "is_active": False
     }
 
+async def ensure_coach_has_subscription(user: dict) -> dict:
+    """Assegna abbonamento trial se il coach non ne ha uno"""
+    if user.get("role") == "coach" and not user.get("subscription"):
+        trial_end = (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d")
+        subscription = {
+            "plan": "trial",
+            "status": "active",
+            "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "end_date": trial_end
+        }
+        await db.users.update_one(
+            {"id": user["id"]},
+            {"$set": {"subscription": subscription}}
+        )
+        user["subscription"] = subscription
+    return user
+
 # Dependency per verificare abbonamento attivo per operazioni di scrittura
 async def require_active_subscription(current_user: dict = Depends(get_current_user)):
     if current_user.get("role") == "coach" and not check_subscription_active(current_user):
