@@ -543,6 +543,9 @@ async def login(credentials: UserLogin):
     if not user or not verify_password(credentials.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
+    # Assegna abbonamento trial se il coach non ne ha uno
+    user = await ensure_coach_has_subscription(user)
+    
     access_token = create_access_token(data={"sub": user["id"]})
     
     subscription_data = get_subscription_info(user)
