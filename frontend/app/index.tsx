@@ -30,14 +30,15 @@ export default function LoginScreen() {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    // Solo se autenticato E non in fase di loading, reindirizza
+    if (!isLoading && isAuthenticated && user) {
       if (user.role === 'athlete') {
         router.replace('/athlete-home');
       } else {
         router.replace('/(tabs)');
       }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, isLoading]);
 
   const handleCoachLogin = async () => {
     if (!email || !password) {
