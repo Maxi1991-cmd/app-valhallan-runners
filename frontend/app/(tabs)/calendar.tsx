@@ -34,7 +34,7 @@ interface CalendarWorkout {
 }
 
 export default function CalendarTab() {
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { athletes, fetchAthletes } = useDataStore();
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -45,16 +45,33 @@ export default function CalendarTab() {
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    fetchAthletes();
-  }, []);
+    // Solo se autenticato, carica i dati
+    if (isAuthenticated) {
+      fetchAthletes();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    loadWorkouts();
-  }, [selectedAthlete]);
+    // Solo se autenticato, carica workouts
+    if (isAuthenticated) {
+      loadWorkouts();
+    }
+  }, [selectedAthlete, isAuthenticated]);
 
   const loadWorkouts = async () => {
+    // Non fare chiamate se non autenticato
+    if (!isAuthenticated) {
+      setWorkouts([]);
+      return;
+    }
+    
     try {
       const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        setWorkouts([]);
+        return;
+      }
+      
       const params: any = {};
       if (selectedAthlete) {
         params.athlete_id = selectedAthlete;
