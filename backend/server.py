@@ -664,7 +664,7 @@ async def get_athlete(athlete_id: str, current_user: dict = Depends(get_current_
     return AthleteProfile(**athlete)
 
 @api_router.put("/athletes/{athlete_id}", response_model=AthleteProfile)
-async def update_athlete(athlete_id: str, update: AthleteProfileUpdate, current_user: dict = Depends(get_current_user)):
+async def update_athlete(athlete_id: str, update: AthleteProfileUpdate, current_user: dict = Depends(require_active_subscription)):
     athlete = await db.athletes.find_one({"id": athlete_id})
     if not athlete:
         raise HTTPException(status_code=404, detail="Athlete not found")
@@ -685,7 +685,7 @@ async def update_athlete(athlete_id: str, update: AthleteProfileUpdate, current_
     return AthleteProfile(**athlete)
 
 @api_router.delete("/athletes/{athlete_id}")
-async def delete_athlete(athlete_id: str, current_user: dict = Depends(get_current_user)):
+async def delete_athlete(athlete_id: str, current_user: dict = Depends(require_active_subscription)):
     if current_user["role"] != "coach":
         raise HTTPException(status_code=403, detail="Only coaches can delete athletes")
     
