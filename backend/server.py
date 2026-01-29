@@ -418,11 +418,18 @@ def parse_fit_file(fit_content: bytes) -> dict:
 
 # ==================== AUTH ROUTES ====================
 
+# Email del proprietario dell'app - accesso gratuito illimitato
+OWNER_EMAILS = ["owner@valhallanrunners.com"]  # Aggiungi qui la tua email
+
 # Helper function per verificare se l'abbonamento è attivo
 def check_subscription_active(user: dict) -> bool:
     """Verifica se l'abbonamento del coach è attivo"""
     if user.get("role") != "coach":
         return True  # Gli atleti non hanno bisogno di abbonamento
+    
+    # Il proprietario ha sempre accesso illimitato
+    if user.get("email") in OWNER_EMAILS or user.get("is_owner") == True:
+        return True
     
     subscription = user.get("subscription")
     if not subscription:
@@ -451,6 +458,16 @@ def check_subscription_active(user: dict) -> bool:
 
 def get_subscription_info(user: dict) -> Optional[dict]:
     """Restituisce info abbonamento"""
+    # Il proprietario ha abbonamento lifetime
+    if user.get("email") in OWNER_EMAILS or user.get("is_owner") == True:
+        return {
+            "plan": "owner",
+            "status": "active",
+            "start_date": "2025-01-01",
+            "end_date": "2099-12-31",
+            "is_active": True
+        }
+    
     subscription = user.get("subscription")
     if subscription:
         return {
