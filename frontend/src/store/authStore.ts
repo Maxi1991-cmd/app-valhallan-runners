@@ -1,17 +1,21 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authAPI } from '../services/api';
-import { User } from '../types';
+import { User, Subscription } from '../types';
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  subscription: Subscription | null;
+  isSubscriptionActive: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => Promise<void>;
   loadUser: () => Promise<void>;
+  refreshSubscription: () => Promise<void>;
+  updateSubscription: (plan: string, status: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -19,13 +23,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   token: null,
   isLoading: true,
   isAuthenticated: false,
+  subscription: null,
+  isSubscriptionActive: false,
 
   login: async (email: string, password: string) => {
     try {
       const response = await authAPI.login({ email, password });
       const { access_token, user } = response.data;
       await AsyncStorage.setItem('token', access_token);
-      set({ user, token: access_token, isAuthenticated: true });
+      const subscription = user.subscription || null;
+      const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+      set({ user, token: access_token, isAuthenticated: true, subscription, isSubscriptionActive });
     } catch (error: any) {
       throw new Error(error.response?.data?.detail || 'Login failed');
     }
@@ -36,7 +44,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const response = await authAPI.register({ name, email, password, role });
       const { access_token, user } = response.data;
       await AsyncStorage.setItem('token', access_token);
-      set({ user, token: access_token, isAuthenticated: true });
+      const subscription = user.subscription || null;
+      const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+      set({ user, token: access_token, isAuthenticated: true, subscription, isSubscriptionActive });
     } catch (error: any) {
       throw new Error(error.response?.data?.detail || 'Registration failed');
     }
@@ -44,7 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     await AsyncStorage.removeItem('token');
-    set({ user: null, token: null, isAuthenticated: false });
+    set({ user: null, token: null, isAuthenticated: false, subscription: null, isSubscriptionActive: false });
   },
 
   loadUser: async () => {
@@ -52,13 +62,38 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const token = await AsyncStorage.getItem('token');
       if (token) {
         const response = await authAPI.getMe();
-        set({ user: response.data, token, isAuthenticated: true, isLoading: false });
+        const user = response.data;
+        const subscription = user.subscription || null;
+        const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+        set({ user, token, isAuthenticated: true, isLoading: false, subscription, isSubscriptionActive });
       } else {
         set({ isLoading: false });
       }
     } catch (error) {
       await AsyncStorage.removeItem('token');
-      set({ user: null, token: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, token: null, isAuthenticated: false, isLoading: false, subscription: null, isSubscriptionActive: false });
+    }
+  },
+
+  refreshSubscription: async () => {
+    try {
+      const response = await authAPI.getSubscription();
+      const subscription = response.data;
+      const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+      set({ subscription, isSubscriptionActive });
+    } catch (error) {
+      console.error('Error refreshing subscription:', error);
+    }
+  },
+
+  updateSubscription: async (plan: string, status: string) => {
+    try {
+      const response = await authAPI.updateSubscription({ plan, status });
+      const subscription = response.data.subscription;
+      const isSubscriptionActive = status === 'active';
+      set({ subscription: { ...subscription, is_active: isSubscriptionActive }, isSubscriptionActive });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || 'Aggiornamento abbonamento fallito');
     }
   },
 }));
