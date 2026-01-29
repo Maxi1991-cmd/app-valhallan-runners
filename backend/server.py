@@ -53,6 +53,12 @@ class UserBase(BaseModel):
     name: str
     role: str = "coach"  # coach or athlete
 
+class SubscriptionInfo(BaseModel):
+    plan: str = "none"  # none, monthly, annual
+    status: str = "inactive"  # active, inactive, expired
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+
 class UserCreate(UserBase):
     password: str
 
@@ -64,6 +70,7 @@ class User(UserBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=datetime.utcnow)
     coach_id: Optional[str] = None  # For athletes, links to their coach
+    subscription: Optional[SubscriptionInfo] = None
 
 class UserResponse(BaseModel):
     id: str
@@ -71,6 +78,11 @@ class UserResponse(BaseModel):
     name: str
     role: str
     coach_id: Optional[str] = None
+    subscription: Optional[SubscriptionInfo] = None
+
+class SubscriptionUpdate(BaseModel):
+    plan: str  # monthly, annual
+    status: str  # active, inactive
 
 class Token(BaseModel):
     access_token: str
