@@ -26,6 +26,7 @@ export const authAPI = {
     api.post('/auth/register', data),
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data),
+  athleteLogin: (data: { email: string; access_code: string }) => api.post('/auth/athlete-login', data),
   getMe: () => api.get('/auth/me'),
   getSubscription: () => api.get('/auth/subscription'),
   updateSubscription: (data: { plan: string; status: string }) => api.put('/auth/subscription', data),
