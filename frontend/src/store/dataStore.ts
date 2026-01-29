@@ -121,8 +121,12 @@ export const useDataStore = create<DataState>((set, get) => ({
         notifications: notifResponse.data,
         unreadCount: countResponse.data.count,
       });
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
+    } catch (error: any) {
+      // Ignora errori 401/403 silenziosamente (utente non autorizzato)
+      if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+        console.error('Error fetching notifications:', error);
+      }
+      set({ notifications: [], unreadCount: 0 });
     }
   },
 
@@ -165,9 +169,13 @@ export const useDataStore = create<DataState>((set, get) => ({
   checkExpiries: async () => {
     try {
       const response = await analyticsAPI.checkExpiries();
-      set({ warnings: response.data.warnings });
-    } catch (error) {
-      console.error('Error checking expiries:', error);
+      set({ warnings: response.data.warnings || [] });
+    } catch (error: any) {
+      // Ignora errori 401/403 silenziosamente
+      if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+        console.error('Error checking expiries:', error);
+      }
+      set({ warnings: [] });
     }
   },
 }));
