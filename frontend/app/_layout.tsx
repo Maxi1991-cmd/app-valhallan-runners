@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import { Stack, useRouter, useSegments, Redirect } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, StyleSheet } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 
 export default function RootLayout() {
-  const { loadUser, isLoading, isAuthenticated, user } = useAuthStore();
-  const segments = useSegments();
+  const { loadUser, isLoading } = useAuthStore();
 
   useEffect(() => {
     loadUser();
@@ -15,17 +14,6 @@ export default function RootLayout() {
 
   if (isLoading) {
     return <LoadingScreen message="Caricamento..." />;
-  }
-
-  // Determina se siamo in un'area protetta
-  const inProtectedArea = segments[0] === '(tabs)' || 
-                          segments[0] === 'athlete-home' ||
-                          segments[0] === 'athlete' ||
-                          segments[0] === 'program';
-
-  // Se non autenticato e in area protetta, redirect immediato
-  if (!isAuthenticated && inProtectedArea) {
-    return <Redirect href="/" />;
   }
 
   return (
