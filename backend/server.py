@@ -686,6 +686,13 @@ async def get_subscription(current_user: dict = Depends(get_current_user)):
 
 # ==================== ATHLETE PROFILE ROUTES ====================
 
+import random
+import string
+
+def generate_access_code():
+    """Genera codice accesso a 6 caratteri alfanumerici"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
 @api_router.post("/athletes", response_model=AthleteProfile)
 async def create_athlete(athlete: AthleteProfileCreate, current_user: dict = Depends(require_active_subscription)):
     if current_user["role"] != "coach":
@@ -694,6 +701,7 @@ async def create_athlete(athlete: AthleteProfileCreate, current_user: dict = Dep
     athlete_dict = athlete.dict()
     athlete_dict["id"] = str(uuid.uuid4())
     athlete_dict["coach_id"] = current_user["id"]
+    athlete_dict["access_code"] = generate_access_code()  # Genera codice accesso
     athlete_dict["biometrics"] = BiometricData().dict()
     athlete_dict["medical_certificate"] = MedicalCertificate().dict()
     athlete_dict["payments"] = []
