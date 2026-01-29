@@ -12,15 +12,19 @@ import { AthleteProfile } from '../../src/types';
 
 export default function AthletesTab() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const { athletes, fetchAthletes, isLoading, warnings } = useDataStore();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchAthletes();
-  }, []);
+    // Solo se autenticato
+    if (isAuthenticated) {
+      fetchAthletes();
+    }
+  }, [isAuthenticated]);
 
   const onRefresh = async () => {
+    if (!isAuthenticated) return;
     setRefreshing(true);
     await fetchAthletes();
     setRefreshing(false);
