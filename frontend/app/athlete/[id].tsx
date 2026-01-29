@@ -94,6 +94,8 @@ export default function AthleteDetail() {
           onPress: async () => {
             try {
               await deleteAthlete(id!);
+              // Refresh della lista atleti
+              await fetchAthletes();
               Alert.alert('Eliminato', 'Atleta eliminato con successo');
               router.replace('/(tabs)');
             } catch (error) {
