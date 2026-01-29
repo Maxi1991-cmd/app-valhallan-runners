@@ -147,6 +147,14 @@ export default function AthleteDetail() {
               <Ionicons name="call" size={12} color="#999" /> {athlete.phone}
             </Text>
           )}
+          
+          {/* Codice Accesso Atleta */}
+          {(athlete as any).access_code && (
+            <View style={styles.accessCodeContainer}>
+              <Text style={styles.accessCodeLabel}>Codice Accesso Atleta:</Text>
+              <Text style={styles.accessCode}>{(athlete as any).access_code}</Text>
+            </View>
+          )}
         </View>
 
         {/* Action Buttons */}
