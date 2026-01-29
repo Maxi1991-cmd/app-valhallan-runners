@@ -1,9 +1,18 @@
+export interface Subscription {
+  plan: 'none' | 'trial' | 'monthly' | 'annual';
+  status: 'active' | 'inactive' | 'expired';
+  start_date?: string;
+  end_date?: string;
+  is_active?: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
   name: string;
   role: 'coach' | 'athlete';
   coach_id?: string;
+  subscription?: Subscription;
 }
 
 export interface BiometricData {
