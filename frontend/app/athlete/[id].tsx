@@ -647,4 +647,22 @@ const styles = StyleSheet.create({
   expiredStatusText: {
     color: '#DC3545',
   },
+  accessCodeContainer: {
+    marginTop: 16,
+    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  accessCodeLabel: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 4,
+  },
+  accessCode: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#FF6B35',
+    letterSpacing: 4,
+  },
 });
