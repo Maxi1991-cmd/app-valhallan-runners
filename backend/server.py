@@ -745,7 +745,7 @@ async def update_payment(athlete_id: str, payment_id: str, paid: bool, current_u
 # ==================== TRAINING PROGRAM ROUTES ====================
 
 @api_router.post("/programs", response_model=TrainingProgram)
-async def create_program(program: TrainingProgramCreate, current_user: dict = Depends(get_current_user)):
+async def create_program(program: TrainingProgramCreate, current_user: dict = Depends(require_active_subscription)):
     if current_user["role"] != "coach":
         raise HTTPException(status_code=403, detail="Only coaches can create programs")
     
@@ -801,7 +801,7 @@ async def get_program(program_id: str, current_user: dict = Depends(get_current_
     return TrainingProgram(**program)
 
 @api_router.put("/programs/{program_id}", response_model=TrainingProgram)
-async def update_program(program_id: str, update: TrainingProgramUpdate, current_user: dict = Depends(get_current_user)):
+async def update_program(program_id: str, update: TrainingProgramUpdate, current_user: dict = Depends(require_active_subscription)):
     if current_user["role"] != "coach":
         raise HTTPException(status_code=403, detail="Only coaches can update programs")
     
@@ -823,7 +823,7 @@ async def update_program(program_id: str, update: TrainingProgramUpdate, current
     return TrainingProgram(**program)
 
 @api_router.delete("/programs/{program_id}")
-async def delete_program(program_id: str, current_user: dict = Depends(get_current_user)):
+async def delete_program(program_id: str, current_user: dict = Depends(require_active_subscription)):
     if current_user["role"] != "coach":
         raise HTTPException(status_code=403, detail="Only coaches can delete programs")
     
