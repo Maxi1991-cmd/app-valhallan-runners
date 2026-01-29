@@ -53,7 +53,7 @@ const safeCheckExpired = (dateString?: string | null): boolean => {
 export default function AthleteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { deleteAthlete, programs, fetchPrograms } = useDataStore();
+  const { deleteAthlete, programs, fetchPrograms, fetchAthletes } = useDataStore();
   const [athlete, setAthlete] = useState<AthleteProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
