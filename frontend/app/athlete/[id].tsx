@@ -85,16 +85,17 @@ export default function AthleteDetail() {
   const handleDelete = () => {
     Alert.alert(
       'Elimina Atleta',
-      'Sei sicuro di voler eliminare questo atleta? Questa azione non può essere annullata.',
+      'Sei sicuro di voler eliminare questo atleta e tutti i suoi dati? Questa azione non può essere annullata.',
       [
-        { text: 'Annulla', style: 'cancel' },
+        { text: 'No', style: 'cancel' },
         {
-          text: 'Elimina',
+          text: 'Sì, elimina',
           style: 'destructive',
           onPress: async () => {
             try {
               await deleteAthlete(id!);
-              router.back();
+              Alert.alert('Eliminato', 'Atleta eliminato con successo');
+              router.replace('/(tabs)');
             } catch (error) {
               Alert.alert('Errore', 'Impossibile eliminare atleta');
             }
