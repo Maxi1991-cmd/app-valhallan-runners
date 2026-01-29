@@ -1460,8 +1460,9 @@ async def compare_athlete_data(
 
 @api_router.get("/check-expiries")
 async def check_expiries(current_user: dict = Depends(get_current_user)):
+    # Solo i coach possono vedere le scadenze, gli atleti ottengono lista vuota
     if current_user["role"] != "coach":
-        raise HTTPException(status_code=403, detail="Only coaches can check expiries")
+        return {"warnings": []}
     
     athletes = await db.athletes.find({"coach_id": current_user["id"]}).to_list(1000)
     
