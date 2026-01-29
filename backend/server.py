@@ -418,6 +418,65 @@ def parse_fit_file(fit_content: bytes) -> dict:
 
 # ==================== AUTH ROUTES ====================
 
+# Helper function per verificare se l'abbonamento è attivo
+def check_subscription_active(user: dict) -> bool:
+    """Verifica se l'abbonamento del coach è attivo"""
+    if user.get("role") != "coach":
+        return True  # Gli atleti non hanno bisogno di abbonamento
+    
+    subscription = user.get("subscription")
+    if not subscription:
+        return False
+    
+    if subscription.get("status") != "active":
+        return False
+    
+    # Verifica data scadenza
+    end_date_str = subscription.get("end_date")
+    if end_date_str:
+        try:
+            # Prova vari formati di data
+            for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"]:
+                try:
+                    end_date = datetime.strptime(end_date_str, fmt).date()
+                    if end_date < datetime.utcnow().date():
+                        return False
+                    break
+                except ValueError:
+                    continue
+        except:
+            pass
+    
+    return True
+
+def get_subscription_info(user: dict) -> Optional[dict]:
+    """Restituisce info abbonamento"""
+    subscription = user.get("subscription")
+    if subscription:
+        return {
+            "plan": subscription.get("plan", "none"),
+            "status": subscription.get("status", "inactive"),
+            "start_date": subscription.get("start_date"),
+            "end_date": subscription.get("end_date"),
+            "is_active": check_subscription_active(user)
+        }
+    return {
+        "plan": "none",
+        "status": "inactive",
+        "start_date": None,
+        "end_date": None,
+        "is_active": False
+    }
+
+# Dependency per verificare abbonamento attivo per operazioni di scrittura
+async def require_active_subscription(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") == "coach" and not check_subscription_active(current_user):
+        raise HTTPException(
+            status_code=403, 
+            detail="Abbonamento scaduto o non attivo. Rinnova per modificare i dati."
+        )
+    return current_user
+
 @api_router.post("/auth/register", response_model=Token)
 async def register(user: UserCreate):
     # Check if user exists
@@ -431,10 +490,22 @@ async def register(user: UserCreate):
     user_dict["password"] = get_password_hash(user.password)
     user_dict["created_at"] = datetime.utcnow()
     
+    # Default subscription per coach: trial attivo per 30 giorni
+    if user_dict.get("role") == "coach":
+        trial_end = (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d")
+        user_dict["subscription"] = {
+            "plan": "trial",
+            "status": "active",
+            "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "end_date": trial_end
+        }
+    
     await db.users.insert_one(user_dict)
     
     # Create token
     access_token = create_access_token(data={"sub": user_dict["id"]})
+    
+    subscription_data = get_subscription_info(user_dict)
     
     return Token(
         access_token=access_token,
@@ -444,7 +515,8 @@ async def register(user: UserCreate):
             email=user_dict["email"],
             name=user_dict["name"],
             role=user_dict["role"],
-            coach_id=user_dict.get("coach_id")
+            coach_id=user_dict.get("coach_id"),
+            subscription=SubscriptionInfo(**subscription_data) if subscription_data else None
         )
     )
 
@@ -456,6 +528,8 @@ async def login(credentials: UserLogin):
     
     access_token = create_access_token(data={"sub": user["id"]})
     
+    subscription_data = get_subscription_info(user)
+    
     return Token(
         access_token=access_token,
         token_type="bearer",
@@ -464,19 +538,59 @@ async def login(credentials: UserLogin):
             email=user["email"],
             name=user["name"],
             role=user["role"],
-            coach_id=user.get("coach_id")
+            coach_id=user.get("coach_id"),
+            subscription=SubscriptionInfo(**subscription_data) if subscription_data else None
         )
     )
 
 @api_router.get("/auth/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
+    subscription_data = get_subscription_info(current_user)
     return UserResponse(
         id=current_user["id"],
         email=current_user["email"],
         name=current_user["name"],
         role=current_user["role"],
-        coach_id=current_user.get("coach_id")
+        coach_id=current_user.get("coach_id"),
+        subscription=SubscriptionInfo(**subscription_data) if subscription_data else None
     )
+
+@api_router.put("/auth/subscription")
+async def update_subscription(
+    subscription: SubscriptionUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Aggiorna lo stato dell'abbonamento del coach"""
+    if current_user.get("role") != "coach":
+        raise HTTPException(status_code=403, detail="Solo i coach possono avere abbonamenti")
+    
+    # Calcola date
+    start_date = datetime.utcnow().strftime("%Y-%m-%d")
+    if subscription.plan == "monthly":
+        end_date = (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d")
+    elif subscription.plan == "annual":
+        end_date = (datetime.utcnow() + timedelta(days=365)).strftime("%Y-%m-%d")
+    else:
+        end_date = None
+    
+    subscription_data = {
+        "plan": subscription.plan,
+        "status": subscription.status,
+        "start_date": start_date,
+        "end_date": end_date
+    }
+    
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"subscription": subscription_data}}
+    )
+    
+    return {"message": "Abbonamento aggiornato", "subscription": subscription_data}
+
+@api_router.get("/auth/subscription")
+async def get_subscription(current_user: dict = Depends(get_current_user)):
+    """Ottieni lo stato dell'abbonamento"""
+    return get_subscription_info(current_user)
 
 # ==================== ATHLETE PROFILE ROUTES ====================
 
