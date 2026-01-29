@@ -6,6 +6,7 @@ import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProfileTab() {
   const router = useRouter();
@@ -24,11 +25,19 @@ export default function ProfileTab() {
         text: 'Esci',
         style: 'destructive',
         onPress: async () => {
+          // 1. Pulisci tutto lo storage
+          await AsyncStorage.clear();
+          
+          // 2. Reset dello state auth
           await logout();
-          // Forza il redirect alla schermata di login
-          setTimeout(() => {
-            router.replace('/');
-          }, 100);
+          
+          // 3. Reset completo navigazione - torna alla root
+          while (router.canGoBack()) {
+            router.back();
+          }
+          
+          // 4. Redirect forzato alla schermata iniziale
+          router.replace('/');
         },
       },
     ]);
