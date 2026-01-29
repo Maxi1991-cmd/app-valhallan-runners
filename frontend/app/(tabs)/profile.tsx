@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import { useRootNavigationState, useRouter } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Updates from 'expo-updates';
 
 export default function ProfileTab() {
   const router = useRouter();
-  const navigation = useNavigation();
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -27,25 +26,24 @@ export default function ProfileTab() {
         text: 'Esci',
         style: 'destructive',
         onPress: async () => {
-          try {
-            // 1. Pulisci completamente lo storage
-            await AsyncStorage.clear();
-            
-            // 2. Reset dello state auth
-            await logout();
-            
-            // 3. Reset COMPLETO dello stack di navigazione
-            // Questo resetta tutto e imposta la schermata iniziale come root
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: 'index' }],
-              })
-            );
-          } catch (error) {
-            console.error('Logout error:', error);
-            // Fallback: forza comunque il redirect
+          // 1. Pulisci completamente lo storage
+          await AsyncStorage.clear();
+          
+          // 2. Reset dello state auth
+          await logout();
+          
+          // 3. Forza reload completo dell'app per resettare tutto
+          // In development usa router.replace, in production usa Updates.reloadAsync
+          if (__DEV__) {
+            // In development, forza navigazione pulita
             router.replace('/');
+          } else {
+            // In production, reload completo
+            try {
+              await Updates.reloadAsync();
+            } catch (e) {
+              router.replace('/');
+            }
           }
         },
       },
