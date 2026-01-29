@@ -25,7 +25,10 @@ export default function ProfileTab() {
         style: 'destructive',
         onPress: async () => {
           await logout();
-          router.replace('/');
+          // Forza il redirect alla schermata di login
+          setTimeout(() => {
+            router.replace('/');
+          }, 100);
         },
       },
     ]);
