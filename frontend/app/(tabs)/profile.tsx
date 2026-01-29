@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import { useAuthStore } from '../../src/store/authStore';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
@@ -10,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ProfileTab() {
   const router = useRouter();
+  const navigation = useNavigation();
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -26,22 +28,23 @@ export default function ProfileTab() {
         style: 'destructive',
         onPress: async () => {
           try {
-            // 1. Pulisci tutto lo storage
+            // 1. Pulisci completamente lo storage
             await AsyncStorage.clear();
             
             // 2. Reset dello state auth
             await logout();
             
-            // 3. Forza redirect alla root con dismissAll se disponibile
-            if (router.canDismiss()) {
-              router.dismissAll();
-            }
-            
-            // 4. Redirect forzato alla schermata iniziale
-            router.replace('/');
+            // 3. Reset COMPLETO dello stack di navigazione
+            // Questo resetta tutto e imposta la schermata iniziale come root
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'index' }],
+              })
+            );
           } catch (error) {
             console.error('Logout error:', error);
-            // Fallback: redirect comunque
+            // Fallback: forza comunque il redirect
             router.replace('/');
           }
         },
