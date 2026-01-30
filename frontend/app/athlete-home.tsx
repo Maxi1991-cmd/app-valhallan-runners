@@ -22,6 +22,8 @@ interface Workout {
   distance_km?: number;
   target_pace?: string;
   completed: boolean;
+  actual_data?: any;
+  modified_by_athlete?: boolean;
 }
 
 interface Program {
@@ -30,36 +32,76 @@ interface Program {
   workouts: Workout[];
 }
 
+interface AthleteProfile {
+  id: string;
+  name: string;
+  email: string;
+  payments: Payment[];
+  medical_certificate: {
+    issue_date?: string;
+    expiry_date?: string;
+  };
+}
+
+interface Payment {
+  id: string;
+  month: string;
+  amount: number;
+  paid: boolean;
+  due_date: string;
+}
+
 export default function AthleteHomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'today' | 'week' | 'month' | 'info'>('today');
   
   // Modal states
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState<{workout: Workout, programId: string} | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedWorkout, setSelectedWorkout] = useState<{workout: Workout & {programId: string, programName: string}} | null>(null);
   
-  // Form states for complete workout
+  // Form states
   const [fatigue, setFatigue] = useState(5);
   const [hasPain, setHasPain] = useState(false);
   const [painLocation, setPainLocation] = useState('');
   const [notes, setNotes] = useState('');
-  
-  // Form state for skip workout
   const [skipReason, setSkipReason] = useState('');
+  
+  // Edit form states
+  const [editDuration, setEditDuration] = useState('');
+  const [editDistance, setEditDistance] = useState('');
+  const [editFatigue, setEditFatigue] = useState(5);
+  const [editNotes, setEditNotes] = useState('');
 
   const fetchData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await axios.get(`${BASE_URL}/api/programs`, {
+      
+      // Fetch programs
+      const programsResponse = await axios.get(`${BASE_URL}/api/programs`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setPrograms(response.data);
+      setPrograms(programsResponse.data);
+      
+      // Fetch athlete profile (pagamenti e certificato)
+      try {
+        const profileResponse = await axios.get(`${BASE_URL}/api/athlete/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAthleteProfile(profileResponse.data);
+      } catch (e) {
+        // Profile endpoint might not exist for athlete view
+        console.log('Could not fetch athlete profile');
+      }
     } catch (error) {
-      console.error('Error fetching programs:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -89,29 +131,49 @@ export default function AthleteHomeScreen() {
     ]);
   };
 
-  // Get today's date in YYYY-MM-DD format
+  // Date helpers
   const today = new Date().toISOString().split('T')[0];
   const dayOfWeek = new Date().toLocaleDateString('it-IT', { weekday: 'long' });
 
-  // Filter workouts
+  // Get all workouts with program info
   const allWorkouts = programs.flatMap(p => 
     p.workouts.map(w => ({ ...w, programId: p.id, programName: p.name }))
   );
-  
-  const todayWorkouts = allWorkouts.filter(w => w.date === today && !w.completed);
-  const weekWorkouts = allWorkouts.filter(w => {
-    if (!w.date) return false;
-    const workoutDate = new Date(w.date);
+
+  // Filter workouts by period
+  const getWeekWorkouts = () => {
     const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay() + 1);
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
-    return workoutDate >= startOfWeek && workoutDate <= endOfWeek;
-  });
+    
+    return allWorkouts.filter(w => {
+      if (!w.date) return false;
+      const workoutDate = new Date(w.date);
+      return workoutDate >= startOfWeek && workoutDate <= endOfWeek;
+    }).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+  };
 
-  const openCompleteModal = (workout: Workout, programId: string) => {
-    setSelectedWorkout({ workout, programId });
+  const getMonthWorkouts = () => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    
+    return allWorkouts.filter(w => {
+      if (!w.date) return false;
+      const workoutDate = new Date(w.date);
+      return workoutDate >= startOfMonth && workoutDate <= endOfMonth;
+    }).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
+  };
+
+  const getTodayWorkouts = () => {
+    return allWorkouts.filter(w => w.date === today && !w.completed);
+  };
+
+  // Open modals
+  const openCompleteModal = (workout: any) => {
+    setSelectedWorkout({ workout });
     setFatigue(5);
     setHasPain(false);
     setPainLocation('');
@@ -119,19 +181,38 @@ export default function AthleteHomeScreen() {
     setShowCompleteModal(true);
   };
 
-  const openSkipModal = (workout: Workout, programId: string) => {
-    setSelectedWorkout({ workout, programId });
+  const openSkipModal = (workout: any) => {
+    setSelectedWorkout({ workout });
     setSkipReason('');
     setShowSkipModal(true);
   };
 
+  const openViewModal = (workout: any) => {
+    setSelectedWorkout({ workout });
+    setShowViewModal(true);
+  };
+
+  const openEditModal = (workout: any) => {
+    if (workout.modified_by_athlete) {
+      Alert.alert('Non modificabile', 'Hai già modificato questo allenamento. La modifica è consentita una sola volta.');
+      return;
+    }
+    setSelectedWorkout({ workout });
+    setEditDuration(workout.actual_data?.duration_minutes?.toString() || workout.duration_minutes?.toString() || '');
+    setEditDistance(workout.actual_data?.distance_km?.toString() || workout.distance_km?.toString() || '');
+    setEditFatigue(workout.actual_data?.fatigue_level || 5);
+    setEditNotes(workout.actual_data?.notes || '');
+    setShowEditModal(true);
+  };
+
+  // Submit handlers
   const submitCompleteWorkout = async () => {
     if (!selectedWorkout) return;
     
     try {
       const token = await AsyncStorage.getItem('token');
       await axios.put(
-        `${BASE_URL}/api/programs/${selectedWorkout.programId}/workouts/${selectedWorkout.workout.id}/complete`,
+        `${BASE_URL}/api/programs/${selectedWorkout.workout.programId}/workouts/${selectedWorkout.workout.id}/complete`,
         {
           duration_minutes: selectedWorkout.workout.duration_minutes,
           distance_km: selectedWorkout.workout.distance_km,
@@ -158,7 +239,7 @@ export default function AthleteHomeScreen() {
     try {
       const token = await AsyncStorage.getItem('token');
       await axios.put(
-        `${BASE_URL}/api/programs/${selectedWorkout.programId}/workouts/${selectedWorkout.workout.id}/complete`,
+        `${BASE_URL}/api/programs/${selectedWorkout.workout.programId}/workouts/${selectedWorkout.workout.id}/complete`,
         {
           skipped: true,
           skip_reason: skipReason,
@@ -176,6 +257,32 @@ export default function AthleteHomeScreen() {
     }
   };
 
+  const submitEditWorkout = async () => {
+    if (!selectedWorkout) return;
+    
+    try {
+      const token = await AsyncStorage.getItem('token');
+      await axios.put(
+        `${BASE_URL}/api/programs/${selectedWorkout.workout.programId}/workouts/${selectedWorkout.workout.id}/edit`,
+        {
+          duration_minutes: editDuration ? parseInt(editDuration) : null,
+          distance_km: editDistance ? parseFloat(editDistance) : null,
+          fatigue_level: editFatigue,
+          notes: editNotes,
+          modified_by_athlete: true
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      Alert.alert('Successo', 'Allenamento modificato! Il coach è stato notificato.');
+      setShowEditModal(false);
+      fetchData();
+    } catch (error: any) {
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore nella modifica');
+    }
+  };
+
+  // Helpers
   const getWorkoutTypeColor = (type: string) => {
     switch (type) {
       case 'easy': return '#4CAF50';
@@ -197,6 +304,250 @@ export default function AthleteHomeScreen() {
     }
   };
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '--';
+    try {
+      return new Date(dateStr).toLocaleDateString('it-IT', { 
+        day: '2-digit', 
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const isDateExpired = (dateStr?: string) => {
+    if (!dateStr) return false;
+    try {
+      return new Date(dateStr) < new Date();
+    } catch {
+      return false;
+    }
+  };
+
+  const getDaysUntil = (dateStr?: string) => {
+    if (!dateStr) return null;
+    try {
+      const diff = Math.ceil((new Date(dateStr).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+      return diff;
+    } catch {
+      return null;
+    }
+  };
+
+  // Render workout card
+  const renderWorkoutCard = (workout: any, showActions = true) => {
+    const isPast = workout.date && new Date(workout.date) < new Date(today);
+    const isToday = workout.date === today;
+    
+    return (
+      <Card key={workout.id} style={[styles.workoutCard, workout.completed && styles.completedCard]}>
+        <TouchableOpacity 
+          onPress={() => workout.completed ? openViewModal(workout) : null}
+          disabled={!workout.completed}
+        >
+          <View style={styles.workoutHeader}>
+            <View style={[styles.typeBadge, { backgroundColor: `${getWorkoutTypeColor(workout.workout_type)}20` }]}>
+              <Text style={[styles.typeText, { color: getWorkoutTypeColor(workout.workout_type) }]}>
+                {getWorkoutTypeLabel(workout.workout_type)}
+              </Text>
+            </View>
+            <Text style={styles.workoutDate}>
+              {workout.date ? new Date(workout.date).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) : workout.day}
+            </Text>
+            {workout.completed && (
+              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+            )}
+          </View>
+          
+          <Text style={styles.workoutTitle}>{workout.title}</Text>
+          <Text style={styles.workoutDescription} numberOfLines={2}>{workout.description}</Text>
+          
+          <View style={styles.workoutMeta}>
+            {workout.duration_minutes && (
+              <View style={styles.metaItem}>
+                <Ionicons name="time-outline" size={14} color="#999" />
+                <Text style={styles.metaText}>{workout.duration_minutes} min</Text>
+              </View>
+            )}
+            {workout.distance_km && (
+              <View style={styles.metaItem}>
+                <Ionicons name="navigate-outline" size={14} color="#999" />
+                <Text style={styles.metaText}>{workout.distance_km} km</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
+
+        {/* Actions for today's workouts */}
+        {showActions && isToday && !workout.completed && (
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.actionBtn, styles.completeBtn]}
+              onPress={() => openCompleteModal(workout)}
+            >
+              <Ionicons name="checkmark-circle" size={18} color="#FFF" />
+              <Text style={styles.actionBtnText}>Completato</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.actionBtn, styles.skipBtn]}
+              onPress={() => openSkipModal(workout)}
+            >
+              <Ionicons name="close-circle" size={18} color="#FFF" />
+              <Text style={styles.actionBtnText}>Non eseguito</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Edit button for completed past workouts */}
+        {workout.completed && isPast && !workout.modified_by_athlete && (
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => openEditModal(workout)}
+          >
+            <Ionicons name="pencil" size={16} color="#FF6B35" />
+            <Text style={styles.editButtonText}>Modifica dati</Text>
+          </TouchableOpacity>
+        )}
+
+        {workout.modified_by_athlete && (
+          <View style={styles.modifiedBadge}>
+            <Ionicons name="checkmark" size={12} color="#4CAF50" />
+            <Text style={styles.modifiedText}>Modificato</Text>
+          </View>
+        )}
+      </Card>
+    );
+  };
+
+  // Render tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'today':
+        const todayWorkouts = getTodayWorkouts();
+        return (
+          <View>
+            <Text style={styles.sectionTitle}>🏃 Allenamento di Oggi</Text>
+            {todayWorkouts.length === 0 ? (
+              <Card style={styles.restDayCard}>
+                <Ionicons name="bed" size={48} color="#4CAF50" />
+                <Text style={styles.restDayText}>Giorno di riposo</Text>
+                <Text style={styles.restDaySubtext}>Nessun allenamento programmato</Text>
+              </Card>
+            ) : (
+              todayWorkouts.map(w => renderWorkoutCard(w, true))
+            )}
+          </View>
+        );
+
+      case 'week':
+        const weekWorkouts = getWeekWorkouts();
+        return (
+          <View>
+            <Text style={styles.sectionTitle}>📅 Allenamenti Settimanali</Text>
+            {weekWorkouts.length === 0 ? (
+              <Text style={styles.emptyText}>Nessun allenamento questa settimana</Text>
+            ) : (
+              weekWorkouts.map(w => renderWorkoutCard(w, false))
+            )}
+          </View>
+        );
+
+      case 'month':
+        const monthWorkouts = getMonthWorkouts();
+        return (
+          <View>
+            <Text style={styles.sectionTitle}>📆 Allenamenti Mensili</Text>
+            {monthWorkouts.length === 0 ? (
+              <Text style={styles.emptyText}>Nessun allenamento questo mese</Text>
+            ) : (
+              monthWorkouts.map(w => renderWorkoutCard(w, false))
+            )}
+          </View>
+        );
+
+      case 'info':
+        return (
+          <View>
+            {/* Certificato Medico */}
+            <Text style={styles.sectionTitle}>🏥 Certificato Medico</Text>
+            <Card style={styles.infoCard}>
+              {athleteProfile?.medical_certificate?.expiry_date ? (
+                <>
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Scadenza:</Text>
+                    <Text style={[
+                      styles.infoValue,
+                      isDateExpired(athleteProfile.medical_certificate.expiry_date) && styles.expiredText
+                    ]}>
+                      {formatDate(athleteProfile.medical_certificate.expiry_date)}
+                    </Text>
+                  </View>
+                  {(() => {
+                    const days = getDaysUntil(athleteProfile.medical_certificate.expiry_date);
+                    if (days !== null) {
+                      if (days < 0) {
+                        return (
+                          <View style={[styles.statusBanner, styles.expiredBanner]}>
+                            <Ionicons name="warning" size={18} color="#DC3545" />
+                            <Text style={styles.expiredBannerText}>Scaduto da {Math.abs(days)} giorni</Text>
+                          </View>
+                        );
+                      } else if (days <= 30) {
+                        return (
+                          <View style={[styles.statusBanner, styles.warningBanner]}>
+                            <Ionicons name="alert-circle" size={18} color="#FF9800" />
+                            <Text style={styles.warningBannerText}>Scade tra {days} giorni</Text>
+                          </View>
+                        );
+                      } else {
+                        return (
+                          <View style={[styles.statusBanner, styles.validBanner]}>
+                            <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+                            <Text style={styles.validBannerText}>Valido</Text>
+                          </View>
+                        );
+                      }
+                    }
+                    return null;
+                  })()}
+                </>
+              ) : (
+                <Text style={styles.emptyText}>Nessun certificato registrato</Text>
+              )}
+            </Card>
+
+            {/* Pagamenti */}
+            <Text style={styles.sectionTitle}>💳 Pagamenti</Text>
+            <Card style={styles.infoCard}>
+              {athleteProfile?.payments && athleteProfile.payments.length > 0 ? (
+                athleteProfile.payments.map((payment) => (
+                  <View key={payment.id} style={[styles.paymentRow, !payment.paid && styles.unpaidRow]}>
+                    <View>
+                      <Text style={styles.paymentMonth}>{payment.month}</Text>
+                      <Text style={styles.paymentDue}>Scadenza: {formatDate(payment.due_date)}</Text>
+                    </View>
+                    <View style={styles.paymentRight}>
+                      <Text style={styles.paymentAmount}>€{payment.amount}</Text>
+                      <View style={[styles.paymentStatus, payment.paid ? styles.paidStatus : styles.unpaidStatus]}>
+                        <Text style={[styles.paymentStatusText, payment.paid ? styles.paidText : styles.unpaidText]}>
+                          {payment.paid ? 'Pagato' : 'Da pagare'}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>Nessun pagamento registrato</Text>
+              )}
+            </Card>
+          </View>
+        );
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -209,109 +560,42 @@ export default function AthleteHomeScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Ciao, {user?.name?.split(' ')[0]}!</Text>
-            <Text style={styles.dateText}>{dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}, {new Date().toLocaleDateString('it-IT')}</Text>
+            <Text style={styles.dateText}>
+              {dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}, {new Date().toLocaleDateString('it-IT')}
+            </Text>
           </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
             <Ionicons name="log-out-outline" size={24} color="#FF6B35" />
           </TouchableOpacity>
         </View>
 
-        {/* Today's Workout */}
-        <Card title="🏃 Allenamento di Oggi" style={styles.todayCard}>
-          {todayWorkouts.length === 0 ? (
-            <View style={styles.restDay}>
-              <Ionicons name="bed" size={48} color="#4CAF50" />
-              <Text style={styles.restDayText}>Giorno di riposo</Text>
-              <Text style={styles.restDaySubtext}>Nessun allenamento programmato per oggi</Text>
-            </View>
-          ) : (
-            todayWorkouts.map((workout: any) => (
-              <View key={workout.id} style={styles.workoutItem}>
-                <View style={styles.workoutHeader}>
-                  <View style={[styles.typeBadge, { backgroundColor: `${getWorkoutTypeColor(workout.workout_type)}20` }]}>
-                    <Text style={[styles.typeText, { color: getWorkoutTypeColor(workout.workout_type) }]}>
-                      {getWorkoutTypeLabel(workout.workout_type)}
-                    </Text>
-                  </View>
-                  <Text style={styles.workoutTitle}>{workout.title}</Text>
-                </View>
-                
-                <Text style={styles.workoutDescription}>{workout.description}</Text>
-                
-                <View style={styles.workoutMeta}>
-                  {workout.duration_minutes && (
-                    <View style={styles.metaItem}>
-                      <Ionicons name="time-outline" size={14} color="#999" />
-                      <Text style={styles.metaText}>{workout.duration_minutes} min</Text>
-                    </View>
-                  )}
-                  {workout.distance_km && (
-                    <View style={styles.metaItem}>
-                      <Ionicons name="navigate-outline" size={14} color="#999" />
-                      <Text style={styles.metaText}>{workout.distance_km} km</Text>
-                    </View>
-                  )}
-                  {workout.target_pace && (
-                    <View style={styles.metaItem}>
-                      <Ionicons name="speedometer-outline" size={14} color="#999" />
-                      <Text style={styles.metaText}>{workout.target_pace}</Text>
-                    </View>
-                  )}
-                </View>
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          {[
+            { key: 'today', label: 'Oggi', icon: 'today' },
+            { key: 'week', label: 'Settimana', icon: 'calendar' },
+            { key: 'month', label: 'Mese', icon: 'calendar-outline' },
+            { key: 'info', label: 'Info', icon: 'information-circle' },
+          ].map(tab => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tab, activeTab === tab.key && styles.activeTab]}
+              onPress={() => setActiveTab(tab.key as any)}
+            >
+              <Ionicons 
+                name={tab.icon as any} 
+                size={18} 
+                color={activeTab === tab.key ? '#FF6B35' : '#666'} 
+              />
+              <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={[styles.actionBtn, styles.completeBtn]}
-                    onPress={() => openCompleteModal(workout, workout.programId)}
-                  >
-                    <Ionicons name="checkmark-circle" size={20} color="#FFF" />
-                    <Text style={styles.actionBtnText}>Fine Allenamento</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.actionBtn, styles.skipBtn]}
-                    onPress={() => openSkipModal(workout, workout.programId)}
-                  >
-                    <Ionicons name="close-circle" size={20} color="#FFF" />
-                    <Text style={styles.actionBtnText}>Non Eseguito</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))
-          )}
-        </Card>
-
-        {/* Week Workouts */}
-        <Card title="📅 Allenamenti Settimanali" style={styles.weekCard}>
-          {weekWorkouts.length === 0 ? (
-            <Text style={styles.emptyText}>Nessun allenamento questa settimana</Text>
-          ) : (
-            weekWorkouts.map((workout: any) => (
-              <View key={workout.id} style={[styles.weekWorkoutItem, workout.completed && styles.completedWorkout]}>
-                <View style={styles.weekWorkoutDate}>
-                  <Text style={styles.weekDay}>
-                    {workout.date ? new Date(workout.date).toLocaleDateString('it-IT', { weekday: 'short' }) : '--'}
-                  </Text>
-                  <Text style={styles.weekDateNum}>
-                    {workout.date ? new Date(workout.date).getDate() : '--'}
-                  </Text>
-                </View>
-                <View style={styles.weekWorkoutInfo}>
-                  <Text style={styles.weekWorkoutTitle}>{workout.title}</Text>
-                  <Text style={styles.weekWorkoutMeta}>
-                    {workout.duration_minutes && `${workout.duration_minutes}min`}
-                    {workout.distance_km && ` • ${workout.distance_km}km`}
-                  </Text>
-                </View>
-                {workout.completed ? (
-                  <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
-                ) : (
-                  <View style={[styles.statusDot, { backgroundColor: getWorkoutTypeColor(workout.workout_type) }]} />
-                )}
-              </View>
-            ))
-          )}
-        </Card>
+        {/* Tab Content */}
+        {renderTabContent()}
       </ScrollView>
 
       {/* Complete Workout Modal */}
@@ -363,7 +647,7 @@ export default function AthleteHomeScreen() {
                   style={styles.textInput}
                   value={painLocation}
                   onChangeText={setPainLocation}
-                  placeholder="Es: ginocchio destro, polpaccio..."
+                  placeholder="Es: ginocchio destro..."
                   placeholderTextColor="#666"
                 />
               </>
@@ -411,6 +695,126 @@ export default function AthleteHomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* View Workout Modal */}
+      <Modal visible={showViewModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Dettagli Allenamento</Text>
+              <TouchableOpacity onPress={() => setShowViewModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            {selectedWorkout && (
+              <>
+                <Text style={styles.viewTitle}>{selectedWorkout.workout.title}</Text>
+                <Text style={styles.viewDescription}>{selectedWorkout.workout.description}</Text>
+                
+                <View style={styles.viewSection}>
+                  <Text style={styles.viewSectionTitle}>Dati Registrati</Text>
+                  {selectedWorkout.workout.actual_data && (
+                    <>
+                      {selectedWorkout.workout.actual_data.duration_minutes && (
+                        <Text style={styles.viewData}>Durata: {selectedWorkout.workout.actual_data.duration_minutes} min</Text>
+                      )}
+                      {selectedWorkout.workout.actual_data.distance_km && (
+                        <Text style={styles.viewData}>Distanza: {selectedWorkout.workout.actual_data.distance_km} km</Text>
+                      )}
+                      {selectedWorkout.workout.actual_data.fatigue_level && (
+                        <Text style={styles.viewData}>Fatica: {selectedWorkout.workout.actual_data.fatigue_level}/10</Text>
+                      )}
+                      {selectedWorkout.workout.actual_data.notes && (
+                        <Text style={styles.viewData}>Note: {selectedWorkout.workout.actual_data.notes}</Text>
+                      )}
+                    </>
+                  )}
+                </View>
+
+                {!selectedWorkout.workout.modified_by_athlete && (
+                  <Button 
+                    title="Modifica Dati" 
+                    onPress={() => {
+                      setShowViewModal(false);
+                      openEditModal(selectedWorkout.workout);
+                    }} 
+                    variant="outline"
+                    style={styles.submitBtn} 
+                  />
+                )}
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Workout Modal */}
+      <Modal visible={showEditModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Modifica Allenamento</Text>
+              <TouchableOpacity onPress={() => setShowEditModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.warningBox}>
+              <Ionicons name="warning" size={18} color="#FF9800" />
+              <Text style={styles.warningText}>Puoi modificare una sola volta</Text>
+            </View>
+
+            <Text style={styles.inputLabel}>Durata (minuti)</Text>
+            <TextInput
+              style={styles.textInput}
+              value={editDuration}
+              onChangeText={setEditDuration}
+              placeholder="45"
+              placeholderTextColor="#666"
+              keyboardType="numeric"
+            />
+
+            <Text style={styles.inputLabel}>Distanza (km)</Text>
+            <TextInput
+              style={styles.textInput}
+              value={editDistance}
+              onChangeText={setEditDistance}
+              placeholder="10.5"
+              placeholderTextColor="#666"
+              keyboardType="decimal-pad"
+            />
+
+            <Text style={styles.inputLabel}>Livello di Fatica (1-10)</Text>
+            <View style={styles.fatigueContainer}>
+              {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                <TouchableOpacity
+                  key={num}
+                  style={[styles.fatigueBtn, editFatigue === num && styles.fatigueBtnActive]}
+                  onPress={() => setEditFatigue(num)}
+                >
+                  <Text style={[styles.fatigueBtnText, editFatigue === num && styles.fatigueBtnTextActive]}>
+                    {num}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={styles.inputLabel}>Note</Text>
+            <TextInput
+              style={[styles.textInput, styles.textArea]}
+              value={editNotes}
+              onChangeText={setEditNotes}
+              placeholder="Note aggiuntive..."
+              placeholderTextColor="#666"
+              multiline
+              numberOfLines={3}
+            />
+
+            <Button title="Salva Modifiche" onPress={submitEditWorkout} style={styles.submitBtn} />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -422,15 +826,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 20,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   greeting: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '800',
     color: '#FFF',
   },
@@ -442,28 +847,45 @@ const styles = StyleSheet.create({
   logoutBtn: {
     padding: 8,
   },
-  todayCard: {
-    marginBottom: 16,
-    borderColor: '#FF6B35',
-    borderWidth: 1,
+  tabsContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 20,
   },
-  restDay: {
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    gap: 4,
+    borderRadius: 8,
   },
-  restDayText: {
+  activeTab: {
+    backgroundColor: '#252525',
+  },
+  tabText: {
+    fontSize: 12,
+    color: '#666',
+    fontWeight: '500',
+  },
+  activeTabText: {
+    color: '#FF6B35',
+  },
+  sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#4CAF50',
-    marginTop: 12,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 12,
   },
-  restDaySubtext: {
-    fontSize: 13,
-    color: '#999',
-    marginTop: 4,
+  workoutCard: {
+    marginBottom: 12,
   },
-  workoutItem: {
-    marginBottom: 16,
+  completedCard: {
+    borderColor: '#4CAF50',
+    borderWidth: 1,
   },
   workoutHeader: {
     flexDirection: 'row',
@@ -477,25 +899,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   typeText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
-  workoutTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFF',
+  workoutDate: {
+    fontSize: 12,
+    color: '#999',
     flex: 1,
   },
+  workoutTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 4,
+  },
   workoutDescription: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#CCC',
-    lineHeight: 20,
-    marginBottom: 12,
+    lineHeight: 18,
+    marginBottom: 8,
   },
   workoutMeta: {
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 16,
   },
   metaItem: {
     flexDirection: 'row',
@@ -503,21 +929,25 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   metaText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#999',
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
   },
   actionBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 10,
   },
   completeBtn: {
     backgroundColor: '#4CAF50',
@@ -528,63 +958,164 @@ const styles = StyleSheet.create({
   actionBtnText: {
     color: '#FFF',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
   },
-  weekCard: {
-    marginBottom: 20,
+  editButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  editButtonText: {
+    color: '#FF6B35',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  modifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  modifiedText: {
+    color: '#4CAF50',
+    fontSize: 11,
+  },
+  restDayCard: {
+    alignItems: 'center',
+    padding: 30,
+  },
+  restDayText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4CAF50',
+    marginTop: 12,
+  },
+  restDaySubtext: {
+    fontSize: 13,
+    color: '#999',
+    marginTop: 4,
   },
   emptyText: {
     color: '#666',
     textAlign: 'center',
     padding: 20,
   },
-  weekWorkoutItem: {
+  infoCard: {
+    marginBottom: 16,
+  },
+  infoRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  infoLabel: {
+    color: '#999',
+    fontSize: 14,
+  },
+  infoValue: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  expiredText: {
+    color: '#DC3545',
+  },
+  statusBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  expiredBanner: {
+    backgroundColor: 'rgba(220, 53, 69, 0.15)',
+  },
+  warningBanner: {
+    backgroundColor: 'rgba(255, 152, 0, 0.15)',
+  },
+  validBanner: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+  },
+  expiredBannerText: {
+    color: '#DC3545',
+    fontWeight: '600',
+  },
+  warningBannerText: {
+    color: '#FF9800',
+    fontWeight: '600',
+  },
+  validBannerText: {
+    color: '#4CAF50',
+    fontWeight: '600',
+  },
+  paymentRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
-  completedWorkout: {
-    opacity: 0.6,
+  unpaidRow: {
+    backgroundColor: 'rgba(220, 53, 69, 0.05)',
+    marginHorizontal: -16,
+    paddingHorizontal: 16,
   },
-  weekWorkoutDate: {
-    alignItems: 'center',
-    width: 50,
-    marginRight: 12,
-  },
-  weekDay: {
-    fontSize: 11,
-    color: '#999',
-    textTransform: 'uppercase',
-  },
-  weekDateNum: {
-    fontSize: 18,
-    fontWeight: '700',
+  paymentMonth: {
     color: '#FFF',
-  },
-  weekWorkoutInfo: {
-    flex: 1,
-  },
-  weekWorkoutTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#FFF',
   },
-  weekWorkoutMeta: {
-    fontSize: 12,
+  paymentDue: {
     color: '#999',
+    fontSize: 12,
     marginTop: 2,
   },
-  statusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+  paymentRight: {
+    alignItems: 'flex-end',
+  },
+  paymentAmount: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  paymentStatus: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+    marginTop: 4,
+  },
+  paidStatus: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+  },
+  unpaidStatus: {
+    backgroundColor: 'rgba(220, 53, 69, 0.15)',
+  },
+  paymentStatusText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  paidText: {
+    color: '#4CAF50',
+  },
+  unpaidText: {
+    color: '#DC3545',
   },
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
+    backgroundColor: 'rgba(0,0,0,0.85)',
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -617,9 +1148,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   fatigueBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
@@ -630,6 +1161,7 @@ const styles = StyleSheet.create({
   fatigueBtnText: {
     color: '#999',
     fontWeight: '600',
+    fontSize: 12,
   },
   fatigueBtnTextActive: {
     color: '#FFF',
@@ -669,5 +1201,47 @@ const styles = StyleSheet.create({
   submitBtn: {
     marginTop: 20,
     marginBottom: 20,
+  },
+  warningBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255, 152, 0, 0.15)',
+    padding: 12,
+    borderRadius: 8,
+  },
+  warningText: {
+    color: '#FF9800',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  viewTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 8,
+  },
+  viewDescription: {
+    fontSize: 14,
+    color: '#CCC',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  viewSection: {
+    backgroundColor: '#252525',
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 16,
+  },
+  viewSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FF6B35',
+    marginBottom: 10,
+  },
+  viewData: {
+    fontSize: 14,
+    color: '#CCC',
+    marginBottom: 6,
   },
 });
