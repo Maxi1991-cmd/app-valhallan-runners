@@ -30,6 +30,7 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="logout" options={{ headerShown: false }} />
         <Stack.Screen name="athlete-home" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="athlete/[id]" options={{ title: 'Profilo Atleta' }} />
