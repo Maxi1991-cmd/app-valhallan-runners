@@ -338,7 +338,11 @@ export default function AthleteHomeScreen() {
 
   // Render workout card
   const renderWorkoutCard = (workout: any, showActions = true) => {
-    const isPast = workout.date && new Date(workout.date) < new Date(today);
+    const workoutDate = workout.date ? new Date(workout.date) : null;
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    
+    const isPast = workoutDate ? workoutDate < todayDate : false;
     const isToday = workout.date === today;
     
     return (
@@ -401,8 +405,8 @@ export default function AthleteHomeScreen() {
           </View>
         )}
 
-        {/* Edit button for completed past workouts */}
-        {workout.completed && isPast && !workout.modified_by_athlete && (
+        {/* Edit button ONLY for completed past workouts that haven't been modified */}
+        {workout.completed === true && isPast && !workout.modified_by_athlete && (
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => openEditModal(workout)}
