@@ -25,13 +25,7 @@ export default function ProfileTab() {
         text: 'Esci',
         style: 'destructive',
         onPress: async () => {
-          // 1. Pulisci completamente lo storage
-          await AsyncStorage.clear();
-          
-          // 2. Reset dello state auth
           await logout();
-          
-          // 3. Naviga alla schermata iniziale
           router.replace('/');
         },
       },
