@@ -405,8 +405,8 @@ export default function AthleteHomeScreen() {
           </View>
         )}
 
-        {/* Edit button ONLY for completed past workouts that haven't been modified */}
-        {workout.completed === true && isPast && !workout.modified_by_athlete && (
+        {/* Edit button for PAST workouts (both completed and not completed) that haven't been modified */}
+        {isPast && !workout.modified_by_athlete && (
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => openEditModal(workout)}
