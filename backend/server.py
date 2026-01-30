@@ -1004,6 +1004,104 @@ async def complete_workout(
     
     return {"message": "Workout marked as complete", "notification_sent": True}
 
+# ==================== ATHLETE PROFILE (for athlete view) ====================
+
+@api_router.get("/athlete/profile")
+async def get_athlete_profile(current_user: dict = Depends(get_current_user)):
+    """Get athlete profile for the logged-in athlete"""
+    if current_user["role"] != "athlete":
+        raise HTTPException(status_code=403, detail="Only athletes can access this endpoint")
+    
+    # Find athlete profile linked to this user
+    athlete = await db.athletes.find_one({"user_id": current_user["id"]})
+    if not athlete:
+        # Try to find by email
+        athlete = await db.athletes.find_one({"email": current_user["email"]})
+    
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete profile not found")
+    
+    return {
+        "id": athlete["id"],
+        "name": athlete["name"],
+        "email": athlete["email"],
+        "payments": athlete.get("payments", []),
+        "medical_certificate": athlete.get("medical_certificate", {}),
+        "biometrics": athlete.get("biometrics", {})
+    }
+
+@api_router.put("/programs/{program_id}/workouts/{workout_id}/edit")
+async def edit_workout(
+    program_id: str,
+    workout_id: str,
+    edit_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Allow athlete to edit their completed workout (once only)"""
+    program = await db.programs.find_one({"id": program_id})
+    if not program:
+        raise HTTPException(status_code=404, detail="Program not found")
+    
+    # Find the workout
+    workout_index = None
+    for i, w in enumerate(program.get("workouts", [])):
+        if w.get("id") == workout_id:
+            workout_index = i
+            break
+    
+    if workout_index is None:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    
+    workout = program["workouts"][workout_index]
+    
+    # Check if already modified
+    if workout.get("modified_by_athlete"):
+        raise HTTPException(status_code=400, detail="Questo allenamento è già stato modificato")
+    
+    # Update the workout data
+    if not workout.get("actual_data"):
+        workout["actual_data"] = {}
+    
+    workout["actual_data"]["duration_minutes"] = edit_data.get("duration_minutes")
+    workout["actual_data"]["distance_km"] = edit_data.get("distance_km")
+    workout["actual_data"]["fatigue_level"] = edit_data.get("fatigue_level")
+    workout["actual_data"]["notes"] = edit_data.get("notes")
+    workout["actual_data"]["modified_at"] = datetime.utcnow().isoformat()
+    workout["modified_by_athlete"] = True
+    
+    # Update the program
+    program["workouts"][workout_index] = workout
+    await db.programs.update_one(
+        {"id": program_id},
+        {"$set": {"workouts": program["workouts"]}}
+    )
+    
+    # Get athlete info for notification
+    athlete = await db.athletes.find_one({"id": program["athlete_id"]})
+    athlete_name = athlete["name"] if athlete else "Atleta"
+    
+    # Create notification for coach
+    notification = {
+        "id": str(uuid.uuid4()),
+        "recipient_id": program["coach_id"],
+        "notification_type": "workout_modified",
+        "title": f"Allenamento modificato - {athlete_name}",
+        "message": f"{athlete_name} ha modificato i dati dell'allenamento '{workout.get('title', 'Allenamento')}'",
+        "read": False,
+        "related_data": {
+            "program_id": program_id,
+            "workout_id": workout_id,
+            "athlete_id": program["athlete_id"],
+            "athlete_name": athlete_name,
+            "modified_data": edit_data
+        },
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.notifications.insert_one(notification)
+    
+    return {"message": "Workout modified", "notification_sent": True}
+
 # ==================== CALENDAR ROUTES ====================
 
 @api_router.get("/calendar/workouts")
