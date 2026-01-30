@@ -26,6 +26,10 @@ export default function ProfileTab() {
         style: 'destructive',
         onPress: async () => {
           await logout();
+          // Usa dismissAll per uscire dai tabs, poi vai alla root
+          while (router.canGoBack()) {
+            router.back();
+          }
           router.replace('/');
         },
       },
