@@ -24,11 +24,9 @@ export default function ProfileTab() {
       {
         text: 'Esci',
         style: 'destructive',
-        onPress: async () => {
-          await logout();
-          // Naviga fuori dai tabs usando path relativo
-          router.dismissAll();
-          router.replace('/(tabs)/../');
+        onPress: () => {
+          // Naviga alla pagina di logout che è FUORI dai tabs
+          router.push('/logout');
         },
       },
     ]);
