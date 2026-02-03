@@ -1283,4 +1283,35 @@ const styles = StyleSheet.create({
     color: '#CCC',
     marginBottom: 6,
   },
+  // Edit modal specific styles
+  editModalContent: {
+    backgroundColor: '#1A1A1A',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 0,
+    maxHeight: '90%',
+    marginTop: 'auto',
+  },
+  editModalScroll: {
+    flexGrow: 0,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  inputWithButton: {
+    flex: 1,
+  },
+  confirmInputBtn: {
+    padding: 4,
+  },
+  editSubmitBtn: {
+    marginTop: 24,
+    marginBottom: 10,
+  },
+  bottomSpacer: {
+    height: 40,
+  },
 });
