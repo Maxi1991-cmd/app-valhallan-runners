@@ -298,7 +298,7 @@ export default function ProgramDetail() {
           />
           <Button
             title="Modifica"
-            onPress={() => router.push(`/program/edit/${id}`)}
+            onPress={() => router.push(`/program/create?id=${id}`)}
             variant="outline"
             size="small"
             style={styles.actionButton}
