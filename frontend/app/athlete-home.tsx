@@ -755,69 +755,104 @@ export default function AthleteHomeScreen() {
 
       {/* Edit Workout Modal */}
       <Modal visible={showEditModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Modifica Allenamento</Text>
-              <TouchableOpacity onPress={() => setShowEditModal(false)}>
-                <Ionicons name="close" size={24} color="#FFF" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.warningBox}>
-              <Ionicons name="warning" size={18} color="#FF9800" />
-              <Text style={styles.warningText}>Puoi modificare una sola volta</Text>
-            </View>
-
-            <Text style={styles.inputLabel}>Durata (minuti)</Text>
-            <TextInput
-              style={styles.textInput}
-              value={editDuration}
-              onChangeText={setEditDuration}
-              placeholder="45"
-              placeholderTextColor="#666"
-              keyboardType="numeric"
-            />
-
-            <Text style={styles.inputLabel}>Distanza (km)</Text>
-            <TextInput
-              style={styles.textInput}
-              value={editDistance}
-              onChangeText={setEditDistance}
-              placeholder="10.5"
-              placeholderTextColor="#666"
-              keyboardType="decimal-pad"
-            />
-
-            <Text style={styles.inputLabel}>Livello di Fatica (1-10)</Text>
-            <View style={styles.fatigueContainer}>
-              {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                <TouchableOpacity
-                  key={num}
-                  style={[styles.fatigueBtn, editFatigue === num && styles.fatigueBtnActive]}
-                  onPress={() => setEditFatigue(num)}
-                >
-                  <Text style={[styles.fatigueBtnText, editFatigue === num && styles.fatigueBtnTextActive]}>
-                    {num}
-                  </Text>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.editModalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Modifica Allenamento</Text>
+                <TouchableOpacity onPress={() => setShowEditModal(false)}>
+                  <Ionicons name="close" size={24} color="#FFF" />
                 </TouchableOpacity>
-              ))}
+              </View>
+
+              <ScrollView 
+                style={styles.editModalScroll}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+              >
+                <View style={styles.warningBox}>
+                  <Ionicons name="warning" size={18} color="#FF9800" />
+                  <Text style={styles.warningText}>Puoi modificare una sola volta</Text>
+                </View>
+
+                <Text style={styles.inputLabel}>Durata (minuti)</Text>
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={[styles.textInput, styles.inputWithButton]}
+                    value={editDuration}
+                    onChangeText={setEditDuration}
+                    placeholder="45"
+                    placeholderTextColor="#666"
+                    keyboardType="numeric"
+                    returnKeyType="done"
+                    onSubmitEditing={() => Keyboard.dismiss()}
+                  />
+                  <TouchableOpacity 
+                    style={styles.confirmInputBtn}
+                    onPress={() => Keyboard.dismiss()}
+                  >
+                    <Ionicons name="checkmark-circle" size={28} color="#4CAF50" />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.inputLabel}>Distanza (km)</Text>
+                <View style={styles.inputRow}>
+                  <TextInput
+                    style={[styles.textInput, styles.inputWithButton]}
+                    value={editDistance}
+                    onChangeText={setEditDistance}
+                    placeholder="10.5"
+                    placeholderTextColor="#666"
+                    keyboardType="decimal-pad"
+                    returnKeyType="done"
+                    onSubmitEditing={() => Keyboard.dismiss()}
+                  />
+                  <TouchableOpacity 
+                    style={styles.confirmInputBtn}
+                    onPress={() => Keyboard.dismiss()}
+                  >
+                    <Ionicons name="checkmark-circle" size={28} color="#4CAF50" />
+                  </TouchableOpacity>
+                </View>
+
+                <Text style={styles.inputLabel}>Livello di Fatica (1-10)</Text>
+                <View style={styles.fatigueContainer}>
+                  {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                    <TouchableOpacity
+                      key={num}
+                      style={[styles.fatigueBtn, editFatigue === num && styles.fatigueBtnActive]}
+                      onPress={() => setEditFatigue(num)}
+                    >
+                      <Text style={[styles.fatigueBtnText, editFatigue === num && styles.fatigueBtnTextActive]}>
+                        {num}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <Text style={styles.inputLabel}>Note</Text>
+                <TextInput
+                  style={[styles.textInput, styles.textArea]}
+                  value={editNotes}
+                  onChangeText={setEditNotes}
+                  placeholder="Note aggiuntive..."
+                  placeholderTextColor="#666"
+                  multiline
+                  numberOfLines={3}
+                  returnKeyType="done"
+                  blurOnSubmit={true}
+                />
+
+                <Button title="Salva Modifiche" onPress={submitEditWorkout} style={styles.editSubmitBtn} />
+                
+                <View style={styles.bottomSpacer} />
+              </ScrollView>
             </View>
-
-            <Text style={styles.inputLabel}>Note</Text>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              value={editNotes}
-              onChangeText={setEditNotes}
-              placeholder="Note aggiuntive..."
-              placeholderTextColor="#666"
-              multiline
-              numberOfLines={3}
-            />
-
-            <Button title="Salva Modifiche" onPress={submitEditWorkout} style={styles.submitBtn} />
-          </View>
-        </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
