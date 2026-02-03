@@ -1033,7 +1033,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#252525',
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#666',
     fontWeight: '500',
   },
