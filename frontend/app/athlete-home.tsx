@@ -365,12 +365,13 @@ export default function AthleteHomeScreen() {
     
     const isPast = workoutDate ? workoutDate < todayDate : false;
     const isToday = workout.date === today;
+    const hasFeedback = workout.feedback_sent || workout.completed;
     
     return (
-      <Card key={workout.id} style={[styles.workoutCard, workout.completed && styles.completedCard]}>
+      <Card key={workout.id} style={[styles.workoutCard, hasFeedback && styles.completedCard]}>
         <TouchableOpacity 
-          onPress={() => workout.completed ? openViewModal(workout) : null}
-          disabled={!workout.completed}
+          onPress={() => openViewModal(workout)}
+          activeOpacity={0.7}
         >
           <View style={styles.workoutHeader}>
             <View style={[styles.typeBadge, { backgroundColor: `${getWorkoutTypeColor(workout.workout_type)}20` }]}>
@@ -381,7 +382,7 @@ export default function AthleteHomeScreen() {
             <Text style={styles.workoutDate}>
               {workout.date ? new Date(workout.date).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) : workout.day}
             </Text>
-            {workout.completed && (
+            {hasFeedback && (
               <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
             )}
           </View>
@@ -405,8 +406,16 @@ export default function AthleteHomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Actions for today's workouts */}
-        {showActions && isToday && !workout.completed && (
+        {/* Mostra feedback inviato se presente */}
+        {workout.feedback_sent && workout.athlete_feedback && (
+          <View style={styles.feedbackSentBadge}>
+            <Ionicons name="send" size={12} color="#4CAF50" />
+            <Text style={styles.feedbackSentText}>Feedback inviato al coach</Text>
+          </View>
+        )}
+
+        {/* Actions for today's workouts - solo se NON ha già inviato feedback */}
+        {showActions && isToday && !hasFeedback && (
           <View style={styles.actionButtons}>
             <TouchableOpacity
               style={[styles.actionBtn, styles.completeBtn]}
@@ -426,21 +435,21 @@ export default function AthleteHomeScreen() {
           </View>
         )}
 
-        {/* Edit button for PAST workouts (both completed and not completed) that haven't been modified */}
-        {isPast && !workout.modified_by_athlete && (
+        {/* Modifica (una sola volta) - dopo feedback inviato O per allenamenti passati */}
+        {(hasFeedback || isPast) && !workout.modified_by_athlete && (
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => openEditModal(workout)}
           >
             <Ionicons name="pencil" size={16} color="#FF6B35" />
-            <Text style={styles.editButtonText}>Modifica dati</Text>
+            <Text style={styles.editButtonText}>Modifica (una sola volta)</Text>
           </TouchableOpacity>
         )}
 
         {workout.modified_by_athlete && (
           <View style={styles.modifiedBadge}>
             <Ionicons name="checkmark" size={12} color="#4CAF50" />
-            <Text style={styles.modifiedText}>Modificato</Text>
+            <Text style={styles.modifiedText}>Già modificato</Text>
           </View>
         )}
       </Card>
