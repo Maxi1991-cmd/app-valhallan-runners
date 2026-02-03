@@ -57,7 +57,8 @@ export default function AthleteDetail() {
   const [athlete, setAthlete] = useState<AthleteProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'info' | 'payments' | 'certificate'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'history' | 'payments' | 'certificate'>('info');
+  const [allWorkouts, setAllWorkouts] = useState<(WorkoutSession & { programName: string })[]>([]);
 
   const loadAthlete = async () => {
     try {
