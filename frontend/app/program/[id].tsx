@@ -530,42 +530,6 @@ export default function ProgramDetail() {
                 keyboardType="numeric"
               />
 
-              <Text style={styles.feelingLabel}>Come ti sei sentito?</Text>
-              <View style={styles.feelingContainer}>
-                {[
-                  { value: 'great', label: 'Ottimo', icon: 'happy' },
-                  { value: 'good', label: 'Bene', icon: 'happy-outline' },
-                  { value: 'ok', label: 'Ok', icon: 'remove' },
-                  { value: 'tired', label: 'Stanco', icon: 'sad-outline' },
-                  { value: 'exhausted', label: 'Esausto', icon: 'sad' },
-                ].map((feeling) => (
-                  <TouchableOpacity
-                    key={feeling.value}
-                    style={[
-                      styles.feelingButton,
-                      completionData.feeling === feeling.value && styles.feelingButtonActive,
-                    ]}
-                    onPress={() =>
-                      setCompletionData({ ...completionData, feeling: feeling.value })
-                    }
-                  >
-                    <Ionicons
-                      name={feeling.icon as any}
-                      size={24}
-                      color={completionData.feeling === feeling.value ? '#FFF' : '#999'}
-                    />
-                    <Text
-                      style={[
-                        styles.feelingText,
-                        completionData.feeling === feeling.value && styles.feelingTextActive,
-                      ]}
-                    >
-                      {feeling.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
               <Input
                 label="Note"
                 value={completionData.notes}
@@ -578,7 +542,7 @@ export default function ProgramDetail() {
               />
 
               <Button
-                title="Completa e Notifica Coach"
+                title="Termina"
                 onPress={handleCompleteWorkout}
                 size="large"
                 style={styles.submitButton}
