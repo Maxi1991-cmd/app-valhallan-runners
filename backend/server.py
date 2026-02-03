@@ -1214,7 +1214,19 @@ async def get_notifications(current_user: dict = Depends(get_current_user)):
         {"recipient_id": current_user["id"]}
     ).sort("created_at", -1).to_list(100)
     
-    return [Notification(**n) for n in notifications]
+    # Process notifications to ensure all required fields are present
+    processed = []
+    for n in notifications:
+        # Handle _id conversion
+        if "_id" in n:
+            del n["_id"]
+        # Ensure id field exists
+        if "id" not in n:
+            n["id"] = str(uuid.uuid4())
+        # sender_id is now optional
+        processed.append(Notification(**n))
+    
+    return processed
 
 @api_router.get("/notifications/unread-count")
 async def get_unread_count(current_user: dict = Depends(get_current_user)):
