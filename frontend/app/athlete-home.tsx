@@ -1441,4 +1441,88 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: 40,
   },
+  // Storico styles
+  actualDataContainer: {
+    backgroundColor: '#252525',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  actualDataTitle: {
+    fontSize: 12,
+    color: '#FF6B35',
+    fontWeight: '600',
+    marginBottom: 6,
+  },
+  actualDataRow: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  actualDataText: {
+    fontSize: 13,
+    color: '#CCC',
+  },
+  actualDataNotes: {
+    fontSize: 12,
+    color: '#999',
+    fontStyle: 'italic',
+    marginTop: 6,
+  },
+  historyActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  statusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+  statusCompleted: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+  },
+  statusMissed: {
+    backgroundColor: 'rgba(220, 53, 69, 0.15)',
+  },
+  statusPillText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  statusCompletedText: {
+    color: '#4CAF50',
+  },
+  statusMissedText: {
+    color: '#DC3545',
+  },
+  historyEditBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    borderRadius: 8,
+  },
+  historyEditText: {
+    color: '#FF6B35',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  alreadyModifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  alreadyModifiedText: {
+    color: '#4CAF50',
+    fontSize: 11,
+    fontStyle: 'italic',
+  },
 });
