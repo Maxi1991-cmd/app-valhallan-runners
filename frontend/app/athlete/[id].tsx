@@ -64,11 +64,45 @@ export default function AthleteDetail() {
     try {
       const response = await athleteAPI.getOne(id!);
       setAthlete(response.data);
+      
+      // Carica i programmi e i workout dell'atleta
+      await loadWorkouts();
     } catch (error) {
       Alert.alert('Errore', 'Impossibile caricare atleta');
       router.back();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadWorkouts = async () => {
+    try {
+      const response = await programAPI.getAll(id!);
+      const programsData = response.data;
+      
+      // Estrai tutti i workout da tutti i programmi
+      const workouts: (WorkoutSession & { programName: string })[] = [];
+      programsData.forEach((program: any) => {
+        if (program.workouts && Array.isArray(program.workouts)) {
+          program.workouts.forEach((workout: WorkoutSession) => {
+            workouts.push({
+              ...workout,
+              programName: program.name,
+            });
+          });
+        }
+      });
+      
+      // Ordina per data (dal più recente al più vecchio)
+      workouts.sort((a, b) => {
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+      });
+      
+      setAllWorkouts(workouts);
+    } catch (error) {
+      console.log('Errore caricamento workout:', error);
     }
   };
 
