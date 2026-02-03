@@ -204,7 +204,7 @@ class NotificationCreate(NotificationBase):
 
 class Notification(NotificationBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    sender_id: str
+    sender_id: Optional[str] = None  # Made optional for legacy notifications
     recipient_id: str
     read: bool = False
     related_data: Optional[dict] = None
