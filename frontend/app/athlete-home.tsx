@@ -811,7 +811,7 @@ export default function AthleteHomeScreen() {
               numberOfLines={4}
             />
 
-            <Button title="Invia al Coach" onPress={submitSkipWorkout} variant="danger" style={styles.submitBtn} />
+            <Button title="Invia" onPress={submitSkipWorkout} variant="danger" style={styles.submitBtn} />
           </View>
         </View>
       </Modal>
