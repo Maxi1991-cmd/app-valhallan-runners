@@ -733,6 +733,31 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontStyle: 'italic',
   },
+  feedbackSection: {
+    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FF6B35',
+  },
+  feedbackTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FF6B35',
+    marginBottom: 8,
+  },
+  feedbackText: {
+    fontSize: 12,
+    color: '#CCC',
+    marginBottom: 4,
+  },
+  feedbackDate: {
+    fontSize: 10,
+    color: '#999',
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
   completedSection: {
     marginTop: 12,
     paddingTop: 12,
