@@ -1551,4 +1551,26 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontStyle: 'italic',
   },
+  feedbackSentBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    borderRadius: 8,
+  },
+  feedbackSentText: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  modalScrollContent: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  modalBottomSpacer: {
+    height: 40,
+  },
 });
