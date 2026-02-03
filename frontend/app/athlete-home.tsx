@@ -179,6 +179,19 @@ export default function AthleteHomeScreen() {
     return allWorkouts.filter(w => w.date === today && !w.completed);
   };
 
+  // Storico: tutti gli allenamenti passati (ordinati dal più recente)
+  const getHistoryWorkouts = () => {
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    
+    return allWorkouts.filter(w => {
+      if (!w.date) return false;
+      const workoutDate = new Date(w.date);
+      workoutDate.setHours(0, 0, 0, 0);
+      return workoutDate < todayDate;
+    }).sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime());
+  };
+
   // Open modals
   const openCompleteModal = (workout: any) => {
     setSelectedWorkout({ workout });
