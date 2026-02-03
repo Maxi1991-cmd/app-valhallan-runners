@@ -731,73 +731,90 @@ export default function AthleteHomeScreen() {
 
       {/* Complete Workout Modal */}
       <Modal visible={showCompleteModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Fine Allenamento</Text>
-              <TouchableOpacity onPress={() => setShowCompleteModal(false)}>
-                <Ionicons name="close" size={24} color="#FFF" />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.inputLabel}>Livello di Fatica (1-10)</Text>
-            <View style={styles.fatigueContainer}>
-              {[1,2,3,4,5,6,7,8,9,10].map(num => (
-                <TouchableOpacity
-                  key={num}
-                  style={[styles.fatigueBtn, fatigue === num && styles.fatigueBtnActive]}
-                  onPress={() => setFatigue(num)}
-                >
-                  <Text style={[styles.fatigueBtnText, fatigue === num && styles.fatigueBtnTextActive]}>
-                    {num}
-                  </Text>
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Fine Allenamento</Text>
+                <TouchableOpacity onPress={() => setShowCompleteModal(false)}>
+                  <Ionicons name="close" size={24} color="#FFF" />
                 </TouchableOpacity>
-              ))}
-            </View>
+              </View>
 
-            <Text style={styles.inputLabel}>Dolori?</Text>
-            <View style={styles.painToggle}>
-              <TouchableOpacity
-                style={[styles.painOption, !hasPain && styles.painOptionActive]}
-                onPress={() => setHasPain(false)}
+              <ScrollView 
+                style={styles.modalScrollContent}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
               >
-                <Text style={[styles.painOptionText, !hasPain && styles.painOptionTextActive]}>No</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.painOption, hasPain && styles.painOptionActive]}
-                onPress={() => setHasPain(true)}
-              >
-                <Text style={[styles.painOptionText, hasPain && styles.painOptionTextActive]}>Sì</Text>
-              </TouchableOpacity>
-            </View>
+                <Text style={styles.inputLabel}>Livello di Fatica (1-10)</Text>
+                <View style={styles.fatigueContainer}>
+                  {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                    <TouchableOpacity
+                      key={num}
+                      style={[styles.fatigueBtn, fatigue === num && styles.fatigueBtnActive]}
+                      onPress={() => setFatigue(num)}
+                    >
+                      <Text style={[styles.fatigueBtnText, fatigue === num && styles.fatigueBtnTextActive]}>
+                        {num}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
-            {hasPain && (
-              <>
-                <Text style={styles.inputLabel}>Dove?</Text>
+                <Text style={styles.inputLabel}>Dolori?</Text>
+                <View style={styles.painToggle}>
+                  <TouchableOpacity
+                    style={[styles.painOption, !hasPain && styles.painOptionActive]}
+                    onPress={() => setHasPain(false)}
+                  >
+                    <Text style={[styles.painOptionText, !hasPain && styles.painOptionTextActive]}>No</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.painOption, hasPain && styles.painOptionActive]}
+                    onPress={() => setHasPain(true)}
+                  >
+                    <Text style={[styles.painOptionText, hasPain && styles.painOptionTextActive]}>Sì</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {hasPain && (
+                  <>
+                    <Text style={styles.inputLabel}>Dove?</Text>
+                    <TextInput
+                      style={styles.textInput}
+                      value={painLocation}
+                      onChangeText={setPainLocation}
+                      placeholder="Es: ginocchio destro..."
+                      placeholderTextColor="#666"
+                      returnKeyType="done"
+                      onSubmitEditing={() => Keyboard.dismiss()}
+                    />
+                  </>
+                )}
+
+                <Text style={styles.inputLabel}>Note (opzionale)</Text>
                 <TextInput
-                  style={styles.textInput}
-                  value={painLocation}
-                  onChangeText={setPainLocation}
-                  placeholder="Es: ginocchio destro..."
+                  style={[styles.textInput, styles.textArea]}
+                  value={notes}
+                  onChangeText={setNotes}
+                  placeholder="Come ti sei sentito?"
                   placeholderTextColor="#666"
+                  multiline
+                  numberOfLines={3}
+                  blurOnSubmit={true}
+                  returnKeyType="done"
                 />
-              </>
-            )}
 
-            <Text style={styles.inputLabel}>Note (opzionale)</Text>
-            <TextInput
-              style={[styles.textInput, styles.textArea]}
-              value={notes}
-              onChangeText={setNotes}
-              placeholder="Come ti sei sentito?"
-              placeholderTextColor="#666"
-              multiline
-              numberOfLines={3}
-            />
-
-            <Button title="Invia al Coach" onPress={submitCompleteWorkout} style={styles.submitBtn} />
-          </View>
-        </View>
+                <Button title="Invia al Coach" onPress={submitCompleteWorkout} style={styles.submitBtn} />
+                
+                <View style={styles.modalBottomSpacer} />
+              </ScrollView>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Skip Workout Modal */}
