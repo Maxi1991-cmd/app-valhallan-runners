@@ -390,6 +390,33 @@ export default function ProgramDetail() {
               </Text>
             )}
 
+            {/* Feedback dell'atleta */}
+            {workout.feedback_sent && workout.athlete_feedback && (
+              <View style={styles.feedbackSection}>
+                <Text style={styles.feedbackTitle}>
+                  <Ionicons name="chatbubble-ellipses" size={14} color="#FF6B35" /> Feedback Atleta
+                </Text>
+                {workout.athlete_feedback.fatigue_level && (
+                  <Text style={styles.feedbackText}>
+                    Fatica: {workout.athlete_feedback.fatigue_level}/10
+                  </Text>
+                )}
+                {workout.athlete_feedback.has_pain && (
+                  <Text style={styles.feedbackText}>
+                    Dolori: {workout.athlete_feedback.pain_location || 'Sì'}
+                  </Text>
+                )}
+                {workout.athlete_feedback.notes && (
+                  <Text style={styles.feedbackText}>
+                    Note: {workout.athlete_feedback.notes}
+                  </Text>
+                )}
+                <Text style={styles.feedbackDate}>
+                  Inviato il {workout.feedback_date}
+                </Text>
+              </View>
+            )}
+
             {workout.completed && workout.completed_date && (
               <View style={styles.completedSection}>
                 <Text style={styles.completedDate}>
