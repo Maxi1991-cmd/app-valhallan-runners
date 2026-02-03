@@ -37,8 +37,7 @@ export default function RootLayout() {
         <Stack.Screen name="athlete/create" options={{ title: 'Nuovo Atleta' }} />
         <Stack.Screen name="athlete/edit/[id]" options={{ title: 'Modifica Atleta' }} />
         <Stack.Screen name="program/[id]" options={{ title: 'Programma' }} />
-        <Stack.Screen name="program/create" options={{ title: 'Nuovo Programma' }} />
-        <Stack.Screen name="program/edit/[id]" options={{ title: 'Modifica Programma' }} />
+        <Stack.Screen name="program/create" options={{ title: 'Programma' }} />
       </Stack>
     </View>
   );
