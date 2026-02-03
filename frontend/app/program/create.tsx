@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
+import { programAPI } from '../../src/services/api';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { Card } from '../../src/components/Card';
+import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WorkoutSession } from '../../src/types';
@@ -29,10 +31,14 @@ const getDefaultEndDate = (): string => {
   return formatDateToISO(endDate);
 };
 
-export default function CreateProgram() {
+export default function CreateOrEditProgram() {
   const router = useRouter();
-  const { athletes, fetchAthletes, createProgram } = useDataStore();
-  const [loading, setLoading] = useState(false);
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEditMode = !!id;
+  
+  const { athletes, fetchAthletes, createProgram, updateProgram } = useDataStore();
+  const [loading, setLoading] = useState(isEditMode);
+  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -47,7 +53,7 @@ export default function CreateProgram() {
 
   const [newWorkout, setNewWorkout] = useState({
     day: 'Settimana 1 - Lunedì 08:00',
-    date: getDefaultStartDate(), // Data reale per il calendario
+    date: getDefaultStartDate(),
     title: '',
     description: '',
     workout_type: 'easy',
@@ -60,7 +66,31 @@ export default function CreateProgram() {
 
   useEffect(() => {
     fetchAthletes();
-  }, []);
+    if (isEditMode) {
+      loadProgram();
+    }
+  }, [id]);
+
+  const loadProgram = async () => {
+    try {
+      const response = await programAPI.getOne(id!);
+      const data = response.data;
+      setForm({
+        name: data.name,
+        description: data.description || '',
+        start_date: data.start_date,
+        end_date: data.end_date,
+        goal: data.goal || '',
+        athlete_id: data.athlete_id || '',
+      });
+      setWorkouts(data.workouts || []);
+    } catch (error) {
+      Alert.alert('Errore', 'Impossibile caricare programma');
+      router.back();
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const workoutTypes = [
     { value: 'easy', label: 'Facile' },
@@ -79,14 +109,24 @@ export default function CreateProgram() {
       return;
     }
 
-    setWorkouts([...workouts, {
-      ...newWorkout,
-      date: newWorkout.date, // Data per il calendario (YYYY-MM-DD)
+    const workout: Partial<WorkoutSession> = {
+      id: `temp-${Date.now()}`,
+      day: newWorkout.day,
+      date: newWorkout.date,
+      title: newWorkout.title,
+      description: newWorkout.description,
+      workout_type: newWorkout.workout_type,
       duration_minutes: newWorkout.duration_minutes ? parseInt(newWorkout.duration_minutes) : undefined,
       distance_km: newWorkout.distance_km ? parseFloat(newWorkout.distance_km) : undefined,
+      target_pace: newWorkout.target_pace || undefined,
+      heart_rate_zone: newWorkout.heart_rate_zone || undefined,
+      notes: newWorkout.notes || undefined,
       completed: false,
-    }]);
+    };
 
+    setWorkouts([...workouts, workout]);
+    
+    // Reset form per nuovo allenamento
     setNewWorkout({
       day: 'Settimana 1 - Lunedì 08:00',
       date: getDefaultStartDate(),
@@ -105,9 +145,15 @@ export default function CreateProgram() {
     setWorkouts(workouts.filter((_, i) => i !== index));
   };
 
-  const handleCreate = async () => {
-    if (!form.name || !form.athlete_id || !form.start_date || !form.end_date) {
+  const handleSubmit = async () => {
+    // Validazione
+    if (!form.name || !form.start_date || !form.end_date) {
       Alert.alert('Errore', 'Compila tutti i campi obbligatori');
+      return;
+    }
+
+    if (!isEditMode && !form.athlete_id) {
+      Alert.alert('Errore', 'Seleziona un atleta');
       return;
     }
 
@@ -116,20 +162,32 @@ export default function CreateProgram() {
       return;
     }
 
-    setLoading(true);
+    setSaving(true);
     try {
-      await createProgram({
-        ...form,
-        workouts,
-      });
-      Alert.alert('Successo', 'Programma creato');
+      if (isEditMode) {
+        await updateProgram(id!, {
+          ...form,
+          workouts,
+        });
+        Alert.alert('Successo', 'Programma aggiornato');
+      } else {
+        await createProgram({
+          ...form,
+          workouts,
+        });
+        Alert.alert('Successo', 'Programma creato');
+      }
       router.back();
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore durante la creazione');
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore durante il salvataggio');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading) {
+    return <LoadingScreen message="Caricamento..." />;
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -147,28 +205,33 @@ export default function CreateProgram() {
             placeholder="Piano Maratona 12 Settimane"
           />
 
-          <Text style={styles.label}>Atleta *</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.athleteScroll}>
-            {athletes.map((athlete) => (
-              <TouchableOpacity
-                key={athlete.id}
-                style={[
-                  styles.athleteChip,
-                  form.athlete_id === athlete.id && styles.athleteChipActive,
-                ]}
-                onPress={() => setForm({ ...form, athlete_id: athlete.id })}
-              >
-                <Text
-                  style={[
-                    styles.athleteChipText,
-                    form.athlete_id === athlete.id && styles.athleteChipTextActive,
-                  ]}
-                >
-                  {athlete.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          {/* Mostra selezione atleta solo in modalità creazione */}
+          {!isEditMode && (
+            <>
+              <Text style={styles.label}>Atleta *</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.athleteScroll}>
+                {athletes.map((athlete) => (
+                  <TouchableOpacity
+                    key={athlete.id}
+                    style={[
+                      styles.athleteChip,
+                      form.athlete_id === athlete.id && styles.athleteChipActive,
+                    ]}
+                    onPress={() => setForm({ ...form, athlete_id: athlete.id })}
+                  >
+                    <Text
+                      style={[
+                        styles.athleteChipText,
+                        form.athlete_id === athlete.id && styles.athleteChipTextActive,
+                      ]}
+                    >
+                      {athlete.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </>
+          )}
 
           <View style={styles.row}>
             <Input
@@ -206,10 +269,10 @@ export default function CreateProgram() {
           <Text style={styles.sectionTitle}>Allenamenti ({workouts.length})</Text>
 
           {workouts.map((workout, index) => (
-            <Card key={index} style={styles.workoutCard}>
+            <Card key={workout.id || index} style={styles.workoutCard}>
               <View style={styles.workoutHeader}>
                 <View>
-                  <Text style={styles.workoutDay}>{workout.day}</Text>
+                  <Text style={styles.workoutDay}>{workout.date || workout.day}</Text>
                   <Text style={styles.workoutTitle}>{workout.title}</Text>
                 </View>
                 <TouchableOpacity onPress={() => removeWorkout(index)}>
@@ -229,6 +292,9 @@ export default function CreateProgram() {
                   </Text>
                 )}
               </View>
+              {workout.completed && (
+                <Text style={styles.completedBadge}>✓ Completato</Text>
+              )}
             </Card>
           ))}
 
@@ -334,11 +400,11 @@ export default function CreateProgram() {
           </Card>
 
           <Button
-            title="Crea Programma"
-            onPress={handleCreate}
-            loading={loading}
+            title={isEditMode ? "Salva Modifiche" : "Crea Programma"}
+            onPress={handleSubmit}
+            loading={saving}
             size="large"
-            style={styles.createButton}
+            style={styles.submitButton}
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -456,12 +522,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
+  completedBadge: {
+    fontSize: 11,
+    color: '#4CAF50',
+    marginTop: 8,
+    fontWeight: '600',
+  },
   newWorkoutCard: {
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#FF6B35',
   },
-  createButton: {
+  submitButton: {
     marginBottom: 40,
   },
 });
