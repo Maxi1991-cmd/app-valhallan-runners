@@ -143,14 +143,22 @@ export default function AthleteHomeScreen() {
   // Filter workouts by period
   const getWeekWorkouts = () => {
     const now = new Date();
+    // Calcola l'inizio della settimana (Lunedì)
+    const dayOfWeek = now.getDay();
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Domenica = -6, altri = 1 - giorno
+    
     const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay() + 1);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(now.getDate() + diffToMonday);
+    
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
     
     return allWorkouts.filter(w => {
       if (!w.date) return false;
       const workoutDate = new Date(w.date);
+      workoutDate.setHours(12, 0, 0, 0); // Normalizza per evitare problemi di timezone
       return workoutDate >= startOfWeek && workoutDate <= endOfWeek;
     }).sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime());
   };
