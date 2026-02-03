@@ -773,4 +773,96 @@ const styles = StyleSheet.create({
     color: '#FF6B35',
     letterSpacing: 4,
   },
+  // Storico Allenamenti styles
+  workoutRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  workoutLeft: {
+    flexDirection: 'row',
+    flex: 1,
+    gap: 12,
+  },
+  workoutDateBadge: {
+    backgroundColor: '#252525',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    minWidth: 55,
+    alignItems: 'center',
+  },
+  workoutDateText: {
+    color: '#FF6B35',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  workoutInfo: {
+    flex: 1,
+  },
+  workoutTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  workoutProgram: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 2,
+  },
+  workoutMeta: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 4,
+  },
+  workoutMetaText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  workoutRight: {
+    alignItems: 'flex-end',
+    gap: 4,
+  },
+  completedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  completedText: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  missedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  missedText: {
+    color: '#DC3545',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  pendingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  pendingText: {
+    color: '#FF9800',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  fatigueText: {
+    fontSize: 11,
+    color: '#999',
+  },
+  modifiedText: {
+    fontSize: 10,
+    color: '#FF6B35',
+    fontStyle: 'italic',
+  },
 });
