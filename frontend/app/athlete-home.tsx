@@ -176,7 +176,8 @@ export default function AthleteHomeScreen() {
   };
 
   const getTodayWorkouts = () => {
-    return allWorkouts.filter(w => w.date === today && !w.completed);
+    // Mostra tutti gli allenamenti di oggi (anche quelli con feedback inviato)
+    return allWorkouts.filter(w => w.date === today);
   };
 
   // Storico: tutti gli allenamenti passati (ordinati dal più recente)
