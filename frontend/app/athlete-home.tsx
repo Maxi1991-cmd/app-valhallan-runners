@@ -784,7 +784,18 @@ export default function AthleteHomeScreen() {
               </>
             )}
 
-            <Button title="Termina" onPress={submitCompleteWorkout} style={styles.submitBtn} />
+            <Text style={styles.inputLabel}>Note (opzionale)</Text>
+            <TextInput
+              style={[styles.textInput, styles.textArea]}
+              value={notes}
+              onChangeText={setNotes}
+              placeholder="Come ti sei sentito?"
+              placeholderTextColor="#666"
+              multiline
+              numberOfLines={3}
+            />
+
+            <Button title="Invia al Coach" onPress={submitCompleteWorkout} style={styles.submitBtn} />
           </View>
         </View>
       </Modal>
