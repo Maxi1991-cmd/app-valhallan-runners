@@ -215,14 +215,14 @@ export default function AthleteDetail() {
 
         {/* Tab Buttons */}
         <View style={styles.tabContainer}>
-          {(['info', 'payments', 'certificate'] as const).map((tab) => (
+          {(['info', 'history', 'payments', 'certificate'] as const).map((tab) => (
             <TouchableOpacity
               key={tab}
               style={[styles.tabButton, activeTab === tab && styles.tabButtonActive]}
               onPress={() => setActiveTab(tab)}
             >
               <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                {tab === 'info' ? 'Info' : tab === 'payments' ? 'Pagamenti' : 'Certificato'}
+                {tab === 'info' ? 'Info' : tab === 'history' ? 'Storico' : tab === 'payments' ? 'Pagamenti' : 'Certificato'}
               </Text>
             </TouchableOpacity>
           ))}
