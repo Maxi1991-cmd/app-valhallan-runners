@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
-import { athleteAPI } from '../../src/services/api';
+import { athleteAPI, programAPI } from '../../src/services/api';
 import { Card } from '../../src/components/Card';
 import { Button } from '../../src/components/Button';
 import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AthleteProfile } from '../../src/types';
+import { AthleteProfile, WorkoutSession } from '../../src/types';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
