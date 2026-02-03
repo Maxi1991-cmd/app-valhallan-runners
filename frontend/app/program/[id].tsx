@@ -128,22 +128,21 @@ export default function ProgramDetail() {
         avg_heart_rate: completionData.avg_heart_rate ? parseInt(completionData.avg_heart_rate) : null,
         max_heart_rate: completionData.max_heart_rate ? parseInt(completionData.max_heart_rate) : null,
         calories: completionData.calories ? parseInt(completionData.calories) : null,
-        feeling: completionData.feeling,
         notes: completionData.notes || null,
       };
 
+      // Use /finalize endpoint - no notification, updates analytics
       await axios.put(
-        `${BASE_URL}/api/programs/${id}/workouts/${selectedWorkout.id}/complete`,
+        `${BASE_URL}/api/programs/${id}/workouts/${selectedWorkout.id}/finalize`,
         data,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setCompleteModalVisible(false);
       loadProgram();
-      fetchNotifications(); // Refresh notifications
-      Alert.alert('Successo', 'Allenamento completato! Il coach è stato notificato.');
+      Alert.alert('Successo', 'Allenamento terminato! Analisi dati aggiornate.');
     } catch (error) {
-      Alert.alert('Errore', 'Impossibile completare allenamento');
+      Alert.alert('Errore', 'Impossibile terminare allenamento');
     }
   };
 
