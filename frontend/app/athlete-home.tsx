@@ -493,6 +493,111 @@ export default function AthleteHomeScreen() {
           </View>
         );
 
+      case 'history':
+        const historyWorkouts = getHistoryWorkouts();
+        return (
+          <View>
+            <Text style={styles.sectionTitle}>📚 Storico Allenamenti</Text>
+            {historyWorkouts.length === 0 ? (
+              <Text style={styles.emptyText}>Nessun allenamento passato</Text>
+            ) : (
+              historyWorkouts.map(w => (
+                <Card key={w.id} style={[styles.workoutCard, w.completed && styles.completedCard]}>
+                  <View style={styles.workoutHeader}>
+                    <View style={[styles.typeBadge, { backgroundColor: `${getWorkoutTypeColor(w.workout_type)}20` }]}>
+                      <Text style={[styles.typeText, { color: getWorkoutTypeColor(w.workout_type) }]}>
+                        {getWorkoutTypeLabel(w.workout_type)}
+                      </Text>
+                    </View>
+                    <Text style={styles.workoutDate}>
+                      {w.date ? new Date(w.date).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) : w.day}
+                    </Text>
+                    {w.completed && (
+                      <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                    )}
+                  </View>
+                  
+                  <Text style={styles.workoutTitle}>{w.title}</Text>
+                  <Text style={styles.workoutDescription} numberOfLines={2}>{w.description}</Text>
+                  
+                  <View style={styles.workoutMeta}>
+                    {w.duration_minutes && (
+                      <View style={styles.metaItem}>
+                        <Ionicons name="time-outline" size={14} color="#999" />
+                        <Text style={styles.metaText}>{w.duration_minutes} min</Text>
+                      </View>
+                    )}
+                    {w.distance_km && (
+                      <View style={styles.metaItem}>
+                        <Ionicons name="navigate-outline" size={14} color="#999" />
+                        <Text style={styles.metaText}>{w.distance_km} km</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Dati registrati se completato */}
+                  {w.completed && w.actual_data && (
+                    <View style={styles.actualDataContainer}>
+                      <Text style={styles.actualDataTitle}>Dati registrati:</Text>
+                      <View style={styles.actualDataRow}>
+                        {w.actual_data.duration_minutes && (
+                          <Text style={styles.actualDataText}>
+                            Durata: {w.actual_data.duration_minutes} min
+                          </Text>
+                        )}
+                        {w.actual_data.fatigue_level && (
+                          <Text style={styles.actualDataText}>
+                            Fatica: {w.actual_data.fatigue_level}/10
+                          </Text>
+                        )}
+                      </View>
+                      {w.actual_data.notes && (
+                        <Text style={styles.actualDataNotes}>"{w.actual_data.notes}"</Text>
+                      )}
+                    </View>
+                  )}
+
+                  {/* Stato e azione modifica */}
+                  <View style={styles.historyActionRow}>
+                    <View style={[
+                      styles.statusPill,
+                      w.completed ? styles.statusCompleted : styles.statusMissed
+                    ]}>
+                      <Ionicons 
+                        name={w.completed ? "checkmark-circle" : "close-circle"} 
+                        size={14} 
+                        color={w.completed ? "#4CAF50" : "#DC3545"} 
+                      />
+                      <Text style={[
+                        styles.statusPillText,
+                        w.completed ? styles.statusCompletedText : styles.statusMissedText
+                      ]}>
+                        {w.completed ? "Completato" : "Non eseguito"}
+                      </Text>
+                    </View>
+
+                    {/* Pulsante modifica (solo se non già modificato) */}
+                    {!w.modified_by_athlete ? (
+                      <TouchableOpacity
+                        style={styles.historyEditBtn}
+                        onPress={() => openEditModal(w)}
+                      >
+                        <Ionicons name="pencil" size={16} color="#FF6B35" />
+                        <Text style={styles.historyEditText}>Modifica</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={styles.alreadyModifiedBadge}>
+                        <Ionicons name="checkmark" size={12} color="#4CAF50" />
+                        <Text style={styles.alreadyModifiedText}>Già modificato</Text>
+                      </View>
+                    )}
+                  </View>
+                </Card>
+              ))
+            )}
+          </View>
+        );
+
       case 'info':
         return (
           <View>
