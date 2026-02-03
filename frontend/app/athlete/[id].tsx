@@ -324,6 +324,76 @@ export default function AthleteDetail() {
           </>
         )}
 
+        {/* History Tab - Storico Allenamenti */}
+        {activeTab === 'history' && (
+          <Card title="Storico Allenamenti" style={styles.card}>
+            {allWorkouts.length > 0 ? (
+              allWorkouts.map((workout, index) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const workoutDate = workout.date ? new Date(workout.date) : null;
+                const isPast = workoutDate ? workoutDate < today : false;
+                
+                return (
+                  <View key={workout.id || index} style={styles.workoutRow}>
+                    <View style={styles.workoutLeft}>
+                      <View style={styles.workoutDateBadge}>
+                        <Text style={styles.workoutDateText}>
+                          {safeFormatDate(workout.date, 'short')}
+                        </Text>
+                      </View>
+                      <View style={styles.workoutInfo}>
+                        <Text style={styles.workoutTitle}>{workout.title}</Text>
+                        <Text style={styles.workoutProgram}>{workout.programName}</Text>
+                        <View style={styles.workoutMeta}>
+                          {workout.duration_minutes && (
+                            <Text style={styles.workoutMetaText}>
+                              <Ionicons name="time-outline" size={12} color="#999" /> {workout.duration_minutes} min
+                            </Text>
+                          )}
+                          {workout.distance_km && (
+                            <Text style={styles.workoutMetaText}>
+                              <Ionicons name="navigate-outline" size={12} color="#999" /> {workout.distance_km} km
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.workoutRight}>
+                      {workout.completed ? (
+                        <View style={styles.completedBadge}>
+                          <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+                          <Text style={styles.completedText}>Fatto</Text>
+                        </View>
+                      ) : isPast ? (
+                        <View style={styles.missedBadge}>
+                          <Ionicons name="close-circle" size={20} color="#DC3545" />
+                          <Text style={styles.missedText}>Saltato</Text>
+                        </View>
+                      ) : (
+                        <View style={styles.pendingBadge}>
+                          <Ionicons name="time" size={20} color="#FF9800" />
+                          <Text style={styles.pendingText}>In arrivo</Text>
+                        </View>
+                      )}
+                      {workout.actual_data?.fatigue_level && (
+                        <Text style={styles.fatigueText}>
+                          Fatica: {workout.actual_data.fatigue_level}/10
+                        </Text>
+                      )}
+                      {workout.modified_by_athlete && (
+                        <Text style={styles.modifiedText}>Modificato</Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              })
+            ) : (
+              <Text style={styles.emptyText}>Nessun allenamento programmato</Text>
+            )}
+          </Card>
+        )}
+
         {/* Payments Tab */}
         {activeTab === 'payments' && (
           <Card title="Pagamenti Mensili" style={styles.card}>
