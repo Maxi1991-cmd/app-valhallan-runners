@@ -600,6 +600,7 @@ export default function AthleteHomeScreen() {
             { key: 'today', label: 'Oggi', icon: 'today' },
             { key: 'week', label: 'Settimana', icon: 'calendar' },
             { key: 'month', label: 'Mese', icon: 'calendar-outline' },
+            { key: 'history', label: 'Storico', icon: 'time' },
             { key: 'info', label: 'Info', icon: 'information-circle' },
           ].map(tab => (
             <TouchableOpacity
@@ -609,7 +610,7 @@ export default function AthleteHomeScreen() {
             >
               <Ionicons 
                 name={tab.icon as any} 
-                size={18} 
+                size={16} 
                 color={activeTab === tab.key ? '#FF6B35' : '#666'} 
               />
               <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
