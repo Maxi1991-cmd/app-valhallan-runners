@@ -58,7 +58,7 @@ export default function AthleteHomeScreen() {
   const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'today' | 'week' | 'month' | 'info'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'week' | 'month' | 'history' | 'info'>('today');
   
   // Modal states
   const [showCompleteModal, setShowCompleteModal] = useState(false);
