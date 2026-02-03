@@ -943,6 +943,7 @@ async def complete_workout(
     completion_data: Optional[WorkoutCompletionData] = None,
     current_user: dict = Depends(get_current_user)
 ):
+    """Athlete sends feedback to coach - triggers notification"""
     program = await db.programs.find_one({"id": program_id})
     if not program:
         raise HTTPException(status_code=404, detail="Program not found")
@@ -959,17 +960,18 @@ async def complete_workout(
     
     completed_date = datetime.utcnow().strftime("%Y-%m-%d")
     
-    # Prepare actual data
-    actual_data = {}
+    # Prepare feedback data from athlete
+    feedback_data = {}
     if completion_data:
-        actual_data = {k: v for k, v in completion_data.dict().items() if v is not None}
+        feedback_data = {k: v for k, v in completion_data.dict().items() if v is not None}
     
+    # Mark as feedback sent (not fully completed yet)
     await db.programs.update_one(
         {"id": program_id, "workouts.id": workout_id},
         {"$set": {
-            "workouts.$.completed": True,
-            "workouts.$.completed_date": completed_date,
-            "workouts.$.actual_data": actual_data
+            "workouts.$.feedback_sent": True,
+            "workouts.$.feedback_date": completed_date,
+            "workouts.$.athlete_feedback": feedback_data
         }}
     )
     
@@ -977,14 +979,14 @@ async def complete_workout(
     athlete = await db.athletes.find_one({"id": program["athlete_id"]})
     athlete_name = athlete["name"] if athlete else "Atleta"
     
-    # Send notification to coach
+    # Send notification to coach with athlete feedback
     notification = {
         "id": str(uuid.uuid4()),
         "sender_id": current_user["id"],
         "recipient_id": program["coach_id"],
-        "title": f"Allenamento completato - {athlete_name}",
-        "message": f"{athlete_name} ha completato '{workout.get('title', 'Allenamento')}'",
-        "notification_type": "workout_completed",
+        "title": f"Feedback allenamento - {athlete_name}",
+        "message": f"{athlete_name} ha inviato il feedback per '{workout.get('title', 'Allenamento')}'",
+        "notification_type": "workout_feedback",
         "read": False,
         "related_data": {
             "program_id": program_id,
@@ -994,15 +996,81 @@ async def complete_workout(
             "workout_type": workout.get("workout_type"),
             "athlete_id": program["athlete_id"],
             "athlete_name": athlete_name,
-            "completed_date": completed_date,
-            "actual_data": actual_data
+            "feedback_date": completed_date,
+            "athlete_feedback": feedback_data
         },
         "created_at": datetime.utcnow()
     }
     
     await db.notifications.insert_one(notification)
     
-    return {"message": "Workout marked as complete", "notification_sent": True}
+    return {"message": "Feedback sent to coach", "notification_sent": True}
+
+
+@api_router.put("/programs/{program_id}/workouts/{workout_id}/finalize")
+async def finalize_workout(
+    program_id: str,
+    workout_id: str,
+    actual_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Coach finalizes workout with actual training data - updates analytics, NO notification"""
+    # Only coach can finalize
+    if current_user["role"] != "coach":
+        raise HTTPException(status_code=403, detail="Only coach can finalize workouts")
+    
+    program = await db.programs.find_one({"id": program_id})
+    if not program:
+        raise HTTPException(status_code=404, detail="Program not found")
+    
+    if program["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Find the workout
+    workout = None
+    for w in program.get("workouts", []):
+        if w.get("id") == workout_id:
+            workout = w
+            break
+    
+    if not workout:
+        raise HTTPException(status_code=404, detail="Workout not found")
+    
+    completed_date = datetime.utcnow().strftime("%Y-%m-%d")
+    
+    # Update workout as completed with actual data
+    await db.programs.update_one(
+        {"id": program_id, "workouts.id": workout_id},
+        {"$set": {
+            "workouts.$.completed": True,
+            "workouts.$.completed_date": completed_date,
+            "workouts.$.actual_data": actual_data
+        }}
+    )
+    
+    # Update athlete analytics with actual training data
+    activity_record = {
+        "id": str(uuid.uuid4()),
+        "athlete_id": program["athlete_id"],
+        "program_id": program_id,
+        "workout_id": workout_id,
+        "date": workout.get("date", completed_date),
+        "workout_type": workout.get("workout_type", "training"),
+        "title": workout.get("title", "Allenamento"),
+        "duration_minutes": actual_data.get("duration_minutes"),
+        "distance_km": actual_data.get("distance_km"),
+        "avg_pace": actual_data.get("avg_pace"),
+        "avg_heart_rate": actual_data.get("avg_heart_rate"),
+        "max_heart_rate": actual_data.get("max_heart_rate"),
+        "calories": actual_data.get("calories"),
+        "notes": actual_data.get("notes"),
+        "created_at": datetime.utcnow()
+    }
+    
+    # Insert into activities collection for analytics
+    await db.activities.insert_one(activity_record)
+    
+    return {"message": "Workout finalized", "analytics_updated": True}
 
 # ==================== ATHLETE PROFILE (for athlete view) ====================
 
