@@ -365,7 +365,8 @@ export default function AthleteHomeScreen() {
     
     const isPast = workoutDate ? workoutDate < todayDate : false;
     const isToday = workout.date === today;
-    const hasFeedback = workout.feedback_sent || workout.completed;
+    // Controlla se feedback è stato inviato (feedback_sent, completed, o athlete_feedback presente)
+    const hasFeedback = workout.feedback_sent === true || workout.completed === true || (workout.athlete_feedback && Object.keys(workout.athlete_feedback).length > 0);
     
     return (
       <Card key={workout.id} style={[styles.workoutCard, hasFeedback && styles.completedCard]}>
@@ -407,7 +408,7 @@ export default function AthleteHomeScreen() {
         </TouchableOpacity>
 
         {/* Mostra feedback inviato se presente */}
-        {workout.feedback_sent && workout.athlete_feedback && (
+        {hasFeedback && !workout.completed && (
           <View style={styles.feedbackSentBadge}>
             <Ionicons name="send" size={12} color="#4CAF50" />
             <Text style={styles.feedbackSentText}>Feedback inviato al coach</Text>
