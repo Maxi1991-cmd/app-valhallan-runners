@@ -1083,6 +1083,7 @@ async def edit_workout(
     # Create notification for coach
     notification = {
         "id": str(uuid.uuid4()),
+        "sender_id": current_user["id"],  # The athlete who modified the workout
         "recipient_id": program["coach_id"],
         "notification_type": "workout_modified",
         "title": f"Allenamento modificato - {athlete_name}",
