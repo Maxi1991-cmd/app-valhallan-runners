@@ -1491,6 +1491,33 @@ async def upload_fit_activity(
     
     return ActivityData(**activity_dict)
 
+@api_router.get("/activities/{activity_id}")
+async def get_activity(
+    activity_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get a single activity by ID"""
+    activity = await db.activities.find_one({"id": activity_id})
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    
+    # Verify permission
+    athlete = await db.athletes.find_one({"id": activity["athlete_id"]})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] == "coach" and athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Remove MongoDB _id and ensure defaults
+    if "_id" in activity:
+        del activity["_id"]
+    if "activity_type" not in activity or not activity["activity_type"]:
+        activity["activity_type"] = "running"
+    
+    return activity
+
+
 @api_router.get("/activities", response_model=List[ActivityData])
 async def get_activities(
     athlete_id: str,
