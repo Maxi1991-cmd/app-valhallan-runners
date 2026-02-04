@@ -1515,6 +1515,91 @@ async def get_activities(
     
     return [ActivityData(**a) for a in activities]
 
+
+@api_router.put("/activities/{activity_id}/feedback")
+async def activity_feedback(
+    activity_id: str,
+    feedback_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Athlete sends feedback for a standalone activity"""
+    activity = await db.activities.find_one({"id": activity_id})
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    
+    # Get athlete info
+    athlete = await db.athletes.find_one({"id": activity["athlete_id"]})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    athlete_name = athlete["name"]
+    
+    # Update activity with feedback
+    await db.activities.update_one(
+        {"id": activity_id},
+        {"$set": {
+            "feedback_sent": True,
+            "feedback_date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "athlete_feedback": feedback_data
+        }}
+    )
+    
+    # Send notification to coach
+    notification = {
+        "id": str(uuid.uuid4()),
+        "sender_id": current_user["id"],
+        "recipient_id": athlete["coach_id"],
+        "title": f"Feedback attività - {athlete_name}",
+        "message": f"{athlete_name} ha inviato il feedback per un'attività fuori programma",
+        "notification_type": "workout_feedback",
+        "read": False,
+        "related_data": {
+            "activity_id": activity_id,
+            "athlete_id": activity["athlete_id"],
+            "athlete_name": athlete_name,
+            "activity_type": activity.get("activity_type"),
+            "feedback_date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "athlete_feedback": feedback_data
+        },
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.notifications.insert_one(notification)
+    
+    return {"message": "Feedback sent to coach"}
+
+
+@api_router.put("/activities/{activity_id}/finalize")
+async def finalize_activity(
+    activity_id: str,
+    actual_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Coach finalizes standalone activity with actual training data - updates analytics"""
+    if current_user["role"] != "coach":
+        raise HTTPException(status_code=403, detail="Only coach can finalize activities")
+    
+    activity = await db.activities.find_one({"id": activity_id})
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    
+    athlete = await db.athletes.find_one({"id": activity["athlete_id"]})
+    if not athlete or athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Update activity as completed
+    await db.activities.update_one(
+        {"id": activity_id},
+        {"$set": {
+            "completed": True,
+            "completed_date": datetime.utcnow().strftime("%Y-%m-%d"),
+            "actual_data": actual_data
+        }}
+    )
+    
+    return {"message": "Activity finalized", "analytics_updated": True}
+
+
 # ==================== ANALYTICS & COMPARISON ROUTES ====================
 
 @api_router.get("/analytics/athlete/{athlete_id}")
