@@ -12,6 +12,7 @@ export default function ActivityLayout() {
       }}
     >
       <Stack.Screen name="upload" options={{ title: 'Carica Attività' }} />
+      <Stack.Screen name="[id]" options={{ title: 'Dettaglio Attività' }} />
     </Stack>
   );
 }
