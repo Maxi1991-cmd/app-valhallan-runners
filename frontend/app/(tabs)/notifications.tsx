@@ -48,6 +48,10 @@ export default function NotificationsTab() {
         return 'alarm';
       case 'workout_completed':
         return 'checkmark-circle';
+      case 'workout_feedback':
+        return 'chatbubble-ellipses';
+      case 'workout_modified':
+        return 'pencil';
       default:
         return 'notifications';
     }
@@ -64,6 +68,10 @@ export default function NotificationsTab() {
         return '#2196F3';
       case 'workout_completed':
         return '#4CAF50';
+      case 'workout_feedback':
+        return '#FF6B35';
+      case 'workout_modified':
+        return '#FF9800';
       default:
         return '#FF6B35';
     }
