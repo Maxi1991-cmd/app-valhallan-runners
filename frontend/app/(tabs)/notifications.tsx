@@ -413,8 +413,8 @@ export default function NotificationsTab() {
                 </View>
 
                 <Button 
-                  title="Vai al Programma" 
-                  onPress={goToProgram} 
+                  title={feedbackModal.data?.isStandalone ? "Vai all'Attività" : "Vai al Programma"}
+                  onPress={goToTarget} 
                   style={styles.goToProgramBtn}
                 />
               </View>
