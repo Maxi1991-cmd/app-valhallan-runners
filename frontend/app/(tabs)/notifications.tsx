@@ -554,4 +554,100 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 4,
   },
+  // Modal Feedback styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  feedbackModalContent: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    width: '100%',
+    maxWidth: 400,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  feedbackContent: {
+    gap: 16,
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  feedbackHeaderText: {
+    flex: 1,
+  },
+  feedbackAthleteName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  feedbackWorkoutTitle: {
+    fontSize: 14,
+    color: '#FF6B35',
+    marginTop: 2,
+  },
+  feedbackDate: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 2,
+  },
+  feedbackDetails: {
+    backgroundColor: '#252525',
+    borderRadius: 12,
+    padding: 16,
+    gap: 16,
+  },
+  feedbackRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  feedbackIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  feedbackLabel: {
+    fontSize: 12,
+    color: '#999',
+  },
+  feedbackValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  feedbackNotesSection: {
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  feedbackNotes: {
+    fontSize: 14,
+    color: '#CCC',
+    fontStyle: 'italic',
+    marginTop: 6,
+    lineHeight: 20,
+  },
+  goToProgramBtn: {
+    marginTop: 16,
+  },
 });
