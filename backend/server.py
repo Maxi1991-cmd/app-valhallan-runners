@@ -1624,10 +1624,27 @@ async def get_athlete_analytics(
     else:
         start_date = (now - timedelta(days=365)).strftime("%Y-%m-%d")
     
+    # Get standalone activities
     activities = await db.activities.find({
         "athlete_id": athlete_id,
-        "date": {"$gte": start_date}
+        "date": {"$gte": start_date},
+        "completed": True
     }).to_list(1000)
+    
+    # Get completed workouts from programs and add to activities
+    programs = await db.programs.find({"athlete_id": athlete_id}).to_list(1000)
+    for program in programs:
+        for workout in program.get("workouts", []):
+            if workout.get("completed") and workout.get("date", "") >= start_date:
+                actual = workout.get("actual_data", {})
+                activities.append({
+                    "date": workout.get("date"),
+                    "distance_km": actual.get("distance_km") or workout.get("distance_km"),
+                    "duration_minutes": actual.get("duration_minutes") or workout.get("duration_minutes"),
+                    "avg_heart_rate": actual.get("avg_heart_rate"),
+                    "avg_pace": actual.get("avg_pace"),
+                    "activity_type": workout.get("workout_type", "running")
+                })
     
     # Calculate analytics
     total_distance = sum(a.get("distance_km", 0) or 0 for a in activities)
