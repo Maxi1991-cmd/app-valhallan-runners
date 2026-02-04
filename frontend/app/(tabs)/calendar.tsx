@@ -294,33 +294,78 @@ export default function CalendarTab() {
             </View>
           </>
         ) : (
-          <View style={styles.weekView}>
-            {getWeekDays().map((date) => (
-              <View key={date} style={styles.weekDay}>
-                <TouchableOpacity
-                  style={[
-                    styles.weekDayHeader,
-                    date === selectedDate && styles.weekDayHeaderActive,
-                  ]}
-                  onPress={() => setSelectedDate(date)}
-                >
-                  <Text style={styles.weekDayName}>
-                    {format(parseISO(date), 'EEE', { locale: it })}
-                  </Text>
-                  <Text
+          <View style={styles.weekViewVertical}>
+            {getWeekDays().map((date) => {
+              const dayWorkouts = getWorkoutsForDate(date);
+              const isToday = date === format(new Date(), 'yyyy-MM-dd');
+              
+              return (
+                <View key={date} style={[styles.weekRowHorizontal, isToday && styles.weekRowToday]}>
+                  {/* Giorno a sinistra */}
+                  <TouchableOpacity
                     style={[
-                      styles.weekDayNumber,
-                      date === selectedDate && styles.weekDayNumberActive,
+                      styles.weekDayLeft,
+                      date === selectedDate && styles.weekDayLeftActive,
                     ]}
+                    onPress={() => setSelectedDate(date)}
                   >
-                    {format(parseISO(date), 'd')}
-                  </Text>
-                </TouchableOpacity>
-                <View style={styles.weekDayWorkouts}>
-                  {renderDayWorkouts(date)}
+                    <Text style={[styles.weekDayNameHorizontal, isToday && styles.weekDayNameToday]}>
+                      {format(parseISO(date), 'EEE', { locale: it }).toUpperCase()}
+                    </Text>
+                    <Text style={[
+                      styles.weekDayNumberHorizontal,
+                      date === selectedDate && styles.weekDayNumberActive,
+                      isToday && styles.weekDayNumberToday
+                    ]}>
+                      {format(parseISO(date), 'd')}
+                    </Text>
+                    <Text style={styles.weekDayMonth}>
+                      {format(parseISO(date), 'MMM', { locale: it })}
+                    </Text>
+                  </TouchableOpacity>
+                  
+                  {/* Allenamenti a destra */}
+                  <View style={styles.weekWorkoutsRight}>
+                    {dayWorkouts.length === 0 ? (
+                      <Text style={styles.noWorkoutText}>Nessun allenamento</Text>
+                    ) : (
+                      dayWorkouts.map((workout, index) => (
+                        <TouchableOpacity
+                          key={workout.id || index}
+                          style={[
+                            styles.workoutItemHorizontal,
+                            { borderLeftColor: getWorkoutTypeColor(workout.workout_type) },
+                            workout.completed && styles.workoutItemCompleted
+                          ]}
+                          onPress={() => openWorkoutDetail(workout)}
+                        >
+                          <View style={styles.workoutItemMainHorizontal}>
+                            <Text style={styles.workoutTitleHorizontal} numberOfLines={1}>
+                              {workout.title}
+                            </Text>
+                            <Text style={styles.workoutAthleteHorizontal}>{workout.athlete_name}</Text>
+                            {workout.program_name === 'Fuori Programma' && (
+                              <Text style={styles.standaloneTag}>Extra</Text>
+                            )}
+                          </View>
+                          <View style={styles.workoutMetaHorizontal}>
+                            {workout.duration_minutes && (
+                              <Text style={styles.metaTextHorizontal}>{workout.duration_minutes} min</Text>
+                            )}
+                            {workout.distance_km && (
+                              <Text style={styles.metaTextHorizontal}>{workout.distance_km} km</Text>
+                            )}
+                            {workout.completed && (
+                              <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
 
