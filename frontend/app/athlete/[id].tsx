@@ -77,6 +77,7 @@ export default function AthleteDetail() {
 
   const loadWorkouts = async () => {
     try {
+      const token = await AsyncStorage.getItem('token');
       const response = await programAPI.getAll(id!);
       const programsData = response.data;
       
@@ -92,6 +93,33 @@ export default function AthleteDetail() {
           });
         }
       });
+      
+      // Carica anche le attività standalone (fuori programma)
+      try {
+        const activitiesResponse = await axios.get(
+          `${process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001'}/api/activities?athlete_id=${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const activities = activitiesResponse.data || [];
+        activities.forEach((activity: any) => {
+          workouts.push({
+            id: activity.id,
+            date: activity.date,
+            title: `${(activity.activity_type || 'Attività').charAt(0).toUpperCase() + (activity.activity_type || 'attività').slice(1)}`,
+            description: `Durata: ${activity.duration_minutes || 0} min, Distanza: ${activity.distance_km || 0} km`,
+            workout_type: activity.activity_type || 'other',
+            duration_minutes: activity.duration_minutes,
+            distance_km: activity.distance_km,
+            completed: activity.completed || false,
+            feedback_sent: activity.feedback_sent || false,
+            athlete_feedback: activity.athlete_feedback,
+            actual_data: activity.actual_data,
+            programName: 'Fuori Programma',
+          } as any);
+        });
+      } catch (err) {
+        console.log('Errore caricamento attività:', err);
+      }
       
       // Ordina per data (dal più recente al più vecchio)
       workouts.sort((a, b) => {
