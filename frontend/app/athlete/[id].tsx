@@ -11,6 +11,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AthleteProfile, WorkoutSession } from '../../src/types';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const safeFormatDate = (dateString?: string | null, format?: string) => {
   try {
