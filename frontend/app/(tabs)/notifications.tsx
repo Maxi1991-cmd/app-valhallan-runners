@@ -100,7 +100,23 @@ export default function NotificationsTab() {
 
     const relatedData = (item as any).related_data;
     
-    // Se è un feedback, apri il modal con i dettagli
+    // Se è un feedback di attività standalone, apri il modal con i dettagli
+    if (item.notification_type === 'workout_feedback' && relatedData?.activity_id) {
+      setFeedbackModal({
+        visible: true,
+        data: {
+          athleteName: relatedData.athlete_name,
+          workoutTitle: relatedData.activity_type || 'Attività',
+          feedbackDate: relatedData.feedback_date,
+          feedback: relatedData.athlete_feedback,
+          activityId: relatedData.activity_id,
+          isStandalone: true,
+        }
+      });
+      return;
+    }
+    
+    // Se è un feedback di workout normale, apri il modal con i dettagli
     if ((item.notification_type === 'workout_feedback' || item.notification_type === 'workout_modified') && relatedData?.athlete_feedback) {
       setFeedbackModal({
         visible: true,
@@ -111,6 +127,7 @@ export default function NotificationsTab() {
           feedback: relatedData.athlete_feedback,
           programId: relatedData.program_id,
           workoutId: relatedData.workout_id,
+          isStandalone: false,
         }
       });
       return;
@@ -118,8 +135,6 @@ export default function NotificationsTab() {
     
     // Naviga in base al tipo di notifica
     if (item.notification_type === 'workout_completed' && relatedData?.program_id) {
-      router.push(`/program/${relatedData.program_id}`);
-    } else if (item.notification_type === 'workout_feedback' && relatedData?.program_id) {
       router.push(`/program/${relatedData.program_id}`);
     } else if (item.notification_type === 'certificate_expiry' && relatedData?.athlete_id) {
       router.push(`/athlete/${relatedData.athlete_id}?tab=certificate`);
@@ -132,9 +147,12 @@ export default function NotificationsTab() {
     }
   };
 
-  // Vai al programma dal modal feedback
-  const goToProgram = () => {
-    if (feedbackModal.data?.programId) {
+  // Vai al programma o attività dal modal feedback
+  const goToTarget = () => {
+    if (feedbackModal.data?.isStandalone && feedbackModal.data?.activityId) {
+      setFeedbackModal({ visible: false, data: null });
+      router.push(`/activity/${feedbackModal.data.activityId}`);
+    } else if (feedbackModal.data?.programId) {
       setFeedbackModal({ visible: false, data: null });
       router.push(`/program/${feedbackModal.data.programId}`);
     }
