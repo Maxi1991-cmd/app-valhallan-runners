@@ -1517,7 +1517,20 @@ async def get_activities(
     
     activities = await db.activities.find(query).sort("date", -1).to_list(1000)
     
-    return [ActivityData(**a) for a in activities]
+    # Process activities to ensure all fields have defaults
+    result = []
+    for a in activities:
+        # Remove MongoDB _id
+        if "_id" in a:
+            del a["_id"]
+        # Ensure required fields have defaults
+        if "activity_type" not in a or not a["activity_type"]:
+            a["activity_type"] = "running"
+        if "id" not in a:
+            a["id"] = str(uuid.uuid4())
+        result.append(ActivityData(**a))
+    
+    return result
 
 
 @api_router.put("/activities/{activity_id}/feedback")
