@@ -215,8 +215,8 @@ class ActivityData(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     athlete_id: str
     date: str
-    activity_type: str
-    duration_minutes: int
+    activity_type: str = "running"  # Default to running if not specified
+    duration_minutes: Optional[int] = None
     distance_km: Optional[float] = None
     avg_pace: Optional[str] = None
     avg_heart_rate: Optional[int] = None
@@ -227,6 +227,10 @@ class ActivityData(BaseModel):
     source: str = "manual"  # manual, gpx, fit, garmin, polar, suunto, strava, fitbit
     raw_data: Optional[dict] = None
     gpx_points: Optional[List[dict]] = None  # GPS track points
+    completed: bool = False
+    feedback_sent: bool = False
+    athlete_feedback: Optional[dict] = None
+    actual_data: Optional[dict] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class ActivityDataCreate(BaseModel):
