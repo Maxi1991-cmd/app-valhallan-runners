@@ -1180,7 +1180,7 @@ async def get_calendar_workouts(
     end_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    """Get all workouts for calendar view"""
+    """Get all workouts for calendar view (includes both program workouts and standalone activities)"""
     query = {}
     
     if current_user["role"] == "coach":
@@ -1227,8 +1227,66 @@ async def get_calendar_workouts(
                 "heart_rate_zone": workout.get("heart_rate_zone"),
                 "completed": workout.get("completed", False),
                 "completed_date": workout.get("completed_date"),
-                "actual_data": workout.get("actual_data")
+                "actual_data": workout.get("actual_data"),
+                "is_standalone": False
             })
+    
+    # Get standalone activities (fuori programma)
+    activity_query = {}
+    if current_user["role"] == "coach":
+        # Get all athlete ids for this coach
+        coach_athletes = await db.athletes.find({"coach_id": current_user["id"]}).to_list(1000)
+        athlete_ids = [a["id"] for a in coach_athletes]
+        if athlete_id:
+            activity_query["athlete_id"] = athlete_id
+        else:
+            activity_query["athlete_id"] = {"$in": athlete_ids}
+    else:
+        athlete = await db.athletes.find_one({"user_id": current_user["id"]})
+        if athlete:
+            activity_query["athlete_id"] = athlete["id"]
+    
+    if start_date:
+        activity_query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in activity_query:
+            activity_query["date"]["$lte"] = end_date
+        else:
+            activity_query["date"] = {"$lte": end_date}
+    
+    activities = await db.activities.find(activity_query).to_list(1000)
+    
+    for activity in activities:
+        athlete = await db.athletes.find_one({"id": activity["athlete_id"]})
+        athlete_name = athlete["name"] if athlete else "Atleta"
+        
+        calendar_workouts.append({
+            "id": activity.get("id"),
+            "program_id": None,
+            "program_name": "Fuori Programma",
+            "athlete_id": activity["athlete_id"],
+            "athlete_name": athlete_name,
+            "date": activity.get("date"),
+            "title": f"{activity.get('activity_type', 'Attività').title()}",
+            "description": f"Durata: {activity.get('duration_minutes', 0)} min, Distanza: {activity.get('distance_km', 0)} km",
+            "workout_type": activity.get("activity_type", "other"),
+            "duration_minutes": activity.get("duration_minutes"),
+            "distance_km": activity.get("distance_km"),
+            "target_pace": activity.get("avg_pace"),
+            "heart_rate_zone": None,
+            "completed": True,  # Activities are always completed
+            "completed_date": activity.get("date"),
+            "actual_data": {
+                "duration_minutes": activity.get("duration_minutes"),
+                "distance_km": activity.get("distance_km"),
+                "avg_pace": activity.get("avg_pace"),
+                "avg_heart_rate": activity.get("avg_heart_rate"),
+                "max_heart_rate": activity.get("max_heart_rate"),
+                "calories": activity.get("calories"),
+                "elevation_gain": activity.get("elevation_gain")
+            },
+            "is_standalone": True
+        })
     
     # Sort by date
     calendar_workouts.sort(key=lambda x: x.get("date") or "")
