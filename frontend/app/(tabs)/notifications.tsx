@@ -336,6 +336,74 @@ export default function NotificationsTab() {
           </View>
         }
       />
+
+      {/* Modal Feedback Atleta */}
+      <Modal visible={feedbackModal.visible} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.feedbackModalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Feedback Atleta</Text>
+              <TouchableOpacity onPress={() => setFeedbackModal({ visible: false, data: null })}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            {feedbackModal.data && (
+              <View style={styles.feedbackContent}>
+                <View style={styles.feedbackHeader}>
+                  <Ionicons name="person-circle" size={40} color="#FF6B35" />
+                  <View style={styles.feedbackHeaderText}>
+                    <Text style={styles.feedbackAthleteName}>{feedbackModal.data.athleteName}</Text>
+                    <Text style={styles.feedbackWorkoutTitle}>{feedbackModal.data.workoutTitle}</Text>
+                    <Text style={styles.feedbackDate}>{feedbackModal.data.feedbackDate}</Text>
+                  </View>
+                </View>
+
+                <View style={styles.feedbackDetails}>
+                  {feedbackModal.data.feedback?.fatigue_level && (
+                    <View style={styles.feedbackRow}>
+                      <View style={styles.feedbackIconContainer}>
+                        <Ionicons name="fitness" size={20} color="#FF6B35" />
+                      </View>
+                      <View>
+                        <Text style={styles.feedbackLabel}>Livello Fatica</Text>
+                        <Text style={styles.feedbackValue}>{feedbackModal.data.feedback.fatigue_level}/10</Text>
+                      </View>
+                    </View>
+                  )}
+
+                  <View style={styles.feedbackRow}>
+                    <View style={styles.feedbackIconContainer}>
+                      <Ionicons name="medkit" size={20} color={feedbackModal.data.feedback?.has_pain ? '#DC3545' : '#4CAF50'} />
+                    </View>
+                    <View>
+                      <Text style={styles.feedbackLabel}>Dolori</Text>
+                      <Text style={[styles.feedbackValue, feedbackModal.data.feedback?.has_pain && { color: '#DC3545' }]}>
+                        {feedbackModal.data.feedback?.has_pain 
+                          ? feedbackModal.data.feedback?.pain_location || 'Sì' 
+                          : 'Nessun dolore'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {feedbackModal.data.feedback?.notes && (
+                    <View style={styles.feedbackNotesSection}>
+                      <Text style={styles.feedbackLabel}>Note</Text>
+                      <Text style={styles.feedbackNotes}>"{feedbackModal.data.feedback.notes}"</Text>
+                    </View>
+                  )}
+                </View>
+
+                <Button 
+                  title="Vai al Programma" 
+                  onPress={goToProgram} 
+                  style={styles.goToProgramBtn}
+                />
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
