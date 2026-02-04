@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
 import { Card } from '../../src/components/Card';
@@ -23,6 +23,7 @@ export default function NotificationsTab() {
     checkExpiries,
   } = useDataStore();
   const [refreshing, setRefreshing] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{ visible: boolean; data: any }>({ visible: false, data: null });
 
   useEffect(() => {
     fetchNotifications();
