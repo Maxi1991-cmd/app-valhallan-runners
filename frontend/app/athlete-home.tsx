@@ -96,6 +96,42 @@ export default function AthleteHomeScreen() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setAthleteProfile(profileResponse.data);
+        
+        // Fetch standalone activities for athlete's history
+        if (profileResponse.data?.id) {
+          try {
+            const activitiesResponse = await axios.get(
+              `${BASE_URL}/api/activities?athlete_id=${profileResponse.data.id}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            // Activities will be merged in allWorkouts via the programs
+            // Store them to be added to the workouts list
+            const activities = activitiesResponse.data || [];
+            // Update programs to include standalone activities as "workouts"
+            const standaloneProgram = {
+              id: 'standalone-activities',
+              name: 'Fuori Programma',
+              workouts: activities.map((activity: any) => ({
+                id: activity.id,
+                date: activity.date,
+                title: `${(activity.activity_type || 'Attività').charAt(0).toUpperCase() + (activity.activity_type || 'attività').slice(1)}`,
+                description: `Durata: ${activity.duration_minutes || 0} min, Distanza: ${activity.distance_km || 0} km`,
+                workout_type: activity.activity_type || 'other',
+                duration_minutes: activity.duration_minutes,
+                distance_km: activity.distance_km,
+                completed: activity.completed || false,
+                feedback_sent: activity.feedback_sent || false,
+                athlete_feedback: activity.athlete_feedback,
+                actual_data: activity.actual_data,
+                is_standalone: true,
+                activity_id: activity.id,
+              }))
+            };
+            setPrograms([...programsResponse.data, standaloneProgram]);
+          } catch (e) {
+            console.log('Could not fetch standalone activities');
+          }
+        }
       } catch (e) {
         // Profile endpoint might not exist for athlete view
         console.log('Could not fetch athlete profile');
