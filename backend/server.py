@@ -1274,17 +1274,11 @@ async def get_calendar_workouts(
             "distance_km": activity.get("distance_km"),
             "target_pace": activity.get("avg_pace"),
             "heart_rate_zone": None,
-            "completed": True,  # Activities are always completed
-            "completed_date": activity.get("date"),
-            "actual_data": {
-                "duration_minutes": activity.get("duration_minutes"),
-                "distance_km": activity.get("distance_km"),
-                "avg_pace": activity.get("avg_pace"),
-                "avg_heart_rate": activity.get("avg_heart_rate"),
-                "max_heart_rate": activity.get("max_heart_rate"),
-                "calories": activity.get("calories"),
-                "elevation_gain": activity.get("elevation_gain")
-            },
+            "completed": activity.get("completed", False),  # Not completed until athlete gives feedback
+            "feedback_sent": activity.get("feedback_sent", False),
+            "athlete_feedback": activity.get("athlete_feedback"),
+            "completed_date": activity.get("completed_date"),
+            "actual_data": activity.get("actual_data"),
             "is_standalone": True
         })
     
