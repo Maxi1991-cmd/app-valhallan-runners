@@ -745,4 +745,107 @@ const styles = StyleSheet.create({
     color: '#CCC',
     marginBottom: 6,
   },
+  // New horizontal week view styles
+  weekViewVertical: {
+    padding: 16,
+  },
+  weekRowHorizontal: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  weekRowToday: {
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+  },
+  weekDayLeft: {
+    width: 70,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#252525',
+  },
+  weekDayLeftActive: {
+    backgroundColor: '#FF6B35',
+  },
+  weekDayNameHorizontal: {
+    fontSize: 11,
+    color: '#999',
+    fontWeight: '600',
+  },
+  weekDayNameToday: {
+    color: '#FF6B35',
+  },
+  weekDayNumberHorizontal: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFF',
+    marginVertical: 2,
+  },
+  weekDayNumberToday: {
+    color: '#FF6B35',
+  },
+  weekDayMonth: {
+    fontSize: 10,
+    color: '#666',
+    textTransform: 'uppercase',
+  },
+  weekWorkoutsRight: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+  },
+  noWorkoutText: {
+    color: '#555',
+    fontSize: 13,
+    fontStyle: 'italic',
+  },
+  workoutItemHorizontal: {
+    backgroundColor: '#252525',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 6,
+    borderLeftWidth: 3,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  workoutItemCompleted: {
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+  },
+  workoutItemMainHorizontal: {
+    flex: 1,
+  },
+  workoutTitleHorizontal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  workoutAthleteHorizontal: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+  },
+  standaloneTag: {
+    fontSize: 9,
+    color: '#FF6B35',
+    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+  },
+  workoutMetaHorizontal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  metaTextHorizontal: {
+    fontSize: 11,
+    color: '#666',
+  },
 });
