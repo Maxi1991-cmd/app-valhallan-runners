@@ -74,13 +74,12 @@ export default function ActivityDetail() {
     try {
       const token = await AsyncStorage.getItem('token');
       
-      // Get activity by searching all activities (we need to find the one with this id)
-      const response = await axios.get(`${BASE_URL}/api/activities`, {
+      // Get single activity by ID
+      const response = await axios.get(`${BASE_URL}/api/activities/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      const activities = response.data;
-      const found = activities.find((a: Activity) => a.id === id);
+      const found = response.data;
       
       if (!found) {
         Alert.alert('Errore', 'Attività non trovata');
