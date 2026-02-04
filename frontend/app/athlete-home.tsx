@@ -269,21 +269,36 @@ export default function AthleteHomeScreen() {
     
     try {
       const token = await AsyncStorage.getItem('token');
-      await axios.put(
-        `${BASE_URL}/api/programs/${selectedWorkout.workout.programId}/workouts/${selectedWorkout.workout.id}/complete`,
-        {
-          duration_minutes: selectedWorkout.workout.duration_minutes,
-          distance_km: selectedWorkout.workout.distance_km,
-          feeling: `Fatica: ${fatigue}/10${hasPain ? `, Dolore: ${painLocation}` : ''}`,
-          notes: notes,
-          fatigue_level: fatigue,
-          has_pain: hasPain,
-          pain_location: hasPain ? painLocation : null
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const workout = selectedWorkout.workout;
       
-      Alert.alert('Successo', 'Allenamento completato! Il coach è stato notificato.');
+      const feedbackData = {
+        duration_minutes: workout.duration_minutes,
+        distance_km: workout.distance_km,
+        feeling: `Fatica: ${fatigue}/10${hasPain ? `, Dolore: ${painLocation}` : ''}`,
+        notes: notes,
+        fatigue_level: fatigue,
+        has_pain: hasPain,
+        pain_location: hasPain ? painLocation : null
+      };
+      
+      // Check if it's a standalone activity
+      if (workout.is_standalone || workout.activity_id) {
+        // Use the activities feedback endpoint
+        await axios.put(
+          `${BASE_URL}/api/activities/${workout.activity_id || workout.id}/feedback`,
+          feedbackData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } else {
+        // Use the programs endpoint for regular workouts
+        await axios.put(
+          `${BASE_URL}/api/programs/${workout.programId}/workouts/${workout.id}/complete`,
+          feedbackData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
+      
+      Alert.alert('Successo', 'Feedback inviato al coach!');
       setShowCompleteModal(false);
       fetchData();
     } catch (error: any) {
@@ -296,16 +311,29 @@ export default function AthleteHomeScreen() {
     
     try {
       const token = await AsyncStorage.getItem('token');
-      await axios.put(
-        `${BASE_URL}/api/programs/${selectedWorkout.workout.programId}/workouts/${selectedWorkout.workout.id}/complete`,
-        {
-          skipped: true,
-          skip_reason: skipReason,
-          feeling: 'Allenamento non eseguito',
-          notes: skipReason
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const workout = selectedWorkout.workout;
+      
+      const skipData = {
+        skipped: true,
+        skip_reason: skipReason,
+        feeling: 'Allenamento non eseguito',
+        notes: skipReason
+      };
+      
+      // Check if it's a standalone activity
+      if (workout.is_standalone || workout.activity_id) {
+        await axios.put(
+          `${BASE_URL}/api/activities/${workout.activity_id || workout.id}/feedback`,
+          { ...skipData, skipped: true },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } else {
+        await axios.put(
+          `${BASE_URL}/api/programs/${workout.programId}/workouts/${workout.id}/complete`,
+          skipData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      }
       
       Alert.alert('Registrato', 'Il coach è stato notificato.');
       setShowSkipModal(false);
