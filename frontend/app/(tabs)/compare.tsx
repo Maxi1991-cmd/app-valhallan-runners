@@ -157,14 +157,14 @@ export default function CompareTab() {
               label="Inizio"
               value={period1Start}
               onChangeText={setPeriod1Start}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG/MM/AAAA"
               containerStyle={styles.dateInput}
             />
             <Input
               label="Fine"
               value={period1End}
               onChangeText={setPeriod1End}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG/MM/AAAA"
               containerStyle={styles.dateInput}
             />
           </View>
@@ -177,7 +177,7 @@ export default function CompareTab() {
               label="Inizio"
               value={period2Start}
               onChangeText={setPeriod2Start}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG/MM/AAAA"
               containerStyle={styles.dateInput}
             />
             <Input
