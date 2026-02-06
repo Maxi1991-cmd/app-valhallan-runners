@@ -190,12 +190,22 @@ export default function CompareTab() {
           </View>
         </Card>
 
-        <Button
-          title="Confronta"
-          onPress={loadComparison}
-          loading={loading}
-          style={styles.compareButton}
-        />
+        <View style={styles.buttonRow}>
+          <Button
+            title="Confronta"
+            onPress={loadComparison}
+            loading={loading}
+            style={styles.compareButton}
+          />
+          {comparison && (
+            <Button
+              title="Cancella"
+              onPress={clearComparison}
+              variant="outline"
+              style={styles.clearButton}
+            />
+          )}
+        </View>
 
         {/* Comparison Results */}
         {comparison && (
