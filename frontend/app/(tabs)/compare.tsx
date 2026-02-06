@@ -184,7 +184,7 @@ export default function CompareTab() {
               label="Fine"
               value={period2End}
               onChangeText={setPeriod2End}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG/MM/AAAA"
               containerStyle={styles.dateInput}
             />
           </View>
