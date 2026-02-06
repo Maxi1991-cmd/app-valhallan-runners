@@ -55,6 +55,15 @@ export default function CompareTab() {
     setLoading(false);
   };
 
+  const clearComparison = () => {
+    setComparison(null);
+    setPeriod1Start('');
+    setPeriod1End('');
+    setPeriod2Start('');
+    setPeriod2End('');
+    setSelectedAthlete(null);
+  };
+
   const renderStatComparison = (
     label: string,
     value1: any,
