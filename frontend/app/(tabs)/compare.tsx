@@ -409,8 +409,16 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 0,
   },
-  compareButton: {
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
     marginBottom: 20,
+  },
+  compareButton: {
+    flex: 1,
+  },
+  clearButton: {
+    flex: 1,
   },
   summaryCard: {
     marginBottom: 12,
