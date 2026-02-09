@@ -722,6 +722,21 @@ export default function AthleteHomeScreen() {
       case 'info':
         return (
           <View>
+            {/* Impostazioni */}
+            <Text style={styles.sectionTitle}>⚙️ Impostazioni</Text>
+            <Card style={styles.infoCard}>
+              <TouchableOpacity 
+                style={styles.settingsRow}
+                onPress={() => setShowSettingsModal(true)}
+              >
+                <View style={styles.settingsInfo}>
+                  <Ionicons name="notifications-outline" size={22} color="#FF6B35" />
+                  <Text style={styles.settingsText}>Notifiche</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#666" />
+              </TouchableOpacity>
+            </Card>
+
             {/* Certificato Medico */}
             <Text style={styles.sectionTitle}>🏥 Certificato Medico</Text>
             <Card style={styles.infoCard}>
