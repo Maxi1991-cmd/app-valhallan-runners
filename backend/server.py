@@ -164,6 +164,11 @@ class WorkoutSession(BaseModel):
     completed: bool = False
     completed_date: Optional[str] = None
     actual_data: Optional[dict] = None  # Actual performance data
+    # Feedback atleta
+    feedback_sent: bool = False
+    feedback_date: Optional[str] = None
+    athlete_feedback: Optional[dict] = None
+    modified_by_athlete: bool = False
 
 class TrainingProgramBase(BaseModel):
     name: str
