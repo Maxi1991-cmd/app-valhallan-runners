@@ -201,6 +201,12 @@ export default function AthleteDetail() {
           />
         }
       >
+        {/* Pulsante Indietro */}
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#FF6B35" />
+          <Text style={styles.backButtonText}>Indietro</Text>
+        </TouchableOpacity>
+
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.avatarContainer}>
