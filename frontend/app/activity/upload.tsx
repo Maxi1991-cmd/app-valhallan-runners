@@ -189,75 +189,13 @@ export default function UploadActivity() {
             ))}
           </ScrollView>
 
-          {/* Mode Toggle */}
-          <View style={styles.modeToggle}>
-            <TouchableOpacity
-              style={[styles.modeButton, uploadMode === 'manual' && styles.modeButtonActive]}
-              onPress={() => setUploadMode('manual')}
-            >
-              <Ionicons name="create" size={20} color={uploadMode === 'manual' ? '#FFF' : '#999'} />
-              <Text style={[styles.modeText, uploadMode === 'manual' && styles.modeTextActive]}>
-                Manuale
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modeButton, uploadMode === 'file' && styles.modeButtonActive]}
-              onPress={() => setUploadMode('file')}
-            >
-              <Ionicons name="cloud-upload" size={20} color={uploadMode === 'file' ? '#FFF' : '#999'} />
-              <Text style={[styles.modeText, uploadMode === 'file' && styles.modeTextActive]}>
-                Carica File
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {uploadMode === 'file' ? (
-            <Card style={styles.uploadCard}>
-              <View style={styles.uploadContent}>
-                <Ionicons name="document" size={48} color="#FF6B35" />
-                <Text style={styles.uploadTitle}>Carica File GPX o FIT</Text>
-                <Text style={styles.uploadSubtitle}>
-                  Importa attività da Garmin, Polar, Suunto, Strava o Fitbit
-                </Text>
-
-                <Text style={styles.activityTypeLabel}>Tipo Attività</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.typeScroll}>
-                  {activityTypes.map((type) => (
-                    <TouchableOpacity
-                      key={type.value}
-                      style={[
-                        styles.typeChip,
-                        manualData.activity_type === type.value && styles.typeChipActive,
-                      ]}
-                      onPress={() => setManualData({ ...manualData, activity_type: type.value })}
-                    >
-                      <Text
-                        style={[
-                          styles.typeChipText,
-                          manualData.activity_type === type.value && styles.typeChipTextActive,
-                        ]}
-                      >
-                        {type.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-
-                <Button
-                  title="Seleziona File"
-                  onPress={handleFilePick}
-                  loading={loading}
-                  style={styles.uploadButton}
-                />
-              </View>
-            </Card>
-          ) : (
-            <>
-              <Input
-                label="Data *"
-                value={manualData.date}
-                onChangeText={(text) => setManualData({ ...manualData, date: text })}
-                placeholder="GG-MM-AAAA"
+          {/* Form Inserimento Manuale */}
+          <>
+            <Input
+              label="Data *"
+              value={manualData.date}
+              onChangeText={(text) => setManualData({ ...manualData, date: text })}
+              placeholder="GG-MM-AAAA"
               />
 
               <Text style={styles.label}>Tipo Attività</Text>
