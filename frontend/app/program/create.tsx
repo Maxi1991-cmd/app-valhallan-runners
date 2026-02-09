@@ -300,10 +300,10 @@ export default function CreateOrEditProgram() {
 
           <Card title="Nuovo Allenamento" style={styles.newWorkoutCard}>
             <Input
-              label="Data Allenamento (YYYY-MM-DD) *"
+              label="Data Allenamento (GG-MM-AAAA) *"
               value={newWorkout.date}
               onChangeText={(text) => setNewWorkout({ ...newWorkout, date: text })}
-              placeholder="2025-01-27"
+              placeholder="27-01-2025"
             />
 
             <Input
