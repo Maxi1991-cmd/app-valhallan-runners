@@ -665,4 +665,38 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontStyle: 'italic',
   },
+  // Notification settings styles
+  notificationSettingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#252525',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  notificationSettingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    marginRight: 12,
+  },
+  notificationSettingText: {
+    flex: 1,
+  },
+  notificationSettingTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  notificationSettingDesc: {
+    fontSize: 12,
+    color: '#999',
+    lineHeight: 16,
+  },
+  saveSettingsBtn: {
+    marginTop: 16,
+  },
 });
