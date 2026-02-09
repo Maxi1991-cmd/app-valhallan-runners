@@ -183,9 +183,9 @@ export default function ProfileTab() {
         </Card>
 
         <Card title="Impostazioni" style={styles.settingsCard}>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => setShowNotificationsModal(true)}>
             <View style={styles.settingInfo}>
-              <Ionicons name="notifications-outline" size={22} color="#999" />
+              <Ionicons name="notifications-outline" size={22} color="#FF6B35" />
               <Text style={styles.settingText}>Notifiche</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
