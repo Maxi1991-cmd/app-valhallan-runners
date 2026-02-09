@@ -194,20 +194,116 @@ frontend:
         - agent: "main"
         - comment: "Shows workout completion details in notifications"
 
+  - task: "Notification Settings API"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "GET/PUT /api/users/me/notification-settings for both coach and athlete roles"
+
+frontend:
+  - task: "Calendar View (Monthly/Weekly)"
+    implemented: true
+    working: true
+    file: "app/(tabs)/calendar.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Calendar with monthly and weekly views, workout markers"
+
+  - task: "Workout Completion Modal"
+    implemented: true
+    working: true
+    file: "app/program/[id].tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Modal for entering actual workout data with feeling selector"
+
+  - task: "Activity Upload Screen"
+    implemented: true
+    working: true
+    file: "app/activity/upload.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Manual entry or GPX/FIT file upload"
+
+  - task: "Compare Periods Screen"
+    implemented: true
+    working: true
+    file: "app/(tabs)/compare.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Compare athlete data between two periods"
+
+  - task: "Enhanced Notifications"
+    implemented: true
+    working: true
+    file: "app/(tabs)/notifications.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Shows workout completion details in notifications"
+
+  - task: "Coach Notification Settings"
+    implemented: true
+    working: true
+    file: "app/(tabs)/profile.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Coach can toggle feedback and expiration notifications from profile settings"
+
+  - task: "Athlete Notification Settings"
+    implemented: true
+    working: true
+    file: "app/athlete-home.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "Athlete can toggle workout, reminder and expiration notifications from Info tab settings"
+
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 2
+  version: "2.1"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
   current_focus:
-    - "GPX/FIT Upload"
-    - "Calendar View (Monthly/Weekly)"
+    - "Notification Settings"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
     - agent: "main"
-    - message: "V2 features implemented: Calendar (monthly/weekly), workout completion with coach notification, GPX/FIT file upload, activity manual entry, period comparison. All backend APIs tested and working."
+    - message: "V2.1 - Added notification settings feature for both Coach and Athlete roles. Coach can toggle: athlete feedback notifications and expiration alerts. Athlete can toggle: assigned workouts notifications, daily reminders, and expiration alerts."
