@@ -1136,6 +1136,84 @@ export default function AthleteHomeScreen() {
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Settings Modal for Athlete */}
+      <Modal visible={showSettingsModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Impostazioni Notifiche</Text>
+              <TouchableOpacity onPress={() => setShowSettingsModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.settingsSubtitle}>Gestisci le tue preferenze di notifica</Text>
+
+            <View style={styles.notificationSettingRow}>
+              <View style={styles.notificationSettingInfo}>
+                <Ionicons name="fitness-outline" size={24} color="#FF6B35" />
+                <View style={styles.notificationSettingText}>
+                  <Text style={styles.notificationSettingTitle}>Allenamenti assegnati</Text>
+                  <Text style={styles.notificationSettingDesc}>
+                    Ricevi notifica quando il coach ti assegna un nuovo allenamento
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifyAssignedWorkouts}
+                onValueChange={setNotifyAssignedWorkouts}
+                trackColor={{ false: '#333', true: '#FF6B3550' }}
+                thumbColor={notifyAssignedWorkouts ? '#FF6B35' : '#666'}
+              />
+            </View>
+
+            <View style={styles.notificationSettingRow}>
+              <View style={styles.notificationSettingInfo}>
+                <Ionicons name="alarm-outline" size={24} color="#FF6B35" />
+                <View style={styles.notificationSettingText}>
+                  <Text style={styles.notificationSettingTitle}>Promemoria giornaliero</Text>
+                  <Text style={styles.notificationSettingDesc}>
+                    Ricevi un promemoria per l'allenamento del giorno
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifyDailyReminder}
+                onValueChange={setNotifyDailyReminder}
+                trackColor={{ false: '#333', true: '#FF6B3550' }}
+                thumbColor={notifyDailyReminder ? '#FF6B35' : '#666'}
+              />
+            </View>
+
+            <View style={styles.notificationSettingRow}>
+              <View style={styles.notificationSettingInfo}>
+                <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
+                <View style={styles.notificationSettingText}>
+                  <Text style={styles.notificationSettingTitle}>Scadenze certificato/pagamenti</Text>
+                  <Text style={styles.notificationSettingDesc}>
+                    Ricevi notifica quando scade il certificato medico o un pagamento
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifyExpirations}
+                onValueChange={setNotifyExpirations}
+                trackColor={{ false: '#333', true: '#FF6B3550' }}
+                thumbColor={notifyExpirations ? '#FF6B35' : '#666'}
+              />
+            </View>
+
+            <Button
+              title={savingSettings ? "Salvataggio..." : "Salva Impostazioni"}
+              onPress={saveNotificationSettings}
+              variant="primary"
+              style={styles.saveSettingsBtn}
+              disabled={savingSettings}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
