@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { Card } from '../../src/components/Card';
@@ -12,7 +12,12 @@ export default function ProfileTab() {
   const router = useRouter();
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Notification settings
+  const [notifyAthleteFeedback, setNotifyAthleteFeedback] = useState(true);
+  const [notifyExpirations, setNotifyExpirations] = useState(true);
 
   useEffect(() => {
     refreshSubscription();
