@@ -257,7 +257,7 @@ export default function UploadActivity() {
                 label="Data *"
                 value={manualData.date}
                 onChangeText={(text) => setManualData({ ...manualData, date: text })}
-                placeholder="YYYY-MM-DD"
+                placeholder="GG-MM-AAAA"
               />
 
               <Text style={styles.label}>Tipo Attività</Text>

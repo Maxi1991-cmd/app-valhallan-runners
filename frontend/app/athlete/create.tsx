@@ -75,7 +75,7 @@ export default function CreateAthlete() {
             label="Data di Nascita"
             value={form.birth_date}
             onChangeText={(text) => setForm({ ...form, birth_date: text })}
-            placeholder="YYYY-MM-DD"
+            placeholder="GG-MM-AAAA"
           />
 
           <Input

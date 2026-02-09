@@ -238,14 +238,14 @@ export default function CreateOrEditProgram() {
               label="Data Inizio *"
               value={form.start_date}
               onChangeText={(text) => setForm({ ...form, start_date: text })}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG-MM-AAAA"
               containerStyle={styles.halfInput}
             />
             <Input
               label="Data Fine *"
               value={form.end_date}
               onChangeText={(text) => setForm({ ...form, end_date: text })}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG-MM-AAAA"
               containerStyle={styles.halfInput}
             />
           </View>

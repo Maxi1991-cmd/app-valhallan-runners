@@ -178,7 +178,7 @@ export default function EditAthlete() {
             label="Data di Nascita"
             value={form.birth_date}
             onChangeText={(text) => setForm({ ...form, birth_date: text })}
-            placeholder="YYYY-MM-DD"
+            placeholder="GG-MM-AAAA"
           />
 
           <Input
@@ -256,14 +256,14 @@ export default function EditAthlete() {
               label="Data Rilascio"
               value={certificate.issue_date}
               onChangeText={(text) => setCertificate({ ...certificate, issue_date: text })}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG-MM-AAAA"
               containerStyle={styles.halfInput}
             />
             <Input
               label="Data Scadenza"
               value={certificate.expiry_date}
               onChangeText={(text) => setCertificate({ ...certificate, expiry_date: text })}
-              placeholder="YYYY-MM-DD"
+              placeholder="GG-MM-AAAA"
               containerStyle={styles.halfInput}
             />
           </View>
@@ -290,7 +290,7 @@ export default function EditAthlete() {
                 label="Scadenza"
                 value={newPayment.due_date}
                 onChangeText={(text) => setNewPayment({ ...newPayment, due_date: text })}
-                placeholder="YYYY-MM-DD"
+                placeholder="GG-MM-AAAA"
                 containerStyle={styles.halfInput}
               />
             </View>
