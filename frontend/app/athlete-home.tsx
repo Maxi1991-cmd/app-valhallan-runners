@@ -1786,4 +1786,59 @@ const styles = StyleSheet.create({
   modalBottomSpacer: {
     height: 40,
   },
+  // Settings styles
+  settingsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 14,
+  },
+  settingsInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  settingsText: {
+    fontSize: 15,
+    color: '#FFF',
+    fontWeight: '500',
+  },
+  settingsSubtitle: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 16,
+  },
+  notificationSettingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#252525',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  notificationSettingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    marginRight: 12,
+  },
+  notificationSettingText: {
+    flex: 1,
+  },
+  notificationSettingTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  notificationSettingDesc: {
+    fontSize: 12,
+    color: '#999',
+    lineHeight: 16,
+  },
+  saveSettingsBtn: {
+    marginTop: 16,
+  },
 });
