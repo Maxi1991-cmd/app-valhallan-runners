@@ -65,6 +65,7 @@ export default function AthleteHomeScreen() {
   const [showSkipModal, setShowSkipModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<{workout: Workout & {programId: string, programName: string}} | null>(null);
   
   // Form states
@@ -79,6 +80,12 @@ export default function AthleteHomeScreen() {
   const [editDistance, setEditDistance] = useState('');
   const [editFatigue, setEditFatigue] = useState(5);
   const [editNotes, setEditNotes] = useState('');
+
+  // Notification settings for athlete
+  const [notifyAssignedWorkouts, setNotifyAssignedWorkouts] = useState(true);
+  const [notifyDailyReminder, setNotifyDailyReminder] = useState(true);
+  const [notifyExpirations, setNotifyExpirations] = useState(true);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const fetchData = async () => {
     try {
