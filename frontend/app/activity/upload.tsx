@@ -292,8 +292,7 @@ export default function UploadActivity() {
                 size="large"
                 style={styles.saveButton}
               />
-            </>
-          )}
+          </>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
