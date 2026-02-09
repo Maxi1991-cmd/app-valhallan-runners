@@ -150,8 +150,47 @@ export default function AthleteHomeScreen() {
     }
   };
 
+  const loadNotificationSettings = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/api/users/me/notification-settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data) {
+        setNotifyAssignedWorkouts(response.data.notify_assigned_workouts ?? true);
+        setNotifyDailyReminder(response.data.notify_daily_reminder ?? true);
+        setNotifyExpirations(response.data.notify_expirations ?? true);
+      }
+    } catch (error) {
+      console.log('Could not load notification settings, using defaults');
+    }
+  };
+
+  const saveNotificationSettings = async () => {
+    setSavingSettings(true);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      await axios.put(
+        `${BASE_URL}/api/users/me/notification-settings`,
+        {
+          notify_assigned_workouts: notifyAssignedWorkouts,
+          notify_daily_reminder: notifyDailyReminder,
+          notify_expirations: notifyExpirations
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      Alert.alert('Successo', 'Impostazioni notifiche salvate');
+      setShowSettingsModal(false);
+    } catch (error: any) {
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    loadNotificationSettings();
   }, []);
 
   const onRefresh = async () => {
