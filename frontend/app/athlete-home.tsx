@@ -763,10 +763,6 @@ export default function AthleteHomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color="#FF6B35" />
-            <Text style={styles.backText}>Indietro</Text>
-          </TouchableOpacity>
           <View style={styles.headerRight}>
             <View>
               <Text style={styles.greeting}>Ciao, {user?.name?.split(' ')[0]}!</Text>
