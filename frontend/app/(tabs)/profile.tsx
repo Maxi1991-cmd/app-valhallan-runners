@@ -331,6 +331,71 @@ export default function ProfileTab() {
           </View>
         </View>
       </Modal>
+
+      {/* Notifications Settings Modal */}
+      <Modal
+        visible={showNotificationsModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowNotificationsModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Impostazioni Notifiche</Text>
+              <TouchableOpacity onPress={() => setShowNotificationsModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalSubtitle}>Gestisci le tue preferenze di notifica</Text>
+
+            <View style={styles.notificationSettingRow}>
+              <View style={styles.notificationSettingInfo}>
+                <Ionicons name="chatbubble-ellipses-outline" size={24} color="#FF6B35" />
+                <View style={styles.notificationSettingText}>
+                  <Text style={styles.notificationSettingTitle}>Feedback atleta</Text>
+                  <Text style={styles.notificationSettingDesc}>
+                    Ricevi notifica quando un atleta invia feedback sull'allenamento
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifyAthleteFeedback}
+                onValueChange={setNotifyAthleteFeedback}
+                trackColor={{ false: '#333', true: '#FF6B3550' }}
+                thumbColor={notifyAthleteFeedback ? '#FF6B35' : '#666'}
+              />
+            </View>
+
+            <View style={styles.notificationSettingRow}>
+              <View style={styles.notificationSettingInfo}>
+                <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
+                <View style={styles.notificationSettingText}>
+                  <Text style={styles.notificationSettingTitle}>Scadenze certificati/pagamenti</Text>
+                  <Text style={styles.notificationSettingDesc}>
+                    Ricevi notifica quando scadono certificati medici o pagamenti degli atleti
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifyExpirations}
+                onValueChange={setNotifyExpirations}
+                trackColor={{ false: '#333', true: '#FF6B3550' }}
+                thumbColor={notifyExpirations ? '#FF6B35' : '#666'}
+              />
+            </View>
+
+            <Button
+              title={loadingSettings ? "Salvataggio..." : "Salva Impostazioni"}
+              onPress={saveNotificationSettings}
+              variant="primary"
+              style={styles.saveSettingsBtn}
+              disabled={loadingSettings}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
