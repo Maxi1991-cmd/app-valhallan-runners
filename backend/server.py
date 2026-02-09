@@ -257,6 +257,13 @@ class WorkoutCompletionData(BaseModel):
     calories: Optional[int] = None
     notes: Optional[str] = None
     feeling: Optional[str] = None  # great, good, ok, tired, exhausted
+    # Feedback atleta
+    fatigue_level: Optional[int] = None  # 1-10
+    has_pain: Optional[bool] = None
+    pain_location: Optional[str] = None
+    # Skip data
+    skipped: Optional[bool] = None
+    skip_reason: Optional[str] = None
 
 # ==================== AUTH HELPERS ====================
 
