@@ -763,15 +763,21 @@ export default function AthleteHomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Ciao, {user?.name?.split(' ')[0]}!</Text>
-            <Text style={styles.dateText}>
-              {dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}, {new Date().toLocaleDateString('it-IT')}
-            </Text>
-          </View>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Ionicons name="log-out-outline" size={24} color="#FF6B35" />
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <Ionicons name="arrow-back" size={24} color="#FF6B35" />
+            <Text style={styles.backText}>Indietro</Text>
           </TouchableOpacity>
+          <View style={styles.headerRight}>
+            <View>
+              <Text style={styles.greeting}>Ciao, {user?.name?.split(' ')[0]}!</Text>
+              <Text style={styles.dateText}>
+                {dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}, {new Date().toLocaleDateString('it-IT')}
+              </Text>
+            </View>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+              <Ionicons name="log-out-outline" size={24} color="#FF6B35" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Tabs */}
