@@ -700,6 +700,48 @@ async def get_subscription(current_user: dict = Depends(get_current_user)):
     """Ottieni lo stato dell'abbonamento"""
     return get_subscription_info(current_user)
 
+# ==================== NOTIFICATION SETTINGS ROUTES ====================
+
+class NotificationSettingsUpdate(BaseModel):
+    notify_athlete_feedback: Optional[bool] = None
+    notify_expirations: Optional[bool] = None
+    # Athlete-specific settings
+    notify_assigned_workouts: Optional[bool] = None
+    notify_daily_reminder: Optional[bool] = None
+
+@api_router.get("/users/me/notification-settings")
+async def get_notification_settings(current_user: dict = Depends(get_current_user)):
+    """Get user's notification settings"""
+    settings = current_user.get("notification_settings", {})
+    
+    # Return defaults based on role
+    if current_user.get("role") == "coach":
+        return {
+            "notify_athlete_feedback": settings.get("notify_athlete_feedback", True),
+            "notify_expirations": settings.get("notify_expirations", True)
+        }
+    else:  # athlete
+        return {
+            "notify_assigned_workouts": settings.get("notify_assigned_workouts", True),
+            "notify_daily_reminder": settings.get("notify_daily_reminder", True),
+            "notify_expirations": settings.get("notify_expirations", True)
+        }
+
+@api_router.put("/users/me/notification-settings")
+async def update_notification_settings(
+    settings: NotificationSettingsUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update user's notification settings"""
+    settings_dict = {k: v for k, v in settings.dict().items() if v is not None}
+    
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"notification_settings": settings_dict}}
+    )
+    
+    return {"message": "Notification settings updated", "settings": settings_dict}
+
 # ==================== ATHLETE PROFILE ROUTES ====================
 
 import random
