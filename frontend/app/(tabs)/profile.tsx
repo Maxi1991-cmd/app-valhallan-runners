@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, Switch, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { Card } from '../../src/components/Card';
@@ -7,6 +7,9 @@ import { Button } from '../../src/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function ProfileTab() {
   const router = useRouter();
@@ -14,14 +17,53 @@ export default function ProfileTab() {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [loadingSettings, setLoadingSettings] = useState(false);
   
-  // Notification settings
+  // Notification settings for Coach
   const [notifyAthleteFeedback, setNotifyAthleteFeedback] = useState(true);
   const [notifyExpirations, setNotifyExpirations] = useState(true);
 
   useEffect(() => {
     refreshSubscription();
+    loadNotificationSettings();
   }, []);
+
+  const loadNotificationSettings = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/api/users/me/notification-settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data) {
+        setNotifyAthleteFeedback(response.data.notify_athlete_feedback ?? true);
+        setNotifyExpirations(response.data.notify_expirations ?? true);
+      }
+    } catch (error) {
+      // If endpoint doesn't exist yet, use defaults
+      console.log('Could not load notification settings, using defaults');
+    }
+  };
+
+  const saveNotificationSettings = async () => {
+    setLoadingSettings(true);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      await axios.put(
+        `${BASE_URL}/api/users/me/notification-settings`,
+        {
+          notify_athlete_feedback: notifyAthleteFeedback,
+          notify_expirations: notifyExpirations
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      Alert.alert('Successo', 'Impostazioni notifiche salvate');
+      setShowNotificationsModal(false);
+    } catch (error: any) {
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+    } finally {
+      setLoadingSettings(false);
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert('Esci', 'Sei sicuro di voler uscire?', [
