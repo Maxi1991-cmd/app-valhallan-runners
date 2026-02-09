@@ -1093,10 +1093,23 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
+    flexDirection: 'column',
+    marginBottom: 20,
+  },
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  backText: {
+    color: '#FF6B35',
+    fontSize: 16,
+    marginLeft: 4,
+  },
+  headerRight: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
   },
   greeting: {
     fontSize: 26,
