@@ -5,14 +5,12 @@ export default function ActivityLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: '#0F0F0F' },
-        headerTintColor: '#FFF',
-        headerTitleStyle: { fontWeight: '600' },
+        headerShown: false,
         contentStyle: { backgroundColor: '#0F0F0F' },
       }}
     >
-      <Stack.Screen name="upload" options={{ title: 'Carica Attività' }} />
-      <Stack.Screen name="[id]" options={{ title: 'Dettaglio Attività' }} />
+      <Stack.Screen name="upload" />
+      <Stack.Screen name="[id]" />
     </Stack>
   );
 }
