@@ -9,7 +9,6 @@ export default function ActivityLayout() {
         headerTintColor: '#FFF',
         headerTitleStyle: { fontWeight: '600' },
         contentStyle: { backgroundColor: '#0F0F0F' },
-        headerBackTitle: 'Indietro',
       }}
     >
       <Stack.Screen name="upload" options={{ title: 'Carica Attività' }} />
