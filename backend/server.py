@@ -1468,6 +1468,27 @@ async def create_activity(activity: ActivityDataCreate, current_user: dict = Dep
     
     await db.activities.insert_one(activity_dict)
     
+    # If coach creates activity, send notification to athlete
+    if current_user["role"] == "coach" and athlete.get("user_id"):
+        notification = {
+            "id": str(uuid.uuid4()),
+            "sender_id": current_user["id"],
+            "recipient_id": athlete["user_id"],
+            "title": "Nuova attività assegnata",
+            "message": f"Il tuo coach ti ha assegnato una nuova attività: {activity.activity_type.title()} - {activity.date}",
+            "notification_type": "activity_assigned",
+            "read": False,
+            "related_data": {
+                "activity_id": activity_dict["id"],
+                "activity_type": activity.activity_type,
+                "date": activity.date,
+                "duration_minutes": activity.duration_minutes,
+                "distance_km": activity.distance_km
+            },
+            "created_at": datetime.utcnow()
+        }
+        await db.notifications.insert_one(notification)
+    
     return ActivityData(**activity_dict)
 
 @api_router.post("/activities/upload-gpx")
