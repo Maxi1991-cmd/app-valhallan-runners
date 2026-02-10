@@ -125,12 +125,24 @@ export default function UploadActivity() {
       return;
     }
 
+    // Convert date from GG-MM-AAAA to YYYY-MM-DD
+    let formattedDate = manualData.date;
+    if (manualData.date.includes('-') && manualData.date.length === 10) {
+      const parts = manualData.date.split('-');
+      if (parts.length === 3) {
+        // Check if it's DD-MM-YYYY format
+        if (parts[0].length === 2 && parts[2].length === 4) {
+          formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+      }
+    }
+
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
       const data = {
         athlete_id: selectedAthlete,
-        date: manualData.date,
+        date: formattedDate,
         activity_type: manualData.activity_type,
         duration_minutes: parseInt(manualData.duration_minutes),
         distance_km: manualData.distance_km ? parseFloat(manualData.distance_km) : null,
