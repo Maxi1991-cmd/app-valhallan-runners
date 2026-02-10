@@ -82,6 +82,31 @@ export default function AthleteDetail() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'history' | 'payments' | 'certificate'>('info');
   const [allWorkouts, setAllWorkouts] = useState<(WorkoutSession & { programName: string })[]>([]);
+  
+  // State per le attività standalone
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
+  const [activityForm, setActivityForm] = useState({
+    date: '',
+    activity_type: 'running',
+    duration_minutes: '',
+    distance_km: '',
+    avg_pace: '',
+    avg_heart_rate: '',
+  });
+
+  const loadActivities = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/api/activities?athlete_id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setActivities(response.data || []);
+    } catch (error) {
+      console.log('Errore caricamento attività:', error);
+    }
+  };
 
   const loadAthlete = async () => {
     try {
@@ -90,6 +115,7 @@ export default function AthleteDetail() {
       
       // Carica i programmi e i workout dell'atleta
       await loadWorkouts();
+      await loadActivities();
     } catch (error) {
       Alert.alert('Errore', 'Impossibile caricare atleta');
       router.back();
