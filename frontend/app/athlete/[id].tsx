@@ -1165,4 +1165,129 @@ const styles = StyleSheet.create({
     color: '#FF6B35',
     fontStyle: 'italic',
   },
+  // Stili per le attività
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  activityInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activityDateBadge: {
+    backgroundColor: '#252525',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  activityDateText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  activityDetails: {
+    flex: 1,
+  },
+  activityType: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  activityMeta: {
+    color: '#999',
+    fontSize: 12,
+  },
+  feedbackBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 4,
+  },
+  feedbackBadgeText: {
+    color: '#4CAF50',
+    fontSize: 11,
+  },
+  activityActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  activityActionBtn: {
+    padding: 8,
+    backgroundColor: '#252525',
+    borderRadius: 8,
+  },
+  // Stili modal
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#1A1A1A',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '85%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFF',
+  },
+  modalScroll: {
+    padding: 20,
+  },
+  inputLabel: {
+    color: '#999',
+    fontSize: 13,
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  input: {
+    backgroundColor: '#252525',
+    borderRadius: 10,
+    padding: 14,
+    color: '#FFF',
+    fontSize: 15,
+  },
+  typeSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  typeChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: '#252525',
+    borderRadius: 20,
+  },
+  typeChipActive: {
+    backgroundColor: '#FF6B35',
+  },
+  typeChipText: {
+    color: '#999',
+    fontSize: 13,
+  },
+  typeChipTextActive: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
+  saveBtn: {
+    marginTop: 24,
+    marginBottom: 30,
+  },
 });
