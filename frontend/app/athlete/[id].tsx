@@ -547,16 +547,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  backButtonText: {
-    color: '#FF6B35',
-    fontSize: 16,
-    marginLeft: 4,
-  },
   avatarContainer: {
     width: 80,
     height: 80,
