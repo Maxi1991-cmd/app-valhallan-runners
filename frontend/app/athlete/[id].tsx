@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, RefreshControl, Modal, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
 import { athleteAPI, programAPI } from '../../src/services/api';
@@ -13,6 +13,27 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
+
+interface Activity {
+  id: string;
+  athlete_id: string;
+  date: string;
+  activity_type: string;
+  duration_minutes?: number;
+  distance_km?: number;
+  avg_pace?: string;
+  avg_heart_rate?: number;
+  max_heart_rate?: number;
+  calories?: number;
+  elevation_gain?: number;
+  source: string;
+  completed: boolean;
+  feedback_sent: boolean;
+  athlete_feedback?: any;
+  actual_data?: any;
+}
 
 const safeFormatDate = (dateString?: string | null, format?: string) => {
   try {
