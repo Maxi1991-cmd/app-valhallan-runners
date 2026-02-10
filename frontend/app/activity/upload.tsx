@@ -125,15 +125,21 @@ export default function UploadActivity() {
       return;
     }
 
-    // Convert date from GG-MM-AAAA to YYYY-MM-DD
-    let formattedDate = manualData.date;
-    if (manualData.date.includes('-') && manualData.date.length === 10) {
-      const parts = manualData.date.split('-');
-      if (parts.length === 3) {
-        // Check if it's DD-MM-YYYY format
-        if (parts[0].length === 2 && parts[2].length === 4) {
-          formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }
+    // Convert date from GG-MM-AAAA or GG/MM/AAAA to YYYY-MM-DD
+    let formattedDate = manualData.date.trim();
+    
+    // Handle DD/MM/YYYY format (with slash)
+    if (formattedDate.includes('/') && formattedDate.length === 10) {
+      const parts = formattedDate.split('/');
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+        formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+    // Handle DD-MM-YYYY format (with dash)
+    else if (formattedDate.includes('-') && formattedDate.length === 10) {
+      const parts = formattedDate.split('-');
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+        formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
       }
     }
 
