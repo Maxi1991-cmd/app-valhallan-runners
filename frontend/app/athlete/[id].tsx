@@ -714,6 +714,93 @@ export default function AthleteDetail() {
           </Card>
         )}
       </ScrollView>
+
+      {/* Modal Modifica Attività */}
+      <Modal visible={showActivityModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Modifica Attività</Text>
+              <TouchableOpacity onPress={() => { setShowActivityModal(false); setEditingActivity(null); }}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalScroll}>
+              <Text style={styles.inputLabel}>Data (GG-MM-AAAA)</Text>
+              <TextInput
+                style={styles.input}
+                value={activityForm.date}
+                onChangeText={(text) => setActivityForm({...activityForm, date: text})}
+                placeholder="GG-MM-AAAA"
+                placeholderTextColor="#666"
+              />
+
+              <Text style={styles.inputLabel}>Tipo Attività</Text>
+              <View style={styles.typeSelector}>
+                {['running', 'cycling', 'swimming', 'strength', 'other'].map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.typeChip,
+                      activityForm.activity_type === type && styles.typeChipActive
+                    ]}
+                    onPress={() => setActivityForm({...activityForm, activity_type: type})}
+                  >
+                    <Text style={[
+                      styles.typeChipText,
+                      activityForm.activity_type === type && styles.typeChipTextActive
+                    ]}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.inputLabel}>Durata (minuti)</Text>
+              <TextInput
+                style={styles.input}
+                value={activityForm.duration_minutes}
+                onChangeText={(text) => setActivityForm({...activityForm, duration_minutes: text})}
+                placeholder="Es: 45"
+                placeholderTextColor="#666"
+                keyboardType="numeric"
+              />
+
+              <Text style={styles.inputLabel}>Distanza (km)</Text>
+              <TextInput
+                style={styles.input}
+                value={activityForm.distance_km}
+                onChangeText={(text) => setActivityForm({...activityForm, distance_km: text})}
+                placeholder="Es: 10.5"
+                placeholderTextColor="#666"
+                keyboardType="decimal-pad"
+              />
+
+              <Text style={styles.inputLabel}>Passo Medio</Text>
+              <TextInput
+                style={styles.input}
+                value={activityForm.avg_pace}
+                onChangeText={(text) => setActivityForm({...activityForm, avg_pace: text})}
+                placeholder="Es: 5:30 min/km"
+                placeholderTextColor="#666"
+              />
+
+              <Text style={styles.inputLabel}>FC Media (bpm)</Text>
+              <TextInput
+                style={styles.input}
+                value={activityForm.avg_heart_rate}
+                onChangeText={(text) => setActivityForm({...activityForm, avg_heart_rate: text})}
+                placeholder="Es: 145"
+                placeholderTextColor="#666"
+                keyboardType="numeric"
+              />
+
+              <Button title="Salva Modifiche" onPress={saveActivity} style={styles.saveBtn} />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
