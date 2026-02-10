@@ -183,6 +183,90 @@ export default function AthleteDetail() {
     }
   };
 
+  // Funzioni per gestire le attività
+  const openEditActivity = (activity: Activity) => {
+    setEditingActivity(activity);
+    // Converti data da YYYY-MM-DD a DD-MM-YYYY per visualizzazione
+    const dateParts = activity.date.split('-');
+    const displayDate = dateParts.length === 3 && dateParts[0].length === 4
+      ? `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`
+      : activity.date;
+    
+    setActivityForm({
+      date: displayDate,
+      activity_type: activity.activity_type || 'running',
+      duration_minutes: activity.duration_minutes?.toString() || '',
+      distance_km: activity.distance_km?.toString() || '',
+      avg_pace: activity.avg_pace || '',
+      avg_heart_rate: activity.avg_heart_rate?.toString() || '',
+    });
+    setShowActivityModal(true);
+  };
+
+  const saveActivity = async () => {
+    if (!editingActivity) return;
+    
+    // Converti data da DD-MM-YYYY a YYYY-MM-DD
+    let formattedDate = activityForm.date.trim();
+    if (formattedDate.includes('-') && formattedDate.length === 10) {
+      const parts = formattedDate.split('-');
+      if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+        formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+    
+    try {
+      const token = await AsyncStorage.getItem('token');
+      await axios.put(
+        `${BASE_URL}/api/activities/${editingActivity.id}`,
+        {
+          date: formattedDate,
+          activity_type: activityForm.activity_type,
+          duration_minutes: parseInt(activityForm.duration_minutes) || 0,
+          distance_km: parseFloat(activityForm.distance_km) || null,
+          avg_pace: activityForm.avg_pace || null,
+          avg_heart_rate: parseInt(activityForm.avg_heart_rate) || null,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      Alert.alert('Successo', 'Attività modificata');
+      setShowActivityModal(false);
+      setEditingActivity(null);
+      loadActivities();
+      loadWorkouts();
+    } catch (error: any) {
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+    }
+  };
+
+  const deleteActivity = (activity: Activity) => {
+    Alert.alert(
+      'Elimina Attività',
+      `Sei sicuro di voler eliminare questa attività del ${safeFormatDate(activity.date)}?`,
+      [
+        { text: 'Annulla', style: 'cancel' },
+        {
+          text: 'Elimina',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('token');
+              await axios.delete(`${BASE_URL}/api/activities/${activity.id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              Alert.alert('Successo', 'Attività eliminata');
+              loadActivities();
+              loadWorkouts();
+            } catch (error: any) {
+              Alert.alert('Errore', error.response?.data?.detail || 'Errore nell\'eliminazione');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   useEffect(() => {
     loadAthlete();
     fetchPrograms(id);
