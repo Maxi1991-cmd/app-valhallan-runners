@@ -1635,6 +1635,75 @@ async def get_activities(
     return result
 
 
+class ActivityUpdate(BaseModel):
+    date: Optional[str] = None
+    activity_type: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    distance_km: Optional[float] = None
+    avg_pace: Optional[str] = None
+    avg_heart_rate: Optional[int] = None
+    max_heart_rate: Optional[int] = None
+    calories: Optional[int] = None
+    elevation_gain: Optional[int] = None
+
+@api_router.put("/activities/{activity_id}")
+async def update_activity(
+    activity_id: str,
+    update_data: ActivityUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update an activity (coach only)"""
+    activity = await db.activities.find_one({"id": activity_id})
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    
+    # Verify permission - only coach can update
+    athlete = await db.athletes.find_one({"id": activity["athlete_id"]})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] != "coach" or athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Only coach can update activities")
+    
+    # Update only non-null fields
+    update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
+    if update_dict:
+        update_dict["updated_at"] = datetime.utcnow()
+        await db.activities.update_one(
+            {"id": activity_id},
+            {"$set": update_dict}
+        )
+    
+    # Get updated activity
+    updated_activity = await db.activities.find_one({"id": activity_id})
+    if "_id" in updated_activity:
+        del updated_activity["_id"]
+    
+    return updated_activity
+
+@api_router.delete("/activities/{activity_id}")
+async def delete_activity(
+    activity_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete an activity (coach only)"""
+    activity = await db.activities.find_one({"id": activity_id})
+    if not activity:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    
+    # Verify permission - only coach can delete
+    athlete = await db.athletes.find_one({"id": activity["athlete_id"]})
+    if not athlete:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if current_user["role"] != "coach" or athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="Only coach can delete activities")
+    
+    await db.activities.delete_one({"id": activity_id})
+    
+    return {"message": "Activity deleted successfully"}
+
+
 @api_router.put("/activities/{activity_id}/feedback")
 async def activity_feedback(
     activity_id: str,
