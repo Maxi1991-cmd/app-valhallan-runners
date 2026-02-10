@@ -34,11 +34,11 @@ export default function RootLayout() {
         <Stack.Screen name="logout" options={{ headerShown: false }} />
         <Stack.Screen name="athlete-home" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="athlete/[id]" options={{ title: 'Profilo Atleta', headerBackTitle: 'Indietro' }} />
-        <Stack.Screen name="athlete/create" options={{ title: 'Nuovo Atleta', headerBackTitle: 'Indietro' }} />
-        <Stack.Screen name="athlete/edit/[id]" options={{ title: 'Modifica Atleta', headerBackTitle: 'Indietro' }} />
-        <Stack.Screen name="program/[id]" options={{ title: 'Programma', headerBackTitle: 'Indietro' }} />
-        <Stack.Screen name="program/create" options={{ title: 'Programma', headerBackTitle: 'Indietro' }} />
+        <Stack.Screen name="athlete/[id]" options={{ title: 'Profilo Atleta' }} />
+        <Stack.Screen name="athlete/create" options={{ title: 'Nuovo Atleta' }} />
+        <Stack.Screen name="athlete/edit/[id]" options={{ title: 'Modifica Atleta' }} />
+        <Stack.Screen name="program/[id]" options={{ title: 'Programma' }} />
+        <Stack.Screen name="program/create" options={{ title: 'Programma' }} />
         <Stack.Screen name="activity" options={{ headerShown: false }} />
       </Stack>
     </View>
