@@ -467,14 +467,66 @@ export default function AthleteDetail() {
                   size="small"
                   style={styles.actionButtonSmall}
                 />
-                <Button
-                  title="Carica Attività"
-                  onPress={() => router.push(`/activity/upload?athleteId=${id}`)}
-                  variant="secondary"
-                  size="small"
-                  style={styles.actionButtonSmall}
-                />
               </View>
+            </Card>
+
+            {/* Attività Assegnate (Fuori Programma) */}
+            <Card title="Attività Assegnate" style={styles.card}>
+              {activities.length > 0 ? (
+                activities.map((activity) => (
+                  <View key={activity.id} style={styles.activityRow}>
+                    <TouchableOpacity 
+                      style={styles.activityInfo}
+                      onPress={() => router.push(`/activity/${activity.id}`)}
+                    >
+                      <View style={styles.activityDateBadge}>
+                        <Text style={styles.activityDateText}>
+                          {safeFormatDate(activity.date, 'short')}
+                        </Text>
+                      </View>
+                      <View style={styles.activityDetails}>
+                        <Text style={styles.activityType}>
+                          {(activity.activity_type || 'Attività').charAt(0).toUpperCase() + (activity.activity_type || 'attività').slice(1)}
+                        </Text>
+                        <Text style={styles.activityMeta}>
+                          {activity.duration_minutes ? `${activity.duration_minutes} min` : ''}
+                          {activity.duration_minutes && activity.distance_km ? ' • ' : ''}
+                          {activity.distance_km ? `${activity.distance_km} km` : ''}
+                        </Text>
+                        {activity.feedback_sent && (
+                          <View style={styles.feedbackBadge}>
+                            <Ionicons name="chatbubble" size={12} color="#4CAF50" />
+                            <Text style={styles.feedbackBadgeText}>Feedback ricevuto</Text>
+                          </View>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                    <View style={styles.activityActions}>
+                      <TouchableOpacity 
+                        style={styles.activityActionBtn}
+                        onPress={() => openEditActivity(activity)}
+                      >
+                        <Ionicons name="pencil" size={18} color="#FF6B35" />
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={styles.activityActionBtn}
+                        onPress={() => deleteActivity(activity)}
+                      >
+                        <Ionicons name="trash" size={18} color="#DC3545" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>Nessuna attività assegnata</Text>
+              )}
+              <Button
+                title="Nuova Attività"
+                onPress={() => router.push(`/activity/upload?athleteId=${id}`)}
+                variant="secondary"
+                size="small"
+                style={styles.actionButtonSmall}
+              />
             </Card>
 
             {athlete.notes && (
