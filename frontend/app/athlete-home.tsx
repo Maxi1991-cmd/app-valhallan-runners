@@ -1302,6 +1302,58 @@ export default function AthleteHomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Support/FAQ Modal for Athlete */}
+      <Modal visible={showSupportModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Supporto</Text>
+              <TouchableOpacity onPress={() => setShowSupportModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.faqContent}>
+              <Text style={styles.faqTitle}>Domande Frequenti</Text>
+              
+              {faqData.map((faq, index) => (
+                <View key={index} style={styles.faqItem}>
+                  <TouchableOpacity
+                    style={styles.faqQuestionRow}
+                    onPress={() => toggleFaq(index)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.faqQuestion}>{faq.question}</Text>
+                    <Ionicons 
+                      name={expandedFaq === index ? "chevron-up" : "chevron-down"} 
+                      size={20} 
+                      color="#FF6B35" 
+                    />
+                  </TouchableOpacity>
+                  {expandedFaq === index && (
+                    <View style={styles.faqAnswerContainer}>
+                      <Text style={styles.faqAnswer}>{faq.answer}</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+
+              <TouchableOpacity 
+                style={styles.supportFooter}
+                onPress={() => Linking.openURL('mailto:valhallanrunners@gmail.com')}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="mail-outline" size={20} color="#FF6B35" />
+                <View style={styles.supportFooterTextContainer}>
+                  <Text style={styles.supportFooterText}>Hai altre domande o suggerimenti? Contattaci a</Text>
+                  <Text style={styles.supportEmail}>valhallanrunners@gmail.com</Text>
+                </View>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
