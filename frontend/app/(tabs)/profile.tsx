@@ -16,6 +16,7 @@ export default function ProfileTab() {
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(false);
   
