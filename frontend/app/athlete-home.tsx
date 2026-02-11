@@ -2033,4 +2033,68 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 18,
   },
+  // FAQ/Support styles
+  faqContent: {
+    padding: 20,
+  },
+  faqTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 20,
+  },
+  faqItem: {
+    backgroundColor: '#252525',
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  faqQuestionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  faqQuestion: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFF',
+    flex: 1,
+    paddingRight: 12,
+  },
+  faqAnswerContainer: {
+    backgroundColor: '#1A1A1A',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  faqAnswer: {
+    fontSize: 14,
+    color: '#CCC',
+    lineHeight: 22,
+  },
+  supportFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#252525',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+    gap: 12,
+  },
+  supportFooterTextContainer: {
+    flex: 1,
+  },
+  supportFooterText: {
+    fontSize: 13,
+    color: '#999',
+    lineHeight: 18,
+  },
+  supportEmail: {
+    fontSize: 14,
+    color: '#FF6B35',
+    fontWeight: '600',
+    marginTop: 4,
+    textDecorationLine: 'underline',
+  },
 });
