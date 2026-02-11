@@ -66,6 +66,7 @@ export default function AthleteHomeScreen() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<{workout: Workout & {programId: string, programName: string}} | null>(null);
   
   // Form states
