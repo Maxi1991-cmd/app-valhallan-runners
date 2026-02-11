@@ -514,7 +514,7 @@ export default function ProfileTab() {
               <View style={styles.supportFooter}>
                 <Ionicons name="mail-outline" size={20} color="#FF6B35" />
                 <Text style={styles.supportFooterText}>
-                  Hai altre domande? Contattaci a support@valhallanrunners.com
+                  Hai altre domande? Contattaci a valhallanrunners@gmail.com
                 </Text>
               </View>
             </ScrollView>
