@@ -511,12 +511,17 @@ export default function ProfileTab() {
                 </View>
               ))}
 
-              <View style={styles.supportFooter}>
+              <TouchableOpacity 
+                style={styles.supportFooter}
+                onPress={() => Linking.openURL('mailto:valhallanrunners@gmail.com')}
+                activeOpacity={0.7}
+              >
                 <Ionicons name="mail-outline" size={20} color="#FF6B35" />
-                <Text style={styles.supportFooterText}>
-                  Hai altre domande? Contattaci a valhallanrunners@gmail.com
-                </Text>
-              </View>
+                <View style={styles.supportFooterTextContainer}>
+                  <Text style={styles.supportFooterText}>Hai altre domande? Contattaci a</Text>
+                  <Text style={styles.supportEmail}>valhallanrunners@gmail.com</Text>
+                </View>
+              </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
