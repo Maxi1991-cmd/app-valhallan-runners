@@ -930,10 +930,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
     gap: 12,
   },
+  supportFooterTextContainer: {
+    flex: 1,
+  },
   supportFooterText: {
     fontSize: 13,
     color: '#999',
-    flex: 1,
     lineHeight: 18,
+  },
+  supportEmail: {
+    fontSize: 14,
+    color: '#FF6B35',
+    fontWeight: '600',
+    marginTop: 4,
+    textDecorationLine: 'underline',
   },
 });
