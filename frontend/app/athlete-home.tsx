@@ -1225,6 +1225,51 @@ export default function AthleteHomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Privacy Modal for Athlete */}
+      <Modal visible={showPrivacyModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Privacy</Text>
+              <TouchableOpacity onPress={() => setShowPrivacyModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.privacyContent}>
+              <View style={styles.privacySection}>
+                <View style={styles.privacyIconContainer}>
+                  <Ionicons name="person-outline" size={28} color="#FF6B35" />
+                </View>
+                <Text style={styles.privacyQuestion}>Chi può vedere i dati personali?</Text>
+                <Text style={styles.privacyAnswer}>
+                  I dati sono visibili tra te e il tuo coach.
+                </Text>
+              </View>
+
+              <View style={styles.privacyDivider} />
+
+              <View style={styles.privacySection}>
+                <View style={styles.privacyIconContainer}>
+                  <Ionicons name="fitness-outline" size={28} color="#FF6B35" />
+                </View>
+                <Text style={styles.privacyQuestion}>Chi può vedere i dati allenamento?</Text>
+                <Text style={styles.privacyAnswer}>
+                  Gli allenamenti sono condivisibili tra te e il tuo coach.
+                </Text>
+              </View>
+
+              <View style={styles.privacyFooter}>
+                <Ionicons name="shield-checkmark" size={20} color="#4CAF50" />
+                <Text style={styles.privacyFooterText}>
+                  I tuoi dati sono protetti e non vengono condivisi con terze parti.
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
