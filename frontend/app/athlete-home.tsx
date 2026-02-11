@@ -67,6 +67,8 @@ export default function AthleteHomeScreen() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [selectedWorkout, setSelectedWorkout] = useState<{workout: Workout & {programId: string, programName: string}} | null>(null);
   
   // Form states
@@ -87,6 +89,26 @@ export default function AthleteHomeScreen() {
   const [notifyDailyReminder, setNotifyDailyReminder] = useState(true);
   const [notifyExpirations, setNotifyExpirations] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
+
+  // FAQ data for athlete
+  const faqData = [
+    {
+      question: "Posso usare l'app senza coach?",
+      answer: "No. Valhallan Runners è una piattaforma guidata. L'accesso è possibile solo tramite un codice personale fornito dal tuo coach. Qui non si improvvisa, si lavora insieme."
+    },
+    {
+      question: "A cosa mi serve l'app come atleta?",
+      answer: "L'app è il tuo campo da battaglia digitale. Visualizzi il programma/attività creato per te, registri ogni allenamento e tieni traccia dei tuoi progressi. Ogni dato è un passo verso la tua evoluzione."
+    },
+    {
+      question: "Posso modificare da solo il mio programma/attività?",
+      answer: "No. Il programma viene costruito e aggiornato dal tuo coach. Tu devi concentrarti su una cosa sola: eseguire, registrare, migliorare."
+    }
+  ];
+
+  const toggleFaq = (index: number) => {
+    setExpandedFaq(expandedFaq === index ? null : index);
+  };
 
   const fetchData = async () => {
     try {
