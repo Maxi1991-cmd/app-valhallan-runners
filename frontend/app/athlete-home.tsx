@@ -736,6 +736,16 @@ export default function AthleteHomeScreen() {
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
               </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: '#333' }]}
+                onPress={() => setShowPrivacyModal(true)}
+              >
+                <View style={styles.settingsInfo}>
+                  <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
+                  <Text style={styles.settingsText}>Privacy</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#666" />
+              </TouchableOpacity>
             </Card>
 
             {/* Certificato Medico */}
