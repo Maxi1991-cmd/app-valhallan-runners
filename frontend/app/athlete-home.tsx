@@ -1897,4 +1897,56 @@ const styles = StyleSheet.create({
   saveSettingsBtn: {
     marginTop: 16,
   },
+  // Privacy modal styles
+  privacyContent: {
+    padding: 20,
+  },
+  privacySection: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  privacyIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#252525',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  privacyQuestion: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFF',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  privacyAnswer: {
+    fontSize: 14,
+    color: '#CCC',
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 10,
+  },
+  privacyDivider: {
+    height: 1,
+    backgroundColor: '#333',
+    marginVertical: 10,
+  },
+  privacyFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1A2E1A',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 20,
+    gap: 10,
+  },
+  privacyFooterText: {
+    fontSize: 13,
+    color: '#4CAF50',
+    flex: 1,
+    lineHeight: 18,
+  },
 });
