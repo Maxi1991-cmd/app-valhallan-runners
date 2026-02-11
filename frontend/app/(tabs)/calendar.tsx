@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal } from 'react-native';
-import { Calendar, CalendarList } from 'react-native-calendars';
+import { Calendar, CalendarList, LocaleConfig } from 'react-native-calendars';
 import { useDataStore } from '../../src/store/dataStore';
 import { useAuthStore } from '../../src/store/authStore';
 import { Card } from '../../src/components/Card';
@@ -11,6 +11,24 @@ import { format, startOfWeek, addDays, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Configurazione locale italiana per il calendario
+LocaleConfig.locales['it'] = {
+  monthNames: [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
+  ],
+  monthNamesShort: [
+    'Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu',
+    'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'
+  ],
+  dayNames: [
+    'Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'
+  ],
+  dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'],
+  today: 'Oggi'
+};
+LocaleConfig.defaultLocale = 'it';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
