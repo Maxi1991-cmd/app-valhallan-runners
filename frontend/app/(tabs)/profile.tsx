@@ -233,9 +233,9 @@ export default function ProfileTab() {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity style={styles.settingRow} onPress={() => setShowPrivacyModal(true)}>
             <View style={styles.settingInfo}>
-              <Ionicons name="lock-closed-outline" size={22} color="#999" />
+              <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
               <Text style={styles.settingText}>Privacy</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
