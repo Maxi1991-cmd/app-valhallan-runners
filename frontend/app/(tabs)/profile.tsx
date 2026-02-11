@@ -397,6 +397,56 @@ export default function ProfileTab() {
           </View>
         </View>
       </Modal>
+
+      {/* Privacy Modal */}
+      <Modal
+        visible={showPrivacyModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowPrivacyModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Privacy</Text>
+              <TouchableOpacity onPress={() => setShowPrivacyModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.privacyContent}>
+              <View style={styles.privacySection}>
+                <View style={styles.privacyIconContainer}>
+                  <Ionicons name="person-outline" size={28} color="#FF6B35" />
+                </View>
+                <Text style={styles.privacyQuestion}>Chi può vedere i dati personali?</Text>
+                <Text style={styles.privacyAnswer}>
+                  I dati personali sono visibili solo a te e al tuo atleta.
+                </Text>
+              </View>
+
+              <View style={styles.privacyDivider} />
+
+              <View style={styles.privacySection}>
+                <View style={styles.privacyIconContainer}>
+                  <Ionicons name="fitness-outline" size={28} color="#FF6B35" />
+                </View>
+                <Text style={styles.privacyQuestion}>Chi può vedere i dati allenamento?</Text>
+                <Text style={styles.privacyAnswer}>
+                  I dati sono visibili e condivisi solo tra te e i tuoi atleti.
+                </Text>
+              </View>
+
+              <View style={styles.privacyFooter}>
+                <Ionicons name="shield-checkmark" size={20} color="#4CAF50" />
+                <Text style={styles.privacyFooterText}>
+                  I tuoi dati sono protetti e non vengono condivisi con terze parti.
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
