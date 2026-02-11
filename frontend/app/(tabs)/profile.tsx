@@ -469,6 +469,58 @@ export default function ProfileTab() {
           </View>
         </View>
       </Modal>
+
+      {/* Support/FAQ Modal */}
+      <Modal
+        visible={showSupportModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowSupportModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Supporto</Text>
+              <TouchableOpacity onPress={() => setShowSupportModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.faqContent}>
+              <Text style={styles.faqTitle}>Domande Frequenti</Text>
+              
+              {faqData.map((faq, index) => (
+                <View key={index} style={styles.faqItem}>
+                  <TouchableOpacity
+                    style={styles.faqQuestionRow}
+                    onPress={() => toggleFaq(index)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.faqQuestion}>{faq.question}</Text>
+                    <Ionicons 
+                      name={expandedFaq === index ? "chevron-up" : "chevron-down"} 
+                      size={20} 
+                      color="#FF6B35" 
+                    />
+                  </TouchableOpacity>
+                  {expandedFaq === index && (
+                    <View style={styles.faqAnswerContainer}>
+                      <Text style={styles.faqAnswer}>{faq.answer}</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+
+              <View style={styles.supportFooter}>
+                <Ionicons name="mail-outline" size={20} color="#FF6B35" />
+                <Text style={styles.supportFooterText}>
+                  Hai altre domande? Contattaci a support@valhallanrunners.com
+                </Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
