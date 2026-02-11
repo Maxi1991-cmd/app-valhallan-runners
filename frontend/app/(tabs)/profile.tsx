@@ -17,12 +17,34 @@ export default function ProfileTab() {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(false);
   
   // Notification settings for Coach
   const [notifyAthleteFeedback, setNotifyAthleteFeedback] = useState(true);
   const [notifyExpirations, setNotifyExpirations] = useState(true);
+
+  // FAQ data
+  const faqData = [
+    {
+      question: "Chi può utilizzare la piattaforma come coach?",
+      answer: "Solo coach registrati con abbonamento attivo. Valhallan Runners è uno strumento professionale pensato per chi guida atleti con metodo e responsabilità."
+    },
+    {
+      question: "Gli atleti sono soggetti ad abbonamento per utilizzare l'app?",
+      answer: "No. L'abbonamento è previsto esclusivamente per il coach. L'atleta accede tramite codice personale fornito dal proprio allenatore."
+    },
+    {
+      question: "Posso gestire e modificare i programmi dei miei atleti?",
+      answer: "Sì. Il coach crea, aggiorna e adatta ogni programma in base agli obiettivi e ai feedback dell'atleta. La guida è tua. La crescita è loro."
+    }
+  ];
+
+  const toggleFaq = (index: number) => {
+    setExpandedFaq(expandedFaq === index ? null : index);
+  };
 
   useEffect(() => {
     refreshSubscription();
