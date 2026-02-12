@@ -1928,15 +1928,16 @@ async def compare_athlete_data(
         }).to_list(1000)
         
         for act in activities:
-            all_data.append({
-                "type": "activity",
-                "date": act.get("date"),
-                "duration_minutes": act.get("actual_data", {}).get("duration_minutes") or act.get("duration_minutes") or 0,
-                "distance_km": act.get("actual_data", {}).get("distance_km") or act.get("distance_km") or 0,
-                "avg_heart_rate": act.get("actual_data", {}).get("avg_heart_rate") or act.get("avg_heart_rate"),
-                "elevation_gain": act.get("elevation_gain") or 0,
-                "completed": act.get("completed", False) or act.get("feedback_sent", False)
-            })
+            # Solo attività completate (con feedback o completed=true)
+            is_completed = act.get("completed", False) or act.get("feedback_sent", False)
+            if is_completed:
+                all_data.append({
+                    "type": "activity",
+                    "date": act.get("date"),
+                    "duration_minutes": act.get("actual_data", {}).get("duration_minutes") or act.get("duration_minutes") or 0,
+                    "distance_km": act.get("actual_data", {}).get("distance_km") or act.get("distance_km") or 0,
+                    "avg_heart_rate": act.get("actual_data", {}).get("avg_heart_rate") or act.get("avg_heart_rate"),
+                })
         
         # Get program workouts
         programs = await db.programs.find({"athlete_id": athlete_id}).to_list(100)
@@ -1945,19 +1946,17 @@ async def compare_athlete_data(
             for workout in workouts:
                 workout_date = workout.get("date", "")
                 if workout_date and start_date <= workout_date <= end_date:
-                    # Check if workout is completed (has actual_data or feedback_sent)
+                    # Solo workout completati (status completed o feedback inviato)
                     actual_data = workout.get("actual_data", {})
                     is_completed = workout.get("status") == "completed" or workout.get("feedback_sent", False)
                     
-                    if is_completed or actual_data:
+                    if is_completed:
                         all_data.append({
                             "type": "workout",
                             "date": workout_date,
                             "duration_minutes": actual_data.get("duration_minutes") or workout.get("duration_minutes") or 0,
                             "distance_km": actual_data.get("distance_km") or workout.get("distance_km") or 0,
                             "avg_heart_rate": actual_data.get("avg_heart_rate") or workout.get("avg_heart_rate"),
-                            "elevation_gain": actual_data.get("elevation_gain") or 0,
-                            "completed": is_completed
                         })
         
         return all_data
