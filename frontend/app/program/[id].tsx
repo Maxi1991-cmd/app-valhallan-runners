@@ -779,34 +779,6 @@ export default function ProgramDetail() {
                   keyboardType="numeric"
                 />
 
-                <Text style={styles.editInputLabel}>Sensazione</Text>
-                <View style={styles.feelingSelector}>
-                  {[
-                    { value: 'great', label: '😄', text: 'Ottimo' },
-                    { value: 'good', label: '🙂', text: 'Bene' },
-                    { value: 'ok', label: '😐', text: 'OK' },
-                    { value: 'tired', label: '😓', text: 'Stanco' },
-                    { value: 'exhausted', label: '😵', text: 'Esausto' },
-                  ].map((feeling) => (
-                    <TouchableOpacity
-                      key={feeling.value}
-                      style={[
-                        styles.feelingOption,
-                        editWorkoutData.feeling === feeling.value && styles.feelingOptionActive
-                      ]}
-                      onPress={() => setEditWorkoutData({ ...editWorkoutData, feeling: feeling.value })}
-                    >
-                      <Text style={styles.feelingEmoji}>{feeling.label}</Text>
-                      <Text style={[
-                        styles.feelingText,
-                        editWorkoutData.feeling === feeling.value && styles.feelingTextActive
-                      ]}>
-                        {feeling.text}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
                 <Input
                   label="Note"
                   value={editWorkoutData.notes}
