@@ -53,12 +53,13 @@ export default function ProgramDetail() {
     notes: '',
   });
   const [editWorkoutData, setEditWorkoutData] = useState({
-    title: '',
-    description: '',
-    workout_type: 'easy',
     duration_minutes: '',
     distance_km: '',
-    target_pace: '',
+    avg_pace: '',
+    avg_heart_rate: '',
+    max_heart_rate: '',
+    calories: '',
+    feeling: 'good',
     notes: '',
   });
 
