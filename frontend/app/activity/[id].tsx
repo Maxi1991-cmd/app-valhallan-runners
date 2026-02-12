@@ -457,20 +457,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
   dateText: {
     color: '#CCC',
     fontSize: 14,
-    marginBottom: 4,
   },
   athleteText: {
     color: '#CCC',
     fontSize: 14,
-    marginBottom: 4,
   },
   sourceText: {
     color: '#666',
     fontSize: 12,
     fontStyle: 'italic',
+    marginTop: 4,
   },
   feedbackCard: {
     marginBottom: 16,
