@@ -1974,14 +1974,12 @@ async def compare_athlete_data(
                 "avg_distance_per_activity": 0,
                 "avg_pace": None,
                 "avg_heart_rate": None,
-                "total_elevation": 0,
                 "workouts_count": 0,
                 "activities_count": 0
             }
         
         total_distance = sum(d.get("distance_km", 0) or 0 for d in data_list)
         total_duration = sum(d.get("duration_minutes", 0) or 0 for d in data_list)
-        total_elevation = sum(d.get("elevation_gain", 0) or 0 for d in data_list)
         heart_rates = [d.get("avg_heart_rate") for d in data_list if d.get("avg_heart_rate")]
         
         workouts_count = sum(1 for d in data_list if d.get("type") == "workout")
@@ -2001,7 +1999,6 @@ async def compare_athlete_data(
             "avg_distance_per_activity": round(total_distance / len(data_list), 2) if data_list else 0,
             "avg_pace": avg_pace,
             "avg_heart_rate": int(sum(heart_rates) / len(heart_rates)) if heart_rates else None,
-            "total_elevation": total_elevation,
             "workouts_count": workouts_count,
             "activities_count": activities_count
         }
