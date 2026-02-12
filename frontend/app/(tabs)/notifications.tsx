@@ -100,8 +100,8 @@ export default function NotificationsTab() {
 
     const relatedData = (item as any).related_data;
     
-    // Se è un feedback di attività standalone, apri il modal con i dettagli
-    if (item.notification_type === 'workout_feedback' && relatedData?.activity_id) {
+    // Se è un feedback di attività standalone (ha activity_id ma NON program_id), apri il modal
+    if (item.notification_type === 'workout_feedback' && relatedData?.activity_id && !relatedData?.program_id) {
       setFeedbackModal({
         visible: true,
         data: {
@@ -116,8 +116,8 @@ export default function NotificationsTab() {
       return;
     }
     
-    // Se è un feedback di workout normale, apri il modal con i dettagli
-    if ((item.notification_type === 'workout_feedback' || item.notification_type === 'workout_modified') && relatedData?.athlete_feedback) {
+    // Se è un feedback di workout normale (ha program_id), apri il modal con i dettagli
+    if ((item.notification_type === 'workout_feedback' || item.notification_type === 'workout_modified') && relatedData?.program_id) {
       setFeedbackModal({
         visible: true,
         data: {
