@@ -211,18 +211,20 @@ export default function ActivityDetail() {
               </View>
             </View>
             
-            <Text style={styles.dateText}>
-              <Ionicons name="calendar" size={14} color="#999" /> {activity.date}
-            </Text>
+            <View style={styles.dateRow}>
+              <Ionicons name="calendar" size={14} color="#999" />
+              <Text style={styles.dateText}>{activity.date}</Text>
+            </View>
             
             {athlete && (
-              <Text style={styles.athleteText}>
-                <Ionicons name="person" size={14} color="#999" /> {athlete.name}
-              </Text>
+              <View style={styles.dateRow}>
+                <Ionicons name="person" size={14} color="#999" />
+                <Text style={styles.athleteText}>{athlete.name}</Text>
+              </View>
             )}
             
             <Text style={styles.sourceText}>
-              Fonte: {activity.source === 'manual' ? 'Manuale' : activity.source.toUpperCase()}
+              Fonte: {activity.source === 'manual' ? 'Manuale' : activity.source?.toUpperCase() || 'N/A'}
             </Text>
           </Card>
 
