@@ -1099,10 +1099,9 @@ const styles = StyleSheet.create({
   workoutActions: {
     flexDirection: 'row',
     gap: 8,
-    marginLeft: 8,
   },
   workoutActionBtn: {
-    padding: 8,
+    padding: 10,
     backgroundColor: '#252525',
     borderRadius: 8,
   },
