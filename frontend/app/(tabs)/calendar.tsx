@@ -338,6 +338,7 @@ export default function CalendarTab() {
             {getWeekDays().map((date) => {
               const dayWorkouts = getWorkoutsForDate(date);
               const isToday = date === format(new Date(), 'yyyy-MM-dd');
+              const today = format(new Date(), 'yyyy-MM-dd');
               
               return (
                 <View key={date} style={[styles.weekRowHorizontal, isToday && styles.weekRowToday]}>
@@ -369,35 +370,40 @@ export default function CalendarTab() {
                     {dayWorkouts.length === 0 ? (
                       <Text style={styles.noWorkoutText}>Nessun allenamento</Text>
                     ) : (
-                      dayWorkouts.map((workout, index) => (
-                        <TouchableOpacity
-                          key={workout.id || index}
-                          style={[
-                            styles.workoutItemHorizontal,
-                            { borderLeftColor: getWorkoutTypeColor(workout.workout_type) },
-                            workout.completed && styles.workoutItemCompleted
-                          ]}
-                          onPress={() => openWorkoutDetail(workout)}
-                        >
-                          <View style={styles.workoutItemMainHorizontal}>
-                            <Text style={styles.workoutTitleHorizontal} numberOfLines={1}>
-                              {workout.title}
-                            </Text>
-                            <Text style={styles.workoutAthleteHorizontal}>{workout.athlete_name}</Text>
-                            {workout.program_name === 'Fuori Programma' && (
-                              <Text style={styles.standaloneTag}>Extra</Text>
-                            )}
-                          </View>
-                          <View style={styles.workoutMetaHorizontal}>
-                            {workout.duration_minutes && (
-                              <Text style={styles.metaTextHorizontal}>{workout.duration_minutes} min</Text>
-                            )}
-                            {workout.distance_km && (
-                              <Text style={styles.metaTextHorizontal}>{workout.distance_km} km</Text>
-                            )}
-                            {workout.completed && (
-                              <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
-                            )}
+                      dayWorkouts.map((workout, index) => {
+                        const isExpired = !workout.completed && workout.date < today;
+                        return (
+                          <TouchableOpacity
+                            key={workout.id || index}
+                            style={[
+                              styles.workoutItemHorizontal,
+                              { borderLeftColor: getWorkoutTypeColor(workout.workout_type) },
+                              workout.completed && styles.workoutItemCompleted,
+                              isExpired && styles.workoutItemExpiredHorizontal
+                            ]}
+                            onPress={() => openWorkoutDetail(workout)}
+                          >
+                            <View style={styles.workoutItemMainHorizontal}>
+                              <Text style={styles.workoutTitleHorizontal} numberOfLines={1}>
+                                {workout.title}
+                              </Text>
+                              <Text style={styles.workoutAthleteHorizontal}>{workout.athlete_name}</Text>
+                              {workout.program_name === 'Fuori Programma' && (
+                                <Text style={styles.standaloneTag}>Extra</Text>
+                              )}
+                            </View>
+                            <View style={styles.workoutMetaHorizontal}>
+                              {workout.duration_minutes && (
+                                <Text style={styles.metaTextHorizontal}>{workout.duration_minutes} min</Text>
+                              )}
+                              {workout.distance_km && (
+                                <Text style={styles.metaTextHorizontal}>{workout.distance_km} km</Text>
+                              )}
+                              {workout.completed ? (
+                                <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
+                              ) : isExpired ? (
+                                <Ionicons name="close-circle" size={18} color="#DC3545" />
+                              ) : null}
                           </View>
                         </TouchableOpacity>
                       ))
