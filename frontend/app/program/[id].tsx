@@ -680,6 +680,98 @@ export default function ProgramDetail() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
+
+      {/* Edit Workout Modal */}
+      <Modal visible={editWorkoutModalVisible} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Modifica Allenamento</Text>
+              <TouchableOpacity onPress={() => { setEditWorkoutModalVisible(false); setSelectedWorkout(null); }}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalScroll}>
+              <Input
+                label="Titolo"
+                value={editWorkoutData.title}
+                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, title: text })}
+                placeholder="Es: Corsa Lenta"
+              />
+              <Input
+                label="Descrizione"
+                value={editWorkoutData.description}
+                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, description: text })}
+                placeholder="Descrizione allenamento"
+                multiline
+              />
+              
+              <Text style={styles.inputLabel}>Tipo Allenamento</Text>
+              <View style={styles.typeSelector}>
+                {['easy', 'tempo', 'intervals', 'long', 'recovery', 'race'].map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.typeChip,
+                      editWorkoutData.workout_type === type && styles.typeChipActive
+                    ]}
+                    onPress={() => setEditWorkoutData({ ...editWorkoutData, workout_type: type })}
+                  >
+                    <Text style={[
+                      styles.typeChipText,
+                      editWorkoutData.workout_type === type && styles.typeChipTextActive
+                    ]}>
+                      {type === 'easy' ? 'Facile' : 
+                       type === 'tempo' ? 'Tempo' :
+                       type === 'intervals' ? 'Intervalli' :
+                       type === 'long' ? 'Lungo' :
+                       type === 'recovery' ? 'Recupero' : 'Gara'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Input
+                label="Durata (minuti)"
+                value={editWorkoutData.duration_minutes}
+                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, duration_minutes: text })}
+                placeholder="Es: 45"
+                keyboardType="numeric"
+              />
+              <Input
+                label="Distanza (km)"
+                value={editWorkoutData.distance_km}
+                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, distance_km: text })}
+                placeholder="Es: 10"
+                keyboardType="decimal-pad"
+              />
+              <Input
+                label="Passo Target"
+                value={editWorkoutData.target_pace}
+                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, target_pace: text })}
+                placeholder="Es: 5:30 min/km"
+              />
+              <Input
+                label="Note"
+                value={editWorkoutData.notes}
+                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, notes: text })}
+                placeholder="Note aggiuntive"
+                multiline
+              />
+
+              <Button
+                title="Salva Modifiche"
+                onPress={handleEditWorkout}
+                style={styles.submitButton}
+              />
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
