@@ -128,14 +128,16 @@ export default function ProgramDetail() {
 
   const openEditWorkoutModal = (workout: WorkoutSession) => {
     setSelectedWorkout(workout);
+    const actualData = workout.actual_data || {};
     setEditWorkoutData({
-      title: workout.title || '',
-      description: workout.description || '',
-      workout_type: workout.workout_type || 'easy',
-      duration_minutes: workout.duration_minutes?.toString() || '',
-      distance_km: workout.distance_km?.toString() || '',
-      target_pace: workout.target_pace || '',
-      notes: workout.notes || '',
+      duration_minutes: actualData.duration_minutes?.toString() || '',
+      distance_km: actualData.distance_km?.toString() || '',
+      avg_pace: actualData.avg_pace || '',
+      avg_heart_rate: actualData.avg_heart_rate?.toString() || '',
+      max_heart_rate: actualData.max_heart_rate?.toString() || '',
+      calories: actualData.calories?.toString() || '',
+      feeling: actualData.feeling || 'good',
+      notes: actualData.notes || '',
     });
     setEditWorkoutModalVisible(true);
   };
@@ -146,18 +148,21 @@ export default function ProgramDetail() {
     try {
       const token = await AsyncStorage.getItem('token');
       
-      // Aggiorna il workout nel programma
+      // Aggiorna i dati effettivi (actual_data) del workout
       const updatedWorkouts = program.workouts.map((w) => {
         if (w.id === selectedWorkout.id) {
           return {
             ...w,
-            title: editWorkoutData.title,
-            description: editWorkoutData.description,
-            workout_type: editWorkoutData.workout_type,
-            duration_minutes: editWorkoutData.duration_minutes ? parseInt(editWorkoutData.duration_minutes) : undefined,
-            distance_km: editWorkoutData.distance_km ? parseFloat(editWorkoutData.distance_km) : undefined,
-            target_pace: editWorkoutData.target_pace || undefined,
-            notes: editWorkoutData.notes || undefined,
+            actual_data: {
+              duration_minutes: editWorkoutData.duration_minutes ? parseInt(editWorkoutData.duration_minutes) : undefined,
+              distance_km: editWorkoutData.distance_km ? parseFloat(editWorkoutData.distance_km) : undefined,
+              avg_pace: editWorkoutData.avg_pace || undefined,
+              avg_heart_rate: editWorkoutData.avg_heart_rate ? parseInt(editWorkoutData.avg_heart_rate) : undefined,
+              max_heart_rate: editWorkoutData.max_heart_rate ? parseInt(editWorkoutData.max_heart_rate) : undefined,
+              calories: editWorkoutData.calories ? parseInt(editWorkoutData.calories) : undefined,
+              feeling: editWorkoutData.feeling,
+              notes: editWorkoutData.notes || undefined,
+            },
           };
         }
         return w;
@@ -169,7 +174,7 @@ export default function ProgramDetail() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      Alert.alert('Successo', 'Allenamento modificato');
+      Alert.alert('Successo', 'Dati allenamento modificati');
       setEditWorkoutModalVisible(false);
       setSelectedWorkout(null);
       loadProgram();
