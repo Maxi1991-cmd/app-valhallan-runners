@@ -126,6 +126,91 @@ export default function ProgramDetail() {
     setCompleteModalVisible(true);
   };
 
+  const openEditWorkoutModal = (workout: WorkoutSession) => {
+    setSelectedWorkout(workout);
+    setEditWorkoutData({
+      title: workout.title || '',
+      description: workout.description || '',
+      workout_type: workout.workout_type || 'easy',
+      duration_minutes: workout.duration_minutes?.toString() || '',
+      distance_km: workout.distance_km?.toString() || '',
+      target_pace: workout.target_pace || '',
+      notes: workout.notes || '',
+    });
+    setEditWorkoutModalVisible(true);
+  };
+
+  const handleEditWorkout = async () => {
+    if (!selectedWorkout || !program) return;
+    
+    try {
+      const token = await AsyncStorage.getItem('token');
+      
+      // Aggiorna il workout nel programma
+      const updatedWorkouts = program.workouts.map((w) => {
+        if (w.id === selectedWorkout.id) {
+          return {
+            ...w,
+            title: editWorkoutData.title,
+            description: editWorkoutData.description,
+            workout_type: editWorkoutData.workout_type,
+            duration_minutes: editWorkoutData.duration_minutes ? parseInt(editWorkoutData.duration_minutes) : undefined,
+            distance_km: editWorkoutData.distance_km ? parseFloat(editWorkoutData.distance_km) : undefined,
+            target_pace: editWorkoutData.target_pace || undefined,
+            notes: editWorkoutData.notes || undefined,
+          };
+        }
+        return w;
+      });
+      
+      await axios.put(
+        `${BASE_URL}/api/programs/${id}`,
+        { ...program, workouts: updatedWorkouts },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      Alert.alert('Successo', 'Allenamento modificato');
+      setEditWorkoutModalVisible(false);
+      setSelectedWorkout(null);
+      loadProgram();
+    } catch (error: any) {
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore nella modifica');
+    }
+  };
+
+  const handleDeleteWorkout = (workout: WorkoutSession) => {
+    Alert.alert(
+      'Elimina Allenamento',
+      `Sei sicuro di voler eliminare "${workout.title}"?`,
+      [
+        { text: 'Annulla', style: 'cancel' },
+        {
+          text: 'Elimina',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('token');
+              
+              // Rimuovi il workout dal programma
+              const updatedWorkouts = program!.workouts.filter((w) => w.id !== workout.id);
+              
+              await axios.put(
+                `${BASE_URL}/api/programs/${id}`,
+                { ...program, workouts: updatedWorkouts },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              
+              Alert.alert('Successo', 'Allenamento eliminato');
+              loadProgram();
+            } catch (error: any) {
+              Alert.alert('Errore', error.response?.data?.detail || 'Errore nell\'eliminazione');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleCompleteWorkout = async () => {
     if (!selectedWorkout) return;
 
