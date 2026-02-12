@@ -1162,4 +1162,74 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '600',
   },
+  // New Edit Workout Modal Styles
+  editHeaderCard: {
+    marginBottom: 16,
+  },
+  editHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  editStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  editStatusText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4CAF50',
+  },
+  editWorkoutTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 8,
+  },
+  editDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  editDateText: {
+    color: '#CCC',
+    fontSize: 14,
+  },
+  editFormCard: {
+    marginBottom: 16,
+  },
+  editInputLabel: {
+    color: '#999',
+    fontSize: 13,
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  editSubmitBtn: {
+    marginTop: 16,
+  },
+  feelingSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  feelingOption: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    backgroundColor: '#252525',
+    minWidth: 55,
+  },
+  feelingOptionActive: {
+    backgroundColor: '#FF6B35',
+  },
+  feelingEmoji: {
+    fontSize: 20,
+  },
 });
