@@ -1962,9 +1962,9 @@ async def compare_athlete_data(
         
         return all_data
     
-    # Get data for both periods
-    data1 = await get_period_data(period1_start, period1_end)
-    data2 = await get_period_data(period2_start, period2_end)
+    # Get data for both periods using normalized dates
+    data1 = await get_period_data(p1_start, p1_end)
+    data2 = await get_period_data(p2_start, p2_end)
     
     def calculate_period_stats(data_list):
         if not data_list:
