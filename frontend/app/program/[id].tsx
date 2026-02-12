@@ -1050,4 +1050,44 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 40,
   },
+  // Workout action buttons
+  workoutActions: {
+    flexDirection: 'row',
+    gap: 8,
+    marginLeft: 8,
+  },
+  workoutActionBtn: {
+    padding: 8,
+    backgroundColor: '#252525',
+    borderRadius: 8,
+  },
+  // Edit workout modal
+  inputLabel: {
+    color: '#999',
+    fontSize: 13,
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  typeSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  typeChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    backgroundColor: '#252525',
+    borderRadius: 20,
+  },
+  typeChipActive: {
+    backgroundColor: '#FF6B35',
+  },
+  typeChipText: {
+    color: '#999',
+    fontSize: 13,
+  },
+  typeChipTextActive: {
+    color: '#FFF',
+    fontWeight: '600',
+  },
 });
