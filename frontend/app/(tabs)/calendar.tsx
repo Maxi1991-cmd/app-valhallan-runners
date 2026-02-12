@@ -406,7 +406,8 @@ export default function CalendarTab() {
                               ) : null}
                           </View>
                         </TouchableOpacity>
-                      ))
+                        );
+                      })
                     )}
                   </View>
                 </View>
