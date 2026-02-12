@@ -403,12 +403,16 @@ export default function CalendarTab() {
         {/* Legend */}
         <View style={styles.legend}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#FF6B35' }]} />
-            <Text style={styles.legendText}>Programmato</Text>
-          </View>
-          <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
             <Text style={styles.legendText}>Completato</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: '#FF6B35' }]} />
+            <Text style={styles.legendText}>Da fare</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: '#DC3545' }]} />
+            <Text style={styles.legendText}>Non effettuato</Text>
           </View>
         </View>
       </ScrollView>
