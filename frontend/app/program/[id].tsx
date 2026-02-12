@@ -40,6 +40,7 @@ export default function ProgramDetail() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [completeModalVisible, setCompleteModalVisible] = useState(false);
+  const [editWorkoutModalVisible, setEditWorkoutModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<WorkoutSession | null>(null);
   const [completionData, setCompletionData] = useState({
     duration_minutes: '',
@@ -49,6 +50,15 @@ export default function ProgramDetail() {
     max_heart_rate: '',
     calories: '',
     feeling: 'good',
+    notes: '',
+  });
+  const [editWorkoutData, setEditWorkoutData] = useState({
+    title: '',
+    description: '',
+    workout_type: 'easy',
+    duration_minutes: '',
+    distance_km: '',
+    target_pace: '',
     notes: '',
   });
 
