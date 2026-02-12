@@ -465,8 +465,18 @@ export default function CalendarTab() {
                 </View>
                 <View style={styles.modalRow}>
                   <Text style={styles.modalLabel}>Stato</Text>
-                  <Text style={[styles.modalValue, { color: selectedWorkout.completed ? '#4CAF50' : '#FF6B35' }]}>
-                    {selectedWorkout.completed ? 'Completato' : 'Da fare'}
+                  <Text style={[styles.modalValue, { 
+                    color: selectedWorkout.completed 
+                      ? '#4CAF50' 
+                      : selectedWorkout.date < format(new Date(), 'yyyy-MM-dd') 
+                        ? '#DC3545' 
+                        : '#FF6B35' 
+                  }]}>
+                    {selectedWorkout.completed 
+                      ? 'Completato' 
+                      : selectedWorkout.date < format(new Date(), 'yyyy-MM-dd')
+                        ? 'Non effettuato'
+                        : 'Da fare'}
                   </Text>
                 </View>
 
