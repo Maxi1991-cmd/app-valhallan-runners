@@ -289,13 +289,6 @@ export default function ProgramDetail() {
         {/* Actions */}
         <View style={styles.actionButtons}>
           <Button
-            title="Esporta PDF"
-            onPress={generatePDF}
-            variant="secondary"
-            size="small"
-            style={styles.actionButton}
-          />
-          <Button
             title="Modifica"
             onPress={() => router.push(`/program/create?id=${id}`)}
             variant="outline"
