@@ -1086,6 +1086,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   // Edit workout modal
+  workoutInfo: {
+    backgroundColor: '#252525',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  workoutInfoTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FFF',
+    marginBottom: 4,
+  },
+  workoutInfoDate: {
+    fontSize: 14,
+    color: '#999',
+  },
   inputLabel: {
     color: '#999',
     fontSize: 13,
