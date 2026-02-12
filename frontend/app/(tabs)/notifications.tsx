@@ -136,10 +136,14 @@ export default function NotificationsTab() {
     // Naviga in base al tipo di notifica
     if (item.notification_type === 'workout_completed' && relatedData?.program_id) {
       router.push(`/program/${relatedData.program_id}`);
+    } else if (item.notification_type === 'activity_assigned' && relatedData?.activity_id) {
+      router.push(`/activity/${relatedData.activity_id}`);
     } else if (item.notification_type === 'certificate_expiry' && relatedData?.athlete_id) {
       router.push(`/athlete/${relatedData.athlete_id}?tab=certificate`);
     } else if (item.notification_type === 'payment_due' && relatedData?.athlete_id) {
       router.push(`/athlete/${relatedData.athlete_id}?tab=payments`);
+    } else if (relatedData?.activity_id) {
+      router.push(`/activity/${relatedData.activity_id}`);
     } else if (relatedData?.athlete_id) {
       router.push(`/athlete/${relatedData.athlete_id}`);
     } else if (relatedData?.program_id) {
