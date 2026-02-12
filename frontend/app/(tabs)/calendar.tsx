@@ -870,6 +870,9 @@ const styles = StyleSheet.create({
   workoutItemCompleted: {
     backgroundColor: 'rgba(76, 175, 80, 0.1)',
   },
+  workoutItemExpiredHorizontal: {
+    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+  },
   workoutItemMainHorizontal: {
     flex: 1,
   },
