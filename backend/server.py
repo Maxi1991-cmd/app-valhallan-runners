@@ -2029,7 +2029,6 @@ async def compare_athlete_data(
             "distance_change_pct": calc_diff(period1_stats["total_distance_km"], period2_stats["total_distance_km"]),
             "duration_change_pct": calc_diff(period1_stats["total_duration_minutes"], period2_stats["total_duration_minutes"]),
             "activities_change_pct": calc_diff(period1_stats["total_activities"], period2_stats["total_activities"]),
-            "elevation_change_pct": calc_diff(period1_stats["total_elevation"], period2_stats["total_elevation"]),
         },
         "summary": {
             "improved_distance": period1_stats["total_distance_km"] > period2_stats["total_distance_km"],
