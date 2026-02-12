@@ -701,97 +701,128 @@ export default function ProgramDetail() {
               </TouchableOpacity>
             </View>
             
-            <ScrollView style={styles.modalScroll}>
+            <ScrollView style={styles.modalBody}>
+              {/* Header con info workout */}
               {selectedWorkout && (
-                <View style={styles.workoutInfo}>
-                  <Text style={styles.workoutInfoTitle}>{selectedWorkout.title}</Text>
-                  <Text style={styles.workoutInfoDate}>{selectedWorkout.date}</Text>
-                </View>
+                <Card style={styles.editHeaderCard}>
+                  <View style={styles.editHeaderRow}>
+                    <View style={[styles.typeBadge, { backgroundColor: `${getWorkoutTypeColor(selectedWorkout.workout_type)}20` }]}>
+                      <Text style={[styles.typeText, { color: getWorkoutTypeColor(selectedWorkout.workout_type) }]}>
+                        {getWorkoutTypeLabel(selectedWorkout.workout_type)}
+                      </Text>
+                    </View>
+                    <View style={styles.editStatusBadge}>
+                      <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+                      <Text style={styles.editStatusText}>Completato</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.editWorkoutTitle}>{selectedWorkout.title}</Text>
+                  <View style={styles.editDateRow}>
+                    <Ionicons name="calendar" size={14} color="#999" />
+                    <Text style={styles.editDateText}>{selectedWorkout.day}</Text>
+                  </View>
+                </Card>
               )}
 
-              <Input
-                label="Durata Effettiva (minuti)"
-                value={editWorkoutData.duration_minutes}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, duration_minutes: text })}
-                placeholder="Es: 45"
-                keyboardType="numeric"
-              />
-              <Input
-                label="Distanza Effettiva (km)"
-                value={editWorkoutData.distance_km}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, distance_km: text })}
-                placeholder="Es: 10.5"
-                keyboardType="decimal-pad"
-              />
-              <Input
-                label="Passo Medio"
-                value={editWorkoutData.avg_pace}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, avg_pace: text })}
-                placeholder="Es: 5:30 min/km"
-              />
-              <Input
-                label="FC Media (bpm)"
-                value={editWorkoutData.avg_heart_rate}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, avg_heart_rate: text })}
-                placeholder="Es: 145"
-                keyboardType="numeric"
-              />
-              <Input
-                label="FC Max (bpm)"
-                value={editWorkoutData.max_heart_rate}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, max_heart_rate: text })}
-                placeholder="Es: 175"
-                keyboardType="numeric"
-              />
-              <Input
-                label="Calorie"
-                value={editWorkoutData.calories}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, calories: text })}
-                placeholder="Es: 450"
-                keyboardType="numeric"
-              />
+              {/* Form Dati Effettivi - Identico a activity/[id].tsx */}
+              <Card title="Dati Effettivi (Coach)" style={styles.editFormCard}>
+                <View style={styles.modalRow}>
+                  <Input
+                    label="Durata (min)"
+                    value={editWorkoutData.duration_minutes}
+                    onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, duration_minutes: text })}
+                    placeholder="45"
+                    keyboardType="numeric"
+                    containerStyle={styles.halfInput}
+                  />
+                  <Input
+                    label="Distanza (km)"
+                    value={editWorkoutData.distance_km}
+                    onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, distance_km: text })}
+                    placeholder="10.5"
+                    keyboardType="decimal-pad"
+                    containerStyle={styles.halfInput}
+                  />
+                </View>
+                
+                <Input
+                  label="Passo Medio"
+                  value={editWorkoutData.avg_pace}
+                  onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, avg_pace: text })}
+                  placeholder="5:30 min/km"
+                />
+                
+                <View style={styles.modalRow}>
+                  <Input
+                    label="FC Media (bpm)"
+                    value={editWorkoutData.avg_heart_rate}
+                    onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, avg_heart_rate: text })}
+                    placeholder="145"
+                    keyboardType="numeric"
+                    containerStyle={styles.halfInput}
+                  />
+                  <Input
+                    label="FC Max (bpm)"
+                    value={editWorkoutData.max_heart_rate}
+                    onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, max_heart_rate: text })}
+                    placeholder="175"
+                    keyboardType="numeric"
+                    containerStyle={styles.halfInput}
+                  />
+                </View>
+                
+                <Input
+                  label="Calorie"
+                  value={editWorkoutData.calories}
+                  onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, calories: text })}
+                  placeholder="450"
+                  keyboardType="numeric"
+                />
 
-              <Text style={styles.inputLabel}>Sensazione</Text>
-              <View style={styles.feelingSelector}>
-                {[
-                  { value: 'great', label: '😄', text: 'Ottimo' },
-                  { value: 'good', label: '🙂', text: 'Bene' },
-                  { value: 'ok', label: '😐', text: 'OK' },
-                  { value: 'tired', label: '😓', text: 'Stanco' },
-                  { value: 'exhausted', label: '😵', text: 'Esausto' },
-                ].map((feeling) => (
-                  <TouchableOpacity
-                    key={feeling.value}
-                    style={[
-                      styles.feelingOption,
-                      editWorkoutData.feeling === feeling.value && styles.feelingOptionActive
-                    ]}
-                    onPress={() => setEditWorkoutData({ ...editWorkoutData, feeling: feeling.value })}
-                  >
-                    <Text style={styles.feelingEmoji}>{feeling.label}</Text>
-                    <Text style={[
-                      styles.feelingText,
-                      editWorkoutData.feeling === feeling.value && styles.feelingTextActive
-                    ]}>
-                      {feeling.text}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                <Text style={styles.editInputLabel}>Sensazione</Text>
+                <View style={styles.feelingSelector}>
+                  {[
+                    { value: 'great', label: '😄', text: 'Ottimo' },
+                    { value: 'good', label: '🙂', text: 'Bene' },
+                    { value: 'ok', label: '😐', text: 'OK' },
+                    { value: 'tired', label: '😓', text: 'Stanco' },
+                    { value: 'exhausted', label: '😵', text: 'Esausto' },
+                  ].map((feeling) => (
+                    <TouchableOpacity
+                      key={feeling.value}
+                      style={[
+                        styles.feelingOption,
+                        editWorkoutData.feeling === feeling.value && styles.feelingOptionActive
+                      ]}
+                      onPress={() => setEditWorkoutData({ ...editWorkoutData, feeling: feeling.value })}
+                    >
+                      <Text style={styles.feelingEmoji}>{feeling.label}</Text>
+                      <Text style={[
+                        styles.feelingText,
+                        editWorkoutData.feeling === feeling.value && styles.feelingTextActive
+                      ]}>
+                        {feeling.text}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
 
-              <Input
-                label="Note"
-                value={editWorkoutData.notes}
-                onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, notes: text })}
-                placeholder="Note aggiuntive"
-                multiline
-              />
+                <Input
+                  label="Note"
+                  value={editWorkoutData.notes}
+                  onChangeText={(text) => setEditWorkoutData({ ...editWorkoutData, notes: text })}
+                  placeholder="Note aggiuntive..."
+                  multiline
+                  numberOfLines={3}
+                />
 
-              <Button
-                title="Salva Modifiche"
-                onPress={handleEditWorkout}
-                style={styles.submitButton}
-              />
+                <Button
+                  title="Salva Modifiche"
+                  onPress={handleEditWorkout}
+                  size="large"
+                  style={styles.editSubmitBtn}
+                />
+              </Card>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
