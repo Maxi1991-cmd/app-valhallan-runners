@@ -898,14 +898,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333',
   },
+  workoutTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  workoutLeftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
   workoutHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 8,
   },
   checkboxContainer: {
-    marginRight: 12,
-    marginTop: 2,
+    marginRight: 0,
+  },
+  workoutContent: {
+    marginBottom: 8,
   },
   workoutInfo: {
     flex: 1,
