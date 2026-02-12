@@ -635,6 +635,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderLeftWidth: 4,
   },
+  workoutItemExpired: {
+    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+  },
   workoutItemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
