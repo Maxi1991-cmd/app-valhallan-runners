@@ -441,6 +441,21 @@ export default function ProgramDetail() {
                   {getWorkoutTypeLabel(workout.workout_type)}
                 </Text>
               </View>
+              {/* Action buttons */}
+              <View style={styles.workoutActions}>
+                <TouchableOpacity
+                  style={styles.workoutActionBtn}
+                  onPress={() => openEditWorkoutModal(workout)}
+                >
+                  <Ionicons name="pencil" size={18} color="#FF6B35" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.workoutActionBtn}
+                  onPress={() => handleDeleteWorkout(workout)}
+                >
+                  <Ionicons name="trash" size={18} color="#DC3545" />
+                </TouchableOpacity>
+              </View>
             </TouchableOpacity>
 
             <Text style={styles.workoutDesc}>{workout.description}</Text>
