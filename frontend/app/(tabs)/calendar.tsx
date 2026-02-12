@@ -193,36 +193,45 @@ export default function CalendarTab() {
 
   const renderDayWorkouts = (date: string) => {
     const dayWorkouts = getWorkoutsForDate(date);
+    const today = format(new Date(), 'yyyy-MM-dd');
     if (dayWorkouts.length === 0) return null;
 
-    return dayWorkouts.map((workout, index) => (
-      <TouchableOpacity
-        key={workout.id || index}
-        style={[
-          styles.workoutItem,
-          { borderLeftColor: getWorkoutTypeColor(workout.workout_type) },
-        ]}
-        onPress={() => openWorkoutDetail(workout)}
-      >
-        <View style={styles.workoutItemHeader}>
-          <Text style={styles.workoutTitle} numberOfLines={1}>
-            {workout.title}
-          </Text>
-          {workout.completed && (
-            <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-          )}
-        </View>
-        <Text style={styles.workoutAthlete}>{workout.athlete_name}</Text>
-        <View style={styles.workoutMeta}>
-          {workout.duration_minutes && (
-            <Text style={styles.metaText}>{workout.duration_minutes}min</Text>
-          )}
-          {workout.distance_km && (
-            <Text style={styles.metaText}>{workout.distance_km}km</Text>
-          )}
-        </View>
-      </TouchableOpacity>
-    ));
+    return dayWorkouts.map((workout, index) => {
+      // Determina lo stato del workout
+      const isExpired = !workout.completed && workout.date < today;
+      
+      return (
+        <TouchableOpacity
+          key={workout.id || index}
+          style={[
+            styles.workoutItem,
+            { borderLeftColor: getWorkoutTypeColor(workout.workout_type) },
+            isExpired && styles.workoutItemExpired,
+          ]}
+          onPress={() => openWorkoutDetail(workout)}
+        >
+          <View style={styles.workoutItemHeader}>
+            <Text style={styles.workoutTitle} numberOfLines={1}>
+              {workout.title}
+            </Text>
+            {workout.completed ? (
+              <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
+            ) : isExpired ? (
+              <Ionicons name="close-circle" size={16} color="#DC3545" />
+            ) : null}
+          </View>
+          <Text style={styles.workoutAthlete}>{workout.athlete_name}</Text>
+          <View style={styles.workoutMeta}>
+            {workout.duration_minutes && (
+              <Text style={styles.metaText}>{workout.duration_minutes}min</Text>
+            )}
+            {workout.distance_km && (
+              <Text style={styles.metaText}>{workout.distance_km}km</Text>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    });
   };
 
   return (
