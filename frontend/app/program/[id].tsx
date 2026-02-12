@@ -410,44 +410,33 @@ export default function ProgramDetail() {
 
         {program.workouts.map((workout, index) => (
           <Card key={workout.id || index} style={styles.workoutCard}>
-            <TouchableOpacity
-              style={styles.workoutHeader}
-              onPress={() => !workout.completed && openCompleteModal(workout)}
-            >
-              <View style={styles.checkboxContainer}>
-                <Ionicons
-                  name={workout.completed ? 'checkbox' : 'square-outline'}
-                  size={24}
-                  color={workout.completed ? '#4CAF50' : '#666'}
-                />
-              </View>
-              <View style={styles.workoutInfo}>
-                <Text style={styles.workoutDay}>{workout.day}</Text>
-                <Text
+            {/* Header con azioni - separato */}
+            <View style={styles.workoutTopRow}>
+              <View style={styles.workoutLeftSection}>
+                <View style={styles.checkboxContainer}>
+                  <Ionicons
+                    name={workout.completed ? 'checkbox' : 'square-outline'}
+                    size={24}
+                    color={workout.completed ? '#4CAF50' : '#666'}
+                  />
+                </View>
+                <View
                   style={[
-                    styles.workoutTitle,
-                    workout.completed && styles.completedTitle,
+                    styles.typeBadge,
+                    { backgroundColor: `${getWorkoutTypeColor(workout.workout_type)}20` },
                   ]}
                 >
-                  {workout.title}
-                </Text>
+                  <Text
+                    style={[
+                      styles.typeText,
+                      { color: getWorkoutTypeColor(workout.workout_type) },
+                    ]}
+                  >
+                    {getWorkoutTypeLabel(workout.workout_type)}
+                  </Text>
+                </View>
               </View>
-              <View
-                style={[
-                  styles.typeBadge,
-                  { backgroundColor: `${getWorkoutTypeColor(workout.workout_type)}20` },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.typeText,
-                    { color: getWorkoutTypeColor(workout.workout_type) },
-                  ]}
-                >
-                  {getWorkoutTypeLabel(workout.workout_type)}
-                </Text>
-              </View>
-              {/* Action buttons */}
+              {/* Action buttons - sempre visibili */}
               <View style={styles.workoutActions}>
                 <TouchableOpacity
                   style={styles.workoutActionBtn}
@@ -462,6 +451,22 @@ export default function ProgramDetail() {
                   <Ionicons name="trash" size={18} color="#DC3545" />
                 </TouchableOpacity>
               </View>
+            </View>
+
+            {/* Contenuto workout - cliccabile per completare */}
+            <TouchableOpacity
+              style={styles.workoutContent}
+              onPress={() => !workout.completed && openCompleteModal(workout)}
+            >
+              <Text style={styles.workoutDay}>{workout.day}</Text>
+              <Text
+                style={[
+                  styles.workoutTitle,
+                  workout.completed && styles.completedTitle,
+                ]}
+              >
+                {workout.title}
+              </Text>
             </TouchableOpacity>
 
             <Text style={styles.workoutDesc}>{workout.description}</Text>
