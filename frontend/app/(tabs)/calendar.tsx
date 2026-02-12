@@ -113,11 +113,24 @@ export default function CalendarTab() {
 
   const getMarkedDates = () => {
     const marked: any = {};
+    const today = format(new Date(), 'yyyy-MM-dd');
     
     workouts.forEach((workout) => {
       if (workout.date) {
         const existing = marked[workout.date];
-        const dotColor = workout.completed ? '#4CAF50' : '#FF6B35';
+        
+        // Determina il colore del pallino:
+        // Verde = Completato
+        // Arancione = Da fare (data futura o oggi)
+        // Rosso = Non effettuato (data passata senza completamento)
+        let dotColor: string;
+        if (workout.completed) {
+          dotColor = '#4CAF50'; // Verde - Completato
+        } else if (workout.date >= today) {
+          dotColor = '#FF6B35'; // Arancione - Da fare
+        } else {
+          dotColor = '#DC3545'; // Rosso - Non effettuato (scaduto)
+        }
         
         if (existing) {
           existing.dots.push({ color: dotColor });
