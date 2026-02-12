@@ -1895,6 +1895,28 @@ async def compare_athlete_data(
     if current_user["role"] == "coach" and athlete["coach_id"] != current_user["id"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
+    # Helper to convert date from DD/MM/YYYY or DD-MM-YYYY to YYYY-MM-DD
+    def normalize_date(date_str: str) -> str:
+        if not date_str:
+            return date_str
+        # Handle DD/MM/YYYY format
+        if '/' in date_str and len(date_str) == 10:
+            parts = date_str.split('/')
+            if len(parts) == 3 and len(parts[0]) == 2 and len(parts[2]) == 4:
+                return f"{parts[2]}-{parts[1]}-{parts[0]}"
+        # Handle DD-MM-YYYY format
+        elif '-' in date_str and len(date_str) == 10:
+            parts = date_str.split('-')
+            if len(parts) == 3 and len(parts[0]) == 2 and len(parts[2]) == 4:
+                return f"{parts[2]}-{parts[1]}-{parts[0]}"
+        return date_str
+    
+    # Normalize all dates to YYYY-MM-DD
+    p1_start = normalize_date(period1_start)
+    p1_end = normalize_date(period1_end)
+    p2_start = normalize_date(period2_start)
+    p2_end = normalize_date(period2_end)
+    
     # Helper function to get all data (activities + program workouts) for a period
     async def get_period_data(start_date: str, end_date: str):
         all_data = []
