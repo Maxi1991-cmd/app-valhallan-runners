@@ -299,13 +299,6 @@ export default function CompareTab() {
                 null
               )}
               {renderStatComparison(
-                'Dislivello Totale',
-                comparison.period1.stats.total_elevation,
-                comparison.period2.stats.total_elevation,
-                'm',
-                comparison.differences.elevation_change_pct
-              )}
-              {renderStatComparison(
                 'Passo Medio',
                 comparison.period1.stats.avg_pace,
                 comparison.period2.stats.avg_pace,
