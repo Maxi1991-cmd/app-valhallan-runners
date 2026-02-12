@@ -1946,9 +1946,9 @@ async def compare_athlete_data(
             for workout in workouts:
                 workout_date = workout.get("date", "")
                 if workout_date and start_date <= workout_date <= end_date:
-                    # Solo workout completati (status completed o feedback inviato)
+                    # Solo workout completati (completed=True o ha actual_data)
                     actual_data = workout.get("actual_data", {})
-                    is_completed = workout.get("status") == "completed" or workout.get("feedback_sent", False)
+                    is_completed = workout.get("completed", False) or bool(actual_data)
                     
                     if is_completed:
                         all_data.append({
