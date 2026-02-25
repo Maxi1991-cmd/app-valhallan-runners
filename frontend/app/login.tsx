@@ -6,10 +6,12 @@ import { Input } from '../src/components/Input';
 import { Button } from '../src/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../src/hooks/useTranslation';
 
 export default function Login() {
   const router = useRouter();
   const { login } = useAuthStore();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +19,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Errore', 'Inserisci email e password');
+      Alert.alert(t('common.error'), t('auth.loginError'));
       return;
     }
 
@@ -26,7 +28,7 @@ export default function Login() {
       await login(email, password);
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Errore', error.message || 'Login fallito');
+      Alert.alert(t('common.error'), error.message || t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -45,13 +47,13 @@ export default function Login() {
 
           <View style={styles.header}>
             <Ionicons name="fitness" size={60} color="#FF6B35" />
-            <Text style={styles.title}>Bentornato</Text>
-            <Text style={styles.subtitle}>Accedi al tuo account</Text>
+            <Text style={styles.title}>{t('auth.coachLogin')}</Text>
+            <Text style={styles.subtitle}>{t('auth.enterEmail')}</Text>
           </View>
 
           <View style={styles.form}>
             <Input
-              label="Email"
+              label={t('auth.email')}
               value={email}
               onChangeText={setEmail}
               placeholder="coach@email.com"
@@ -61,10 +63,10 @@ export default function Login() {
 
             <View style={styles.passwordContainer}>
               <Input
-                label="Password"
+                label={t('auth.password')}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="La tua password"
+                placeholder={t('auth.enterPassword')}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity
@@ -80,7 +82,7 @@ export default function Login() {
             </View>
 
             <Button
-              title="Accedi"
+              title={t('auth.login')}
               onPress={handleLogin}
               loading={loading}
               size="large"
@@ -89,7 +91,7 @@ export default function Login() {
 
             <TouchableOpacity onPress={() => router.push('/register')}>
               <Text style={styles.registerLink}>
-                Non hai un account? <Text style={styles.registerLinkBold}>Registrati</Text>
+                {t('auth.noAccount')} <Text style={styles.registerLinkBold}>{t('auth.register')}</Text>
               </Text>
             </TouchableOpacity>
           </View>
