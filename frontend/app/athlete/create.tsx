@@ -117,11 +117,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
-  sectionNote: {
-    fontSize: 13,
-    color: '#999',
-    marginBottom: 16,
-  },
   createButton: {
     marginTop: 24,
     marginBottom: 40,
