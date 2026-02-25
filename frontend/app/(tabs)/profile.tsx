@@ -211,19 +211,19 @@ export default function ProfileTab() {
 
             <View style={styles.subscriptionDetails}>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Piano:</Text>
+                <Text style={styles.detailLabel}>{t('subscription.plan')}:</Text>
                 <Text style={styles.detailValue}>
-                  {subscription?.plan === 'trial' ? 'Prova Gratuita (30 giorni)' :
-                   subscription?.plan === 'monthly' ? 'Mensile' :
-                   subscription?.plan === 'annual' ? 'Annuale' : 'Nessuno'}
+                  {subscription?.plan === 'trial' ? t('subscription.trialPlan') :
+                   subscription?.plan === 'monthly' ? t('subscription.monthlyPlan') :
+                   subscription?.plan === 'annual' ? t('subscription.annualPlan') : t('subscription.none')}
                 </Text>
               </View>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Inizio:</Text>
+                <Text style={styles.detailLabel}>{t('subscription.startDate')}:</Text>
                 <Text style={styles.detailValue}>{formatDate(subscription?.start_date)}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Scadenza:</Text>
+                <Text style={styles.detailLabel}>{t('subscription.expiryDate')}:</Text>
                 <Text style={[
                   styles.detailValue,
                   !isSubscriptionActive && styles.expiredText
@@ -234,7 +234,7 @@ export default function ProfileTab() {
             </View>
 
             <Button
-              title="Gestisci Abbonamento"
+              title={t('subscription.manage')}
               onPress={() => setShowSubscriptionModal(true)}
               variant="primary"
               style={styles.manageButton}
@@ -242,9 +242,9 @@ export default function ProfileTab() {
           </Card>
         )}
 
-        <Card title="Piattaforme Connesse" style={styles.platformsCard}>
+        <Card title={t('profile.connectedPlatforms')} style={styles.platformsCard}>
           <Text style={styles.platformNote}>
-            Le integrazioni con piattaforme esterne saranno disponibili prossimamente
+            {t('profile.platformsComingSoon')}
           </Text>
           {platformStatus.map((platform, index) => (
             <TouchableOpacity key={index} style={styles.platformRow}>
@@ -264,7 +264,7 @@ export default function ProfileTab() {
                     platform.connected ? styles.connectedText : styles.disconnectedText,
                   ]}
                 >
-                  {platform.connected ? 'Connesso' : 'Prossimamente'}
+                  {platform.connected ? t('profile.connected') : t('profile.comingSoon')}
                 </Text>
               </View>
             </TouchableOpacity>
