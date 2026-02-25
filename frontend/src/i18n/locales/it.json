@@ -274,7 +274,28 @@
     "daysRemaining": "giorni rimanenti",
     "lifetime": "Lifetime",
     "trial": "Prova",
-    "ownerPlan": "Piano Owner"
+    "ownerPlan": "Piano Owner",
+    "connectedPlatforms": "Piattaforme Connesse",
+    "platformsComingSoon": "Le integrazioni con piattaforme esterne saranno disponibili prossimamente",
+    "connected": "Connesso",
+    "comingSoon": "Prossimamente"
+  },
+  "subscription": {
+    "plan": "Piano",
+    "trialPlan": "Prova Gratuita (30 giorni)",
+    "monthlyPlan": "Mensile",
+    "annualPlan": "Annuale",
+    "none": "Nessuno",
+    "startDate": "Inizio",
+    "expiryDate": "Scadenza",
+    "manage": "Gestisci Abbonamento",
+    "selectPlan": "Seleziona un piano",
+    "monthlyDesc": "Accesso completo per 30 giorni",
+    "annualDesc": "Accesso completo per 365 giorni",
+    "save2months": "Risparmia 2 mesi!",
+    "deactivate": "Disattiva Abbonamento",
+    "dataKept": "I dati degli atleti saranno conservati",
+    "note": "Nota: Questa è una simulazione. In produzione, qui verrà integrato un sistema di pagamento reale."
   },
   "settings": {
     "title": "Impostazioni",
