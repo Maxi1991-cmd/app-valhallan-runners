@@ -329,6 +329,10 @@
     "dataUsage": "Utilizzo Dati",
     "dataUsageDesc": "I tuoi dati vengono utilizzati esclusivamente per fornirti il servizio di coaching e non vengono condivisi con terze parti.",
     "dataProtection": "Protezione Dati",
+    "dataProtectionDesc": "Utilizziamo misure di sicurezza standard del settore per proteggere i tuoi dati.",
+    "whoCanSee": "Chi può vedere i dati personali?",
+    "whoCanSeeAnswer": "I dati personali sono visibili solo a te e al tuo atleta."
+  },
     "dataProtectionDesc": "Utilizziamo misure di sicurezza standard del settore per proteggere i tuoi dati."
   },
   "compare": {
