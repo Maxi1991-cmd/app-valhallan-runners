@@ -9,11 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
 export default function CompareTab() {
   const { athletes, fetchAthletes } = useDataStore();
+  const { t } = useTranslation();
   const [selectedAthlete, setSelectedAthlete] = useState<string | null>(null);
   const [period1Start, setPeriod1Start] = useState('');
   const [period1End, setPeriod1End] = useState('');
@@ -28,7 +30,7 @@ export default function CompareTab() {
 
   const loadComparison = async () => {
     if (!selectedAthlete || !period1Start || !period1End || !period2Start || !period2End) {
-      Alert.alert('Errore', 'Seleziona atleta e compila tutte le date');
+      Alert.alert(t('common.error'), t('errors.requiredFields'));
       return;
     }
 
@@ -50,7 +52,7 @@ export default function CompareTab() {
       setComparison(response.data);
     } catch (error) {
       console.error('Error loading comparison:', error);
-      Alert.alert('Errore', 'Impossibile caricare il confronto');
+      Alert.alert(t('common.error'), t('errors.loadingFailed'));
     }
     setLoading(false);
   };
