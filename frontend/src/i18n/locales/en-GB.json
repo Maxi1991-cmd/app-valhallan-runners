@@ -274,7 +274,28 @@
     "daysRemaining": "days remaining",
     "lifetime": "Lifetime",
     "trial": "Trial",
-    "ownerPlan": "Owner Plan"
+    "ownerPlan": "Owner Plan",
+    "connectedPlatforms": "Connected Platforms",
+    "platformsComingSoon": "Integrations with external platforms will be available soon",
+    "connected": "Connected",
+    "comingSoon": "Coming Soon"
+  },
+  "subscription": {
+    "plan": "Plan",
+    "trialPlan": "Free Trial (30 days)",
+    "monthlyPlan": "Monthly",
+    "annualPlan": "Annual",
+    "none": "None",
+    "startDate": "Start",
+    "expiryDate": "Expires",
+    "manage": "Manage Subscription",
+    "selectPlan": "Select a plan",
+    "monthlyDesc": "Full access for 30 days",
+    "annualDesc": "Full access for 365 days",
+    "save2months": "Save 2 months!",
+    "deactivate": "Deactivate Subscription",
+    "dataKept": "Athlete data will be preserved",
+    "note": "Note: This is a simulation. In production, a real payment system will be integrated here."
   },
   "settings": {
     "title": "Settings",
