@@ -226,7 +226,21 @@
     "workoutReminder": "Promemoria allenamento",
     "programExpiring": "Programma in scadenza",
     "goToActivity": "Vai all'attività",
-    "goToWorkout": "Vai all'allenamento"
+    "goToWorkout": "Vai all'allenamento",
+    "deleteTitle": "Elimina Notifica",
+    "deleteConfirm": "Vuoi eliminare questa notifica?",
+    "paymentPending": "Pagamento in sospeso",
+    "certificateExpiring": "Certificato in scadenza",
+    "month": "Mese",
+    "daysOverdue": "giorni di ritardo",
+    "expiresOn": "Scade il",
+    "tapToView": "Tocca per visualizzare",
+    "urgent": "Urgente",
+    "unread": "non lette",
+    "allRead": "Tutto letto",
+    "markAll": "Segna tutte",
+    "expiryWarnings": "Avvisi Scadenze",
+    "willAppearHere": "Le tue notifiche appariranno qui"
   },
   "feedback": {
     "title": "Feedback",
