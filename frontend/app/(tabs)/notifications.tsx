@@ -8,10 +8,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Notification } from '../../src/types';
 import { formatDistanceToNow } from 'date-fns';
-import { it } from 'date-fns/locale';
+import { it, enGB, enUS, fr, es, de } from 'date-fns/locale';
+import { useTranslation } from '../../src/hooks/useTranslation';
+import i18n from '../../src/i18n';
+
+// Get date-fns locale based on i18n
+const getDateFnsLocale = () => {
+  const locale = i18n.locale;
+  if (locale.startsWith('it')) return it;
+  if (locale === 'en-US') return enUS;
+  if (locale.startsWith('en')) return enGB;
+  if (locale.startsWith('fr')) return fr;
+  if (locale.startsWith('es')) return es;
+  if (locale.startsWith('de')) return de;
+  return enGB;
+};
 
 export default function NotificationsTab() {
   const router = useRouter();
+  const { t } = useTranslation();
   const {
     notifications,
     warnings,
