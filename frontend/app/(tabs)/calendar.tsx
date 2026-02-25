@@ -106,6 +106,7 @@ interface CalendarWorkout {
 export default function CalendarTab() {
   const { user, isAuthenticated } = useAuthStore();
   const { athletes, fetchAthletes } = useDataStore();
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<'month' | 'week'>('month');
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [workouts, setWorkouts] = useState<CalendarWorkout[]>([]);
@@ -113,6 +114,7 @@ export default function CalendarTab() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState<CalendarWorkout | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const dateFnsLocale = getDateFnsLocale();
 
   useEffect(() => {
     // Solo se autenticato, carica i dati
