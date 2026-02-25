@@ -8,12 +8,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function ProfileTab() {
   const router = useRouter();
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
+  const { t } = useTranslation();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
