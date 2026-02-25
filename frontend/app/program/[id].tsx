@@ -11,23 +11,37 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrainingProgram, WorkoutSession } from '../../src/types';
 import { format } from 'date-fns';
-import { it } from 'date-fns/locale';
+import { it, enGB, enUS, fr, es, de } from 'date-fns/locale';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from '../../src/hooks/useTranslation';
+import i18n from '../../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
-// Funzione safe per formattare date con date-fns
+// Get date-fns locale based on i18n
+const getDateFnsLocale = () => {
+  const locale = i18n.locale;
+  if (locale.startsWith('it')) return it;
+  if (locale === 'en-US') return enUS;
+  if (locale.startsWith('en')) return enGB;
+  if (locale.startsWith('fr')) return fr;
+  if (locale.startsWith('es')) return es;
+  if (locale.startsWith('de')) return de;
+  return enGB;
+};
+
+// Safe function to format dates with date-fns
 const safeFormatDate = (dateString?: string | null, formatStr: string = 'd MMM yyyy'): string => {
   try {
     if (!dateString || dateString === '') return '--';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return '--';
-    return format(date, formatStr, { locale: it });
+    return format(date, formatStr, { locale: getDateFnsLocale() });
   } catch (e) {
-    console.warn('Errore formattazione data:', dateString, e);
+    console.warn('Date format error:', dateString, e);
     return '--';
   }
 };
@@ -35,6 +49,7 @@ const safeFormatDate = (dateString?: string | null, formatStr: string = 'd MMM y
 export default function ProgramDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t } = useTranslation();
   const { athletes, deleteProgram, fetchNotifications } = useDataStore();
   const [program, setProgram] = useState<TrainingProgram | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +83,7 @@ export default function ProgramDetail() {
       const response = await programAPI.getOne(id!);
       setProgram(response.data);
     } catch (error) {
-      Alert.alert('Errore', 'Impossibile caricare programma');
+      Alert.alert(t('common.error'), t('errors.loadingFailed'));
       router.back();
     } finally {
       setLoading(false);
