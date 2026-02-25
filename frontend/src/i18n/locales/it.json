@@ -25,7 +25,8 @@
     "filter": "Filtra",
     "refresh": "Aggiorna",
     "retry": "Riprova",
-    "optional": "Opzionale"
+    "optional": "Opzionale",
+    "saved": "Salvato"
   },
   "auth": {
     "whoAreYou": "Chi sei?",
