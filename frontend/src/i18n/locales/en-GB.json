@@ -309,9 +309,14 @@
   },
   "compare": {
     "title": "Compare",
+    "subtitle": "Analyse progress over time",
     "selectAthlete": "Select Athlete",
     "period1": "Period 1",
     "period2": "Period 2",
+    "period1Recent": "Period 1 (Recent)",
+    "period2Previous": "Period 2 (Previous)",
+    "start": "Start",
+    "end": "End",
     "from": "From",
     "to": "To",
     "compare": "Compare",
@@ -328,6 +333,7 @@
   },
   "analytics": {
     "title": "Analytics",
+    "subtitle": "Monitor performance",
     "period": "Period",
     "week": "Week",
     "month": "Month",
