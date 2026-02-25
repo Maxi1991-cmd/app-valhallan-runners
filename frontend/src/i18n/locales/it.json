@@ -68,7 +68,7 @@
     "activities": "Attività"
   },
   "athlete": {
-    "title": "Atleti",
+    "title": "Atleta",
     "addAthlete": "Aggiungi Atleta",
     "createAthlete": "Crea Atleta",
     "editAthlete": "Modifica Atleta",
@@ -94,7 +94,13 @@
     "totalDistance": "Distanza Totale",
     "totalDuration": "Durata Totale",
     "avgPace": "Passo Medio",
-    "athleteCreated": "Atleta creato con successo"
+    "athleteCreated": "Atleta creato con successo",
+    "myAthletes": "I Miei Atleti",
+    "athletesCount": "atleti",
+    "addFirstAthlete": "Aggiungi il tuo primo atleta per iniziare",
+    "loading": "Caricamento atleti...",
+    "payment": "Pagamento",
+    "certificateExpires": "Certificato scade"
   },
   "program": {
     "title": "Programmi",
