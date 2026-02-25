@@ -13,6 +13,8 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from '../../src/hooks/useTranslation';
+import i18n from '../../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
@@ -35,6 +37,18 @@ interface Activity {
   actual_data?: any;
 }
 
+// Get locale string based on i18n
+const getLocaleString = () => {
+  const locale = i18n.locale;
+  if (locale.startsWith('it')) return 'it-IT';
+  if (locale === 'en-US') return 'en-US';
+  if (locale.startsWith('en')) return 'en-GB';
+  if (locale.startsWith('fr')) return 'fr-FR';
+  if (locale.startsWith('es')) return 'es-ES';
+  if (locale.startsWith('de')) return 'de-DE';
+  return 'en-GB';
+};
+
 const safeFormatDate = (dateString?: string | null, format?: string) => {
   try {
     if (!dateString || dateString === '') return '--';
@@ -45,21 +59,22 @@ const safeFormatDate = (dateString?: string | null, format?: string) => {
       return '--';
     }
 
-    // Formattazione in italiano
+    const localeStr = getLocaleString();
+    
     if (format === 'short') {
-      return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'short' });
+      return date.toLocaleDateString(localeStr, { day: '2-digit', month: 'short' });
     } else if (format === 'long') {
-      return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+      return date.toLocaleDateString(localeStr, { day: '2-digit', month: 'long', year: 'numeric' });
     }
     
-    return date.toLocaleDateString('it-IT');
+    return date.toLocaleDateString(localeStr);
   } catch (e) {
-    console.warn('Errore formattazione data:', dateString, e);
+    console.warn('Date format error:', dateString, e);
     return '--';
   }
 };
 
-// Funzione helper per verificare in modo sicuro le date del certificato
+// Helper function to safely check certificate dates
 const safeCheckExpired = (dateString?: string | null): boolean => {
   try {
     if (!dateString || dateString === '') return false;
@@ -71,11 +86,10 @@ const safeCheckExpired = (dateString?: string | null): boolean => {
   }
 };
 
-// Funzione rimossa - usiamo safeCheckExpired
-
 export default function AthleteDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t } = useTranslation();
   const { deleteAthlete, programs, fetchPrograms, fetchAthletes } = useDataStore();
   const [athlete, setAthlete] = useState<AthleteProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,7 +97,7 @@ export default function AthleteDetail() {
   const [activeTab, setActiveTab] = useState<'info' | 'history' | 'payments' | 'certificate'>('info');
   const [allWorkouts, setAllWorkouts] = useState<(WorkoutSession & { programName: string })[]>([]);
   
-  // State per le attività standalone
+  // State for standalone activities
   const [activities, setActivities] = useState<Activity[]>([]);
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
