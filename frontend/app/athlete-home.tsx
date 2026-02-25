@@ -382,11 +382,11 @@ export default function AthleteHomeScreen() {
         );
       }
       
-      Alert.alert('Successo', 'Feedback inviato al coach!');
+      Alert.alert(t('common.success'), t('feedback.feedbackSent'));
       setShowCompleteModal(false);
       fetchData();
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.saveFailed'));
     }
   };
 
@@ -400,7 +400,7 @@ export default function AthleteHomeScreen() {
       const skipData = {
         skipped: true,
         skip_reason: skipReason,
-        feeling: 'Allenamento non eseguito',
+        feeling: t('workout.skipped'),
         notes: skipReason
       };
       
@@ -419,11 +419,11 @@ export default function AthleteHomeScreen() {
         );
       }
       
-      Alert.alert('Registrato', 'Il coach è stato notificato.');
+      Alert.alert(t('common.saved'), t('workout.coachNotified'));
       setShowSkipModal(false);
       fetchData();
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.saveFailed'));
     }
   };
 
@@ -444,7 +444,7 @@ export default function AthleteHomeScreen() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      Alert.alert('Successo', 'Allenamento modificato! Il coach è stato notificato.');
+      Alert.alert(t('common.success'), t('workout.editedNotified'));
       setShowEditModal(false);
       fetchData();
     } catch (error: any) {
