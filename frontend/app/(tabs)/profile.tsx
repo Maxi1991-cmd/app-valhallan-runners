@@ -248,32 +248,32 @@ export default function ProfileTab() {
           ))}
         </Card>
 
-        <Card title="Impostazioni" style={styles.settingsCard}>
+        <Card title={t('profile.settings')} style={styles.settingsCard}>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowNotificationsModal(true)}>
             <View style={styles.settingInfo}>
               <Ionicons name="notifications-outline" size={22} color="#FF6B35" />
-              <Text style={styles.settingText}>Notifiche</Text>
+              <Text style={styles.settingText}>{t('navigation.notifications')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowPrivacyModal(true)}>
             <View style={styles.settingInfo}>
               <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
-              <Text style={styles.settingText}>Privacy</Text>
+              <Text style={styles.settingText}>{t('profile.privacy')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingRow} onPress={() => { setExpandedFaq(null); setShowSupportModal(true); }}>
             <View style={styles.settingInfo}>
               <Ionicons name="help-circle-outline" size={22} color="#FF6B35" />
-              <Text style={styles.settingText}>Supporto</Text>
+              <Text style={styles.settingText}>{t('profile.support')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
         </Card>
 
         <Button
-          title="Esci"
+          title={t('auth.logout')}
           onPress={handleLogout}
           variant="danger"
           style={styles.logoutButton}
