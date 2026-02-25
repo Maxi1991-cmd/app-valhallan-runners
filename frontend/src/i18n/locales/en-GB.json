@@ -174,7 +174,15 @@
     "objectives": "Objectives",
     "workoutDeleted": "Workout deleted",
     "workoutCompleted": "Workout completed! Analytics updated.",
-    "dataSaved": "Workout data saved"
+    "dataSaved": "Workout data saved",
+    "skipped": "Workout skipped",
+    "coachNotified": "Coach has been notified.",
+    "editedNotified": "Workout modified! Coach has been notified.",
+    "noWorkoutsScheduled": "No workouts scheduled",
+    "noWorkoutsWeek": "No workouts this week",
+    "noWorkoutsMonth": "No workouts this month",
+    "noPastWorkouts": "No past workouts",
+    "saveChanges": "Save Changes"
   },
   "activity": {
     "title": "Activity",
