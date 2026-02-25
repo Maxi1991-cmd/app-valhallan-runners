@@ -297,11 +297,11 @@ export default function NotificationsTab() {
                 <Text style={styles.notificationTime}>
                   {item.created_at ? formatDistanceToNow(new Date(item.created_at), {
                     addSuffix: true,
-                    locale: it,
-                  }) : 'Adesso'}
+                    locale: getDateFnsLocale(),
+                  }) : t('time.now')}
                 </Text>
                 {hasNavigation && (
-                  <Text style={styles.tapHint}>Tocca per visualizzare</Text>
+                  <Text style={styles.tapHint}>{t('notifications.tapToView')}</Text>
                 )}
               </View>
             </View>
