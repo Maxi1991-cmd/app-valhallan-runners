@@ -100,7 +100,8 @@
     "addFirstAthlete": "Add your first athlete to get started",
     "loading": "Loading athletes...",
     "payment": "Payment",
-    "certificateExpires": "Certificate expires"
+    "certificateExpires": "Certificate expires",
+    "certificate": "Medical Certificate"
   },
   "program": {
     "title": "Programme",
