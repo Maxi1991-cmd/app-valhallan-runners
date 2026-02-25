@@ -87,19 +87,6 @@ export default function CreateAthlete() {
             numberOfLines={3}
           />
 
-          <Text style={styles.sectionTitle}>Accesso App (Opzionale)</Text>
-          <Text style={styles.sectionNote}>
-            Se vuoi permettere all'atleta di accedere all'app, inserisci una password
-          </Text>
-
-          <Input
-            label="Password Atleta"
-            value={form.password}
-            onChangeText={(text) => setForm({ ...form, password: text })}
-            placeholder="Lascia vuoto se non serve accesso"
-            secureTextEntry
-          />
-
           <Button
             title="Crea Atleta"
             onPress={handleCreate}
