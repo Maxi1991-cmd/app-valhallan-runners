@@ -5,10 +5,12 @@ import { useDataStore } from '../../src/store/dataStore';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
 export default function CreateAthlete() {
   const router = useRouter();
   const { createAthlete } = useDataStore();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -20,17 +22,17 @@ export default function CreateAthlete() {
 
   const handleCreate = async () => {
     if (!form.name || !form.email) {
-      Alert.alert('Errore', 'Nome ed email sono obbligatori');
+      Alert.alert(t('common.error'), t('errors.requiredFields'));
       return;
     }
 
     setLoading(true);
     try {
       await createAthlete(form);
-      Alert.alert('Successo', 'Atleta creato con successo');
+      Alert.alert(t('common.success'), t('athlete.athleteCreated'));
       router.back();
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore durante la creazione');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -43,10 +45,10 @@ export default function CreateAthlete() {
         style={styles.keyboardView}
       >
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <Text style={styles.sectionTitle}>Informazioni Base</Text>
+          <Text style={styles.sectionTitle}>{t('athlete.basicInfo')}</Text>
           
           <Input
-            label="Nome Completo *"
+            label={`${t('auth.fullName')} *`}
             value={form.name}
             onChangeText={(text) => setForm({ ...form, name: text })}
             placeholder="Mario Rossi"
@@ -54,7 +56,7 @@ export default function CreateAthlete() {
           />
 
           <Input
-            label="Email *"
+            label={`${t('auth.email')} *`}
             value={form.email}
             onChangeText={(text) => setForm({ ...form, email: text })}
             placeholder="atleta@email.com"
@@ -63,7 +65,7 @@ export default function CreateAthlete() {
           />
 
           <Input
-            label="Telefono"
+            label={t('athlete.phone')}
             value={form.phone}
             onChangeText={(text) => setForm({ ...form, phone: text })}
             placeholder="+39 123 456 7890"
@@ -71,23 +73,23 @@ export default function CreateAthlete() {
           />
 
           <Input
-            label="Data di Nascita"
+            label={t('athlete.birthDate')}
             value={form.birth_date}
             onChangeText={(text) => setForm({ ...form, birth_date: text })}
-            placeholder="GG-MM-AAAA"
+            placeholder="DD-MM-YYYY"
           />
 
           <Input
-            label="Note"
+            label={t('athlete.notes')}
             value={form.notes}
             onChangeText={(text) => setForm({ ...form, notes: text })}
-            placeholder="Note aggiuntive sull'atleta..."
+            placeholder={t('athlete.notesPlaceholder')}
             multiline
             numberOfLines={3}
           />
 
           <Button
-            title="Crea Atleta"
+            title={t('athlete.createAthlete')}
             onPress={handleCreate}
             loading={loading}
             size="large"
