@@ -382,13 +382,13 @@ export default function ProfileTab() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Gestisci Abbonamento</Text>
+              <Text style={styles.modalTitle}>{t('subscription.manage')}</Text>
               <TouchableOpacity onPress={() => setShowSubscriptionModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalSubtitle}>Seleziona un piano</Text>
+            <Text style={styles.modalSubtitle}>{t('subscription.selectPlan')}</Text>
 
             <TouchableOpacity
               style={styles.planOption}
@@ -398,8 +398,8 @@ export default function ProfileTab() {
               <View style={styles.planInfo}>
                 <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
                 <View style={styles.planDetails}>
-                  <Text style={styles.planName}>Mensile</Text>
-                  <Text style={styles.planDescription}>Accesso completo per 30 giorni</Text>
+                  <Text style={styles.planName}>{t('subscription.monthlyPlan')}</Text>
+                  <Text style={styles.planDescription}>{t('subscription.monthlyDesc')}</Text>
                 </View>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#666" />
@@ -413,9 +413,9 @@ export default function ProfileTab() {
               <View style={styles.planInfo}>
                 <Ionicons name="star" size={24} color="#FFD700" />
                 <View style={styles.planDetails}>
-                  <Text style={styles.planName}>Annuale</Text>
-                  <Text style={styles.planDescription}>Accesso completo per 365 giorni</Text>
-                  <Text style={styles.planSaving}>Risparmia 2 mesi!</Text>
+                  <Text style={styles.planName}>{t('subscription.annualPlan')}</Text>
+                  <Text style={styles.planDescription}>{t('subscription.annualDesc')}</Text>
+                  <Text style={styles.planSaving}>{t('subscription.save2months')}</Text>
                 </View>
               </View>
               <Ionicons name="chevron-forward" size={20} color="#666" />
@@ -431,16 +431,16 @@ export default function ProfileTab() {
               <View style={styles.planInfo}>
                 <Ionicons name="pause-circle-outline" size={24} color="#DC3545" />
                 <View style={styles.planDetails}>
-                  <Text style={[styles.planName, { color: '#DC3545' }]}>Disattiva Abbonamento</Text>
+                  <Text style={[styles.planName, { color: '#DC3545' }]}>{t('subscription.deactivate')}</Text>
                   <Text style={styles.planDescription}>
-                    I dati degli atleti saranno conservati
+                    {t('subscription.dataKept')}
                   </Text>
                 </View>
               </View>
             </TouchableOpacity>
 
             <Text style={styles.noteText}>
-              Nota: Questa è una simulazione. In produzione, qui verrà integrato un sistema di pagamento reale.
+              {t('subscription.note')}
             </Text>
           </View>
         </View>
@@ -456,21 +456,21 @@ export default function ProfileTab() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Impostazioni Notifiche</Text>
+              <Text style={styles.modalTitle}>{t('settings.notifications.title')}</Text>
               <TouchableOpacity onPress={() => setShowNotificationsModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalSubtitle}>Gestisci le tue preferenze di notifica</Text>
+            <Text style={styles.modalSubtitle}>{t('settings.notifications.title')}</Text>
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
                 <Ionicons name="chatbubble-ellipses-outline" size={24} color="#FF6B35" />
                 <View style={styles.notificationSettingText}>
-                  <Text style={styles.notificationSettingTitle}>Feedback atleta</Text>
+                  <Text style={styles.notificationSettingTitle}>{t('settings.notifications.feedbackEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
-                    Ricevi notifica quando un atleta invia feedback sull'allenamento
+                    {t('settings.notifications.feedbackEnabledDesc')}
                   </Text>
                 </View>
               </View>
