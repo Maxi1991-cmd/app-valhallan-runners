@@ -279,6 +279,23 @@ export default function ProfileTab() {
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
+          <TouchableOpacity style={styles.settingRow} onPress={() => setShowLanguageModal(true)}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="globe-outline" size={22} color="#FF6B35" />
+              <Text style={styles.settingText}>{t('settings.language')}</Text>
+            </View>
+            <View style={styles.languageCurrentRow}>
+              <Text style={styles.languageCurrent}>
+                {selectedLanguage.startsWith('it') ? '🇮🇹' : 
+                 selectedLanguage === 'en-US' ? '🇺🇸' :
+                 selectedLanguage.startsWith('en') ? '🇬🇧' :
+                 selectedLanguage.startsWith('fr') ? '🇫🇷' :
+                 selectedLanguage.startsWith('es') ? '🇪🇸' :
+                 selectedLanguage.startsWith('de') ? '🇩🇪' : '🌐'}
+              </Text>
+              <Ionicons name="chevron-forward" size={20} color="#666" />
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowPrivacyModal(true)}>
             <View style={styles.settingInfo}>
               <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
@@ -304,6 +321,56 @@ export default function ProfileTab() {
 
         <Text style={styles.versionText}>Valhallan Runners v1.0.0</Text>
       </ScrollView>
+
+      {/* Language Modal */}
+      <Modal
+        visible={showLanguageModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('settings.language')}</Text>
+              <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalSubtitle}>{t('settings.selectLanguage')}</Text>
+
+            {[
+              { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+              { code: 'en-GB', name: 'English (UK)', flag: '🇬🇧' },
+              { code: 'en-US', name: 'English (US)', flag: '🇺🇸' },
+              { code: 'fr', name: 'Français', flag: '🇫🇷' },
+              { code: 'es', name: 'Español', flag: '🇪🇸' },
+              { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+            ].map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.languageOption,
+                  selectedLanguage === lang.code && styles.languageOptionActive
+                ]}
+                onPress={() => handleLanguageChange(lang.code)}
+              >
+                <Text style={styles.languageFlag}>{lang.flag}</Text>
+                <Text style={[
+                  styles.languageName,
+                  selectedLanguage === lang.code && styles.languageNameActive
+                ]}>
+                  {lang.name}
+                </Text>
+                {selectedLanguage === lang.code && (
+                  <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
 
       {/* Subscription Modal */}
       <Modal
