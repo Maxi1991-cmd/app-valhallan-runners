@@ -81,23 +81,22 @@ export default function ProfileTab() {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      Alert.alert('Successo', 'Impostazioni notifiche salvate');
+      Alert.alert(t('common.success'), t('settings.saved'));
       setShowNotificationsModal(false);
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.saveFailed'));
     } finally {
       setLoadingSettings(false);
     }
   };
 
   const handleLogout = () => {
-    Alert.alert('Esci', 'Sei sicuro di voler uscire?', [
-      { text: 'Annulla', style: 'cancel' },
+    Alert.alert(t('auth.logout'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Esci',
+        text: t('auth.logout'),
         style: 'destructive',
         onPress: () => {
-          // Naviga alla pagina di logout che è FUORI dai tabs
           router.push('/logout');
         },
       },
@@ -109,9 +108,9 @@ export default function ProfileTab() {
     try {
       await updateSubscription(plan, status);
       setShowSubscriptionModal(false);
-      Alert.alert('Successo', 'Abbonamento aggiornato con successo');
+      Alert.alert(t('common.success'), t('common.success'));
     } catch (error: any) {
-      Alert.alert('Errore', error.message);
+      Alert.alert(t('common.error'), error.message);
     } finally {
       setIsUpdating(false);
     }
@@ -123,12 +122,12 @@ export default function ProfileTab() {
   };
 
   const getSubscriptionStatusText = () => {
-    if (!subscription || subscription.status === 'inactive') return 'Non attivo';
-    if (subscription.status === 'expired') return 'Scaduto';
-    if (subscription.plan === 'trial') return 'Prova Gratuita';
-    if (subscription.plan === 'monthly') return 'Mensile';
-    if (subscription.plan === 'annual') return 'Annuale';
-    return 'Attivo';
+    if (!subscription || subscription.status === 'inactive') return t('profile.expired');
+    if (subscription.status === 'expired') return t('profile.expired');
+    if (subscription.plan === 'trial') return t('profile.trial');
+    if (subscription.plan === 'monthly') return t('profile.active');
+    if (subscription.plan === 'annual') return t('profile.active');
+    return t('profile.active');
   };
 
   const formatDate = (dateStr?: string) => {
