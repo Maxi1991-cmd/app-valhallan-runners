@@ -7,12 +7,14 @@ import { Button } from '../src/components/Button';
 import { Card } from '../src/components/Card';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../src/hooks/useTranslation';
 
 type RoleType = 'select' | 'coach' | 'athlete';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login, athleteLogin, isAuthenticated, isLoading, loadUser, user } = useAuthStore();
+  const { t } = useTranslation();
   const [role, setRole] = useState<RoleType>('select');
   
   // Coach login
@@ -30,7 +32,6 @@ export default function LoginScreen() {
   }, []);
 
   useEffect(() => {
-    // Solo se autenticato E non in fase di loading, reindirizza
     if (!isLoading && isAuthenticated && user) {
       if (user.role === 'athlete') {
         router.replace('/athlete-home');
@@ -42,14 +43,14 @@ export default function LoginScreen() {
 
   const handleCoachLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Errore', 'Inserisci email e password');
+      Alert.alert(t('common.error'), t('auth.loginError'));
       return;
     }
     setLoading(true);
     try {
       await login(email, password);
     } catch (error: any) {
-      Alert.alert('Errore', error.message);
+      Alert.alert(t('common.error'), error.message);
     } finally {
       setLoading(false);
     }
@@ -57,14 +58,14 @@ export default function LoginScreen() {
 
   const handleAthleteLogin = async () => {
     if (!athleteEmail || !accessCode) {
-      Alert.alert('Errore', 'Inserisci email e codice accesso');
+      Alert.alert(t('common.error'), t('auth.loginError'));
       return;
     }
     setLoading(true);
     try {
       await athleteLogin(athleteEmail, accessCode);
     } catch (error: any) {
-      Alert.alert('Errore', error.message);
+      Alert.alert(t('common.error'), error.message);
     } finally {
       setLoading(false);
     }
@@ -73,12 +74,12 @@ export default function LoginScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Caricamento...</Text>
+        <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
     );
   }
 
-  // Schermata selezione ruolo
+  // Role selection screen
   if (role === 'select') {
     return (
       <SafeAreaView style={styles.container}>
@@ -87,11 +88,11 @@ export default function LoginScreen() {
             <View style={styles.logoCircle}>
               <Ionicons name="fitness" size={48} color="#FF6B35" />
             </View>
-            <Text style={styles.appName}>Valhallan Runners</Text>
-            <Text style={styles.subtitle}>Gestione Atleti per Coach</Text>
+            <Text style={styles.appName}>{t('app.name')}</Text>
+            <Text style={styles.subtitle}>{t('app.tagline')}</Text>
           </View>
 
-          <Text style={styles.selectTitle}>Chi sei?</Text>
+          <Text style={styles.selectTitle}>{t('auth.whoAreYou')}</Text>
 
           <TouchableOpacity
             style={styles.roleCard}
@@ -101,8 +102,8 @@ export default function LoginScreen() {
               <Ionicons name="clipboard" size={32} color="#FF6B35" />
             </View>
             <View style={styles.roleInfo}>
-              <Text style={styles.roleName}>Coach</Text>
-              <Text style={styles.roleDescription}>Gestisci i tuoi atleti e programmi</Text>
+              <Text style={styles.roleName}>{t('auth.coach')}</Text>
+              <Text style={styles.roleDescription}>{t('auth.coachDesc')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#666" />
           </TouchableOpacity>
@@ -115,8 +116,8 @@ export default function LoginScreen() {
               <Ionicons name="body" size={32} color="#4CAF50" />
             </View>
             <View style={styles.roleInfo}>
-              <Text style={styles.roleName}>Atleta</Text>
-              <Text style={styles.roleDescription}>Solo su invito del coach</Text>
+              <Text style={styles.roleName}>{t('auth.athlete')}</Text>
+              <Text style={styles.roleDescription}>{t('auth.athleteDesc')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#666" />
           </TouchableOpacity>
@@ -125,7 +126,7 @@ export default function LoginScreen() {
     );
   }
 
-  // Login Coach
+  // Coach Login
   if (role === 'coach') {
     return (
       <SafeAreaView style={styles.container}>
@@ -136,19 +137,19 @@ export default function LoginScreen() {
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <TouchableOpacity style={styles.backButton} onPress={() => setRole('select')}>
               <Ionicons name="arrow-back" size={24} color="#FFF" />
-              <Text style={styles.backText}>Indietro</Text>
+              <Text style={styles.backText}>{t('common.back')}</Text>
             </TouchableOpacity>
 
             <View style={styles.logoContainer}>
               <View style={[styles.logoCircle, { backgroundColor: 'rgba(255, 107, 53, 0.15)' }]}>
                 <Ionicons name="clipboard" size={40} color="#FF6B35" />
               </View>
-              <Text style={styles.appName}>Accesso Coach</Text>
+              <Text style={styles.appName}>{t('auth.coachLogin')}</Text>
             </View>
 
             <Card style={styles.formCard}>
               <Input
-                label="Email"
+                label={t('auth.email')}
                 value={email}
                 onChangeText={setEmail}
                 placeholder="coach@email.com"
@@ -156,7 +157,7 @@ export default function LoginScreen() {
                 autoCapitalize="none"
               />
               <Input
-                label="Password"
+                label={t('auth.password')}
                 value={password}
                 onChangeText={setPassword}
                 placeholder="••••••••"
@@ -164,7 +165,7 @@ export default function LoginScreen() {
               />
 
               <Button
-                title={loading ? 'Accesso...' : 'Accedi'}
+                title={loading ? t('common.loading') : t('auth.login')}
                 onPress={handleCoachLogin}
                 disabled={loading}
                 style={styles.loginButton}
@@ -175,7 +176,7 @@ export default function LoginScreen() {
                 onPress={() => router.push('/register')}
               >
                 <Text style={styles.registerText}>
-                  Non hai un account? <Text style={styles.registerTextBold}>Registrati</Text>
+                  {t('auth.noAccount')} <Text style={styles.registerTextBold}>{t('auth.register')}</Text>
                 </Text>
               </TouchableOpacity>
             </Card>
@@ -185,7 +186,7 @@ export default function LoginScreen() {
     );
   }
 
-  // Login Atleta
+  // Athlete Login
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -195,20 +196,20 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <TouchableOpacity style={styles.backButton} onPress={() => setRole('select')}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />
-            <Text style={styles.backText}>Indietro</Text>
+            <Text style={styles.backText}>{t('common.back')}</Text>
           </TouchableOpacity>
 
           <View style={styles.logoContainer}>
             <View style={[styles.logoCircle, { backgroundColor: 'rgba(76, 175, 80, 0.15)' }]}>
               <Ionicons name="body" size={40} color="#4CAF50" />
             </View>
-            <Text style={styles.appName}>Accesso Atleta</Text>
-            <Text style={styles.subtitle}>Solo su invito del coach</Text>
+            <Text style={styles.appName}>{t('auth.athleteLogin')}</Text>
+            <Text style={styles.subtitle}>{t('auth.athleteDesc')}</Text>
           </View>
 
           <Card style={styles.formCard}>
             <Input
-              label="Email"
+              label={t('auth.email')}
               value={athleteEmail}
               onChangeText={setAthleteEmail}
               placeholder="atleta@email.com"
@@ -216,10 +217,10 @@ export default function LoginScreen() {
               autoCapitalize="none"
             />
             <Input
-              label="Codice Accesso"
+              label={t('auth.accessCode')}
               value={accessCode}
               onChangeText={(text) => setAccessCode(text.toUpperCase())}
-              placeholder="ABC123"
+              placeholder={t('auth.accessCodePlaceholder')}
               autoCapitalize="characters"
               maxLength={6}
             />
@@ -227,12 +228,12 @@ export default function LoginScreen() {
             <View style={styles.codeHint}>
               <Ionicons name="information-circle" size={16} color="#666" />
               <Text style={styles.codeHintText}>
-                Il codice accesso ti è stato fornito dal tuo coach
+                {t('auth.athleteAccessInfo')}
               </Text>
             </View>
 
             <Button
-              title={loading ? 'Accesso...' : 'Accedi'}
+              title={loading ? t('common.loading') : t('auth.login')}
               onPress={handleAthleteLogin}
               disabled={loading}
               style={styles.loginButton}
