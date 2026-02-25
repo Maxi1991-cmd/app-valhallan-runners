@@ -68,7 +68,7 @@
     "activities": "Activities"
   },
   "athlete": {
-    "title": "Athletes",
+    "title": "Athlete",
     "addAthlete": "Add Athlete",
     "createAthlete": "Create Athlete",
     "editAthlete": "Edit Athlete",
@@ -94,10 +94,16 @@
     "totalDistance": "Total Distance",
     "totalDuration": "Total Duration",
     "avgPace": "Average Pace",
-    "athleteCreated": "Athlete created successfully"
+    "athleteCreated": "Athlete created successfully",
+    "myAthletes": "My Athletes",
+    "athletesCount": "athletes",
+    "addFirstAthlete": "Add your first athlete to get started",
+    "loading": "Loading athletes...",
+    "payment": "Payment",
+    "certificateExpires": "Certificate expires"
   },
   "program": {
-    "title": "Programmes",
+    "title": "Programme",
     "createProgram": "Create Programme",
     "editProgram": "Edit Programme",
     "deleteProgram": "Delete Programme",
@@ -108,11 +114,18 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "selectAthlete": "Select Athlete",
-    "workouts": "Workouts",
+    "workouts": "workouts",
     "addWorkout": "Add Workout",
     "noWorkouts": "No workouts",
     "progress": "Progress",
-    "programDeleted": "Programme deleted"
+    "programDeleted": "Programme deleted",
+    "completed": "completed",
+    "loading": "Loading programmes...",
+    "activePrograms": "active programmes",
+    "newProgram": "New Programme",
+    "noPrograms": "No programmes",
+    "addAthleteFirst": "Add an athlete first",
+    "createFirst": "Create your first training programme"
   },
   "workout": {
     "title": "Workout",
