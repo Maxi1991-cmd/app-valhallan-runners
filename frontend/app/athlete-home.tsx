@@ -207,10 +207,10 @@ export default function AthleteHomeScreen() {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      Alert.alert('Successo', 'Impostazioni notifiche salvate');
+      Alert.alert(t('common.success'), t('settings.saved'));
       setShowSettingsModal(false);
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.saveFailed'));
     } finally {
       setSavingSettings(false);
     }
@@ -228,10 +228,10 @@ export default function AthleteHomeScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('Esci', 'Sei sicuro di voler uscire?', [
-      { text: 'Annulla', style: 'cancel' },
+    Alert.alert(t('auth.logout'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Esci',
+        text: t('auth.logout'),
         style: 'destructive',
         onPress: async () => {
           await logout();
@@ -243,7 +243,17 @@ export default function AthleteHomeScreen() {
 
   // Date helpers
   const today = new Date().toISOString().split('T')[0];
-  const dayOfWeek = new Date().toLocaleDateString('it-IT', { weekday: 'long' });
+  const getLocaleStr = () => {
+    const loc = i18n.locale;
+    if (loc.startsWith('it')) return 'it-IT';
+    if (loc === 'en-US') return 'en-US';
+    if (loc.startsWith('en')) return 'en-GB';
+    if (loc.startsWith('fr')) return 'fr-FR';
+    if (loc.startsWith('es')) return 'es-ES';
+    if (loc.startsWith('de')) return 'de-DE';
+    return 'en-GB';
+  };
+  const dayOfWeek = new Date().toLocaleDateString(getLocaleStr(), { weekday: 'long' });
 
   // Get all workouts with program info
   const allWorkouts = programs.flatMap(p => 
