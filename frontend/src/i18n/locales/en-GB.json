@@ -278,6 +278,8 @@
   },
   "settings": {
     "title": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select app language",
     "notifications": {
       "title": "Notifications",
       "feedbackEnabled": "Athlete feedback",
