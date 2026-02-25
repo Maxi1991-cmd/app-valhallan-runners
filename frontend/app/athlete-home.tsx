@@ -8,6 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from '../src/hooks/useTranslation';
+import i18n from '../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -54,6 +56,7 @@ interface Payment {
 export default function AthleteHomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { t } = useTranslation();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -68,6 +71,7 @@ export default function AthleteHomeScreen() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [selectedWorkout, setSelectedWorkout] = useState<{workout: Workout & {programId: string, programName: string}} | null>(null);
   
@@ -77,6 +81,7 @@ export default function AthleteHomeScreen() {
   const [painLocation, setPainLocation] = useState('');
   const [notes, setNotes] = useState('');
   const [skipReason, setSkipReason] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.locale);
   
   // Edit form states
   const [editDuration, setEditDuration] = useState('');
