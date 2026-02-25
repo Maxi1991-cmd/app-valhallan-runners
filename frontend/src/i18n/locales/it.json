@@ -103,7 +103,7 @@
     "certificateExpires": "Certificato scade"
   },
   "program": {
-    "title": "Programmi",
+    "title": "Programma",
     "createProgram": "Crea Programma",
     "editProgram": "Modifica Programma",
     "deleteProgram": "Elimina Programma",
@@ -114,11 +114,18 @@
     "startDate": "Data Inizio",
     "endDate": "Data Fine",
     "selectAthlete": "Seleziona Atleta",
-    "workouts": "Allenamenti",
+    "workouts": "allenamenti",
     "addWorkout": "Aggiungi Allenamento",
     "noWorkouts": "Nessun allenamento",
     "progress": "Progresso",
-    "programDeleted": "Programma eliminato"
+    "programDeleted": "Programma eliminato",
+    "completed": "completati",
+    "loading": "Caricamento programmi...",
+    "activePrograms": "programmi attivi",
+    "newProgram": "Nuovo Programma",
+    "noPrograms": "Nessun programma",
+    "addAthleteFirst": "Aggiungi prima un atleta",
+    "createFirst": "Crea il primo programma di allenamento"
   },
   "workout": {
     "title": "Allenamento",
