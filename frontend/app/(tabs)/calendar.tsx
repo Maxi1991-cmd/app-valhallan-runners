@@ -396,7 +396,7 @@ export default function CalendarTab() {
               
               return (
                 <View key={date} style={[styles.weekRowHorizontal, isToday && styles.weekRowToday]}>
-                  {/* Giorno a sinistra */}
+                  {/* Day on left */}
                   <TouchableOpacity
                     style={[
                       styles.weekDayLeft,
@@ -405,7 +405,7 @@ export default function CalendarTab() {
                     onPress={() => setSelectedDate(date)}
                   >
                     <Text style={[styles.weekDayNameHorizontal, isToday && styles.weekDayNameToday]}>
-                      {format(parseISO(date), 'EEE', { locale: it }).toUpperCase()}
+                      {format(parseISO(date), 'EEE', { locale: dateFnsLocale }).toUpperCase()}
                     </Text>
                     <Text style={[
                       styles.weekDayNumberHorizontal,
@@ -415,14 +415,14 @@ export default function CalendarTab() {
                       {format(parseISO(date), 'd')}
                     </Text>
                     <Text style={styles.weekDayMonth}>
-                      {format(parseISO(date), 'MMM', { locale: it })}
+                      {format(parseISO(date), 'MMM', { locale: dateFnsLocale })}
                     </Text>
                   </TouchableOpacity>
                   
-                  {/* Allenamenti a destra */}
+                  {/* Workouts on right */}
                   <View style={styles.weekWorkoutsRight}>
                     {dayWorkouts.length === 0 ? (
-                      <Text style={styles.noWorkoutText}>Nessun allenamento</Text>
+                      <Text style={styles.noWorkoutText}>{t('calendar.noWorkoutDay')}</Text>
                     ) : (
                       dayWorkouts.map((workout, index) => {
                         const isExpired = !workout.completed && workout.date < today;
@@ -443,15 +443,15 @@ export default function CalendarTab() {
                               </Text>
                               <Text style={styles.workoutAthleteHorizontal}>{workout.athlete_name}</Text>
                               {workout.program_name === 'Fuori Programma' && (
-                                <Text style={styles.standaloneTag}>Extra</Text>
+                                <Text style={styles.standaloneTag}>{t('activity.standaloneTag')}</Text>
                               )}
                             </View>
                             <View style={styles.workoutMetaHorizontal}>
                               {workout.duration_minutes && (
-                                <Text style={styles.metaTextHorizontal}>{workout.duration_minutes} min</Text>
+                                <Text style={styles.metaTextHorizontal}>{workout.duration_minutes} {t('units.min')}</Text>
                               )}
                               {workout.distance_km && (
-                                <Text style={styles.metaTextHorizontal}>{workout.distance_km} km</Text>
+                                <Text style={styles.metaTextHorizontal}>{workout.distance_km} {t('units.km')}</Text>
                               )}
                               {workout.completed ? (
                                 <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
@@ -474,15 +474,15 @@ export default function CalendarTab() {
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
-            <Text style={styles.legendText}>Completato</Text>
+            <Text style={styles.legendText}>{t('calendar.legend.completed')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#FF6B35' }]} />
-            <Text style={styles.legendText}>Da fare</Text>
+            <Text style={styles.legendText}>{t('calendar.legend.pending')}</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: '#DC3545' }]} />
-            <Text style={styles.legendText}>Non effettuato</Text>
+            <Text style={styles.legendText}>{t('calendar.legend.missed')}</Text>
           </View>
         </View>
       </ScrollView>
