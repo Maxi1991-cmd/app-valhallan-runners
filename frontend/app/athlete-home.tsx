@@ -1190,21 +1190,21 @@ export default function AthleteHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Impostazioni Notifiche</Text>
+              <Text style={styles.modalTitle}>{t('profile.settings')}</Text>
               <TouchableOpacity onPress={() => setShowSettingsModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.settingsSubtitle}>Gestisci le tue preferenze di notifica</Text>
+            <Text style={styles.settingsSubtitle}>{t('settings.notifications.title')}</Text>
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
                 <Ionicons name="fitness-outline" size={24} color="#FF6B35" />
                 <View style={styles.notificationSettingText}>
-                  <Text style={styles.notificationSettingTitle}>Allenamenti assegnati</Text>
+                  <Text style={styles.notificationSettingTitle}>{t('settings.notifications.assignedWorkoutEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
-                    Ricevi notifica quando il coach ti assegna un nuovo allenamento
+                    {t('settings.notifications.assignedWorkoutEnabledDesc')}
                   </Text>
                 </View>
               </View>
@@ -1220,9 +1220,9 @@ export default function AthleteHomeScreen() {
               <View style={styles.notificationSettingInfo}>
                 <Ionicons name="alarm-outline" size={24} color="#FF6B35" />
                 <View style={styles.notificationSettingText}>
-                  <Text style={styles.notificationSettingTitle}>Promemoria giornaliero</Text>
+                  <Text style={styles.notificationSettingTitle}>{t('settings.notifications.reminderEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
-                    Ricevi un promemoria per l'allenamento del giorno
+                    {t('settings.notifications.reminderEnabledDesc')}
                   </Text>
                 </View>
               </View>
@@ -1238,9 +1238,9 @@ export default function AthleteHomeScreen() {
               <View style={styles.notificationSettingInfo}>
                 <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
                 <View style={styles.notificationSettingText}>
-                  <Text style={styles.notificationSettingTitle}>Scadenze certificato/pagamenti</Text>
+                  <Text style={styles.notificationSettingTitle}>{t('settings.notifications.expiryEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
-                    Ricevi notifica quando scade il certificato medico o un pagamento
+                    {t('settings.notifications.expiryEnabledDesc')}
                   </Text>
                 </View>
               </View>
@@ -1253,12 +1253,65 @@ export default function AthleteHomeScreen() {
             </View>
 
             <Button
-              title={savingSettings ? "Salvataggio..." : "Salva Impostazioni"}
+              title={savingSettings ? t('common.loading') : t('common.save')}
               onPress={saveNotificationSettings}
               variant="primary"
               style={styles.saveSettingsBtn}
               disabled={savingSettings}
             />
+          </View>
+        </View>
+      </Modal>
+
+      {/* Language Selection Modal */}
+      <Modal visible={showLanguageModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('settings.language')}</Text>
+              <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.settingsSubtitle}>{t('settings.selectLanguage')}</Text>
+
+            {[
+              { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+              { code: 'en-GB', name: 'English (UK)', flag: '🇬🇧' },
+              { code: 'en-US', name: 'English (US)', flag: '🇺🇸' },
+              { code: 'fr', name: 'Français', flag: '🇫🇷' },
+              { code: 'es', name: 'Español', flag: '🇪🇸' },
+              { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+            ].map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.languageOption,
+                  selectedLanguage === lang.code && styles.languageOptionActive
+                ]}
+                onPress={() => {
+                  setSelectedLanguage(lang.code);
+                  i18n.locale = lang.code;
+                  AsyncStorage.setItem('userLanguage', lang.code);
+                  setShowLanguageModal(false);
+                  // Force re-render
+                  setRefreshing(true);
+                  setTimeout(() => setRefreshing(false), 100);
+                }}
+              >
+                <Text style={styles.languageFlag}>{lang.flag}</Text>
+                <Text style={[
+                  styles.languageName,
+                  selectedLanguage === lang.code && styles.languageNameActive
+                ]}>
+                  {lang.name}
+                </Text>
+                {selectedLanguage === lang.code && (
+                  <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
+                )}
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </Modal>
