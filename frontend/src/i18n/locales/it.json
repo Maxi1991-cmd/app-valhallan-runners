@@ -277,6 +277,8 @@
   },
   "settings": {
     "title": "Impostazioni",
+    "language": "Lingua",
+    "selectLanguage": "Seleziona la lingua dell'app",
     "notifications": {
       "title": "Notifiche",
       "feedbackEnabled": "Feedback atleti",
