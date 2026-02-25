@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useTranslation } from '../../src/hooks/useTranslation';
+import i18n from '../../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -20,27 +21,49 @@ export default function ProfileTab() {
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.locale);
+  const [forceUpdate, setForceUpdate] = useState(0);
   
   // Notification settings for Coach
   const [notifyAthleteFeedback, setNotifyAthleteFeedback] = useState(true);
   const [notifyExpirations, setNotifyExpirations] = useState(true);
 
+  // Load saved language
+  useEffect(() => {
+    AsyncStorage.getItem('userLanguage').then(lang => {
+      if (lang) {
+        setSelectedLanguage(lang);
+        i18n.locale = lang;
+      }
+    });
+  }, []);
+
+  const handleLanguageChange = async (langCode: string) => {
+    setSelectedLanguage(langCode);
+    i18n.locale = langCode;
+    await AsyncStorage.setItem('userLanguage', langCode);
+    setShowLanguageModal(false);
+    // Force re-render
+    setForceUpdate(prev => prev + 1);
+  };
+
   // FAQ data
   const faqData = [
     {
-      question: "Chi può utilizzare la piattaforma come coach?",
-      answer: "Solo coach registrati con abbonamento attivo. Valhallan Runners è uno strumento professionale pensato per chi guida atleti con metodo e responsabilità."
+      question: t('faq.whoCanUse'),
+      answer: t('faq.whoCanUseAnswer')
     },
     {
-      question: "Gli atleti sono soggetti ad abbonamento per utilizzare l'app?",
-      answer: "No. L'abbonamento è previsto esclusivamente per il coach. L'atleta accede tramite codice personale fornito dal proprio allenatore."
+      question: t('faq.athleteSubscription'),
+      answer: t('faq.athleteSubscriptionAnswer')
     },
     {
-      question: "Posso gestire e modificare i programmi dei miei atleti?",
-      answer: "Sì. Il coach crea, aggiorna e adatta ogni programma in base agli obiettivi e ai feedback dell'atleta. La guida è tua. La crescita è loro."
+      question: t('faq.canManagePrograms'),
+      answer: t('faq.canManageProgramsAnswer')
     }
   ];
 
