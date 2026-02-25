@@ -506,19 +506,19 @@ export default function CalendarTab() {
             {selectedWorkout && (
               <ScrollView style={styles.modalBody}>
                 <View style={styles.modalRow}>
-                  <Text style={styles.modalLabel}>Atleta</Text>
+                  <Text style={styles.modalLabel}>{t('athlete.title')}</Text>
                   <Text style={styles.modalValue}>{selectedWorkout.athlete_name}</Text>
                 </View>
                 <View style={styles.modalRow}>
-                  <Text style={styles.modalLabel}>Programma</Text>
+                  <Text style={styles.modalLabel}>{t('program.title')}</Text>
                   <Text style={styles.modalValue}>{selectedWorkout.program_name}</Text>
                 </View>
                 <View style={styles.modalRow}>
-                  <Text style={styles.modalLabel}>Data</Text>
+                  <Text style={styles.modalLabel}>{t('workout.date')}</Text>
                   <Text style={styles.modalValue}>{selectedWorkout.date}</Text>
                 </View>
                 <View style={styles.modalRow}>
-                  <Text style={styles.modalLabel}>Stato</Text>
+                  <Text style={styles.modalLabel}>{t('workout.type')}</Text>
                   <Text style={[styles.modalValue, { 
                     color: selectedWorkout.completed 
                       ? '#4CAF50' 
@@ -527,30 +527,30 @@ export default function CalendarTab() {
                         : '#FF6B35' 
                   }]}>
                     {selectedWorkout.completed 
-                      ? 'Completato' 
+                      ? t('workout.completed')
                       : selectedWorkout.date < format(new Date(), 'yyyy-MM-dd')
-                        ? 'Non effettuato'
-                        : 'Da fare'}
+                        ? t('workout.missed')
+                        : t('workout.pending')}
                   </Text>
                 </View>
 
-                <Text style={styles.modalSectionTitle}>Descrizione</Text>
+                <Text style={styles.modalSectionTitle}>{t('program.description')}</Text>
                 <Text style={styles.modalDescription}>{selectedWorkout.description}</Text>
 
                 {(selectedWorkout.duration_minutes || selectedWorkout.distance_km || selectedWorkout.target_pace) && (
                   <>
-                    <Text style={styles.modalSectionTitle}>Obiettivi</Text>
+                    <Text style={styles.modalSectionTitle}>{t('workout.objectives')}</Text>
                     <View style={styles.modalStats}>
                       {selectedWorkout.duration_minutes && (
                         <View style={styles.modalStat}>
                           <Ionicons name="time" size={20} color="#FF6B35" />
-                          <Text style={styles.modalStatValue}>{selectedWorkout.duration_minutes} min</Text>
+                          <Text style={styles.modalStatValue}>{selectedWorkout.duration_minutes} {t('units.min')}</Text>
                         </View>
                       )}
                       {selectedWorkout.distance_km && (
                         <View style={styles.modalStat}>
                           <Ionicons name="footsteps" size={20} color="#4CAF50" />
-                          <Text style={styles.modalStatValue}>{selectedWorkout.distance_km} km</Text>
+                          <Text style={styles.modalStatValue}>{selectedWorkout.distance_km} {t('units.km')}</Text>
                         </View>
                       )}
                       {selectedWorkout.target_pace && (
@@ -565,36 +565,31 @@ export default function CalendarTab() {
 
                 {selectedWorkout.completed && selectedWorkout.actual_data && (
                   <>
-                    <Text style={styles.modalSectionTitle}>Dati Effettivi</Text>
+                    <Text style={styles.modalSectionTitle}>{t('workout.actualData')}</Text>
                     <View style={styles.actualData}>
                       {selectedWorkout.actual_data.duration_minutes && (
                         <Text style={styles.actualDataText}>
-                          Durata: {selectedWorkout.actual_data.duration_minutes} min
+                          {t('workout.duration')}: {selectedWorkout.actual_data.duration_minutes} {t('units.min')}
                         </Text>
                       )}
                       {selectedWorkout.actual_data.distance_km && (
                         <Text style={styles.actualDataText}>
-                          Distanza: {selectedWorkout.actual_data.distance_km} km
+                          {t('workout.distance')}: {selectedWorkout.actual_data.distance_km} {t('units.km')}
                         </Text>
                       )}
                       {selectedWorkout.actual_data.avg_pace && (
                         <Text style={styles.actualDataText}>
-                          Passo medio: {selectedWorkout.actual_data.avg_pace}
+                          {t('workout.avgPace')}: {selectedWorkout.actual_data.avg_pace}
                         </Text>
                       )}
                       {selectedWorkout.actual_data.avg_heart_rate && (
                         <Text style={styles.actualDataText}>
-                          FC media: {selectedWorkout.actual_data.avg_heart_rate} bpm
-                        </Text>
-                      )}
-                      {selectedWorkout.actual_data.feeling && (
-                        <Text style={styles.actualDataText}>
-                          Sensazione: {selectedWorkout.actual_data.feeling}
+                          {t('workout.avgHeartRate')}: {selectedWorkout.actual_data.avg_heart_rate} {t('units.bpm')}
                         </Text>
                       )}
                       {selectedWorkout.actual_data.notes && (
                         <Text style={styles.actualDataText}>
-                          Note: {selectedWorkout.actual_data.notes}
+                          {t('workout.notes')}: {selectedWorkout.actual_data.notes}
                         </Text>
                       )}
                     </View>
