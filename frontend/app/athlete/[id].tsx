@@ -220,7 +220,7 @@ export default function AthleteDetail() {
   const saveActivity = async () => {
     if (!editingActivity) return;
     
-    // Converti data da DD-MM-YYYY a YYYY-MM-DD
+    // Convert date from DD-MM-YYYY to YYYY-MM-DD
     let formattedDate = activityForm.date.trim();
     if (formattedDate.includes('-') && formattedDate.length === 10) {
       const parts = formattedDate.split('-');
@@ -244,24 +244,24 @@ export default function AthleteDetail() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      Alert.alert('Successo', 'Attività modificata');
+      Alert.alert(t('common.success'), t('activity.activityFinalized'));
       setShowActivityModal(false);
       setEditingActivity(null);
       loadActivities();
       loadWorkouts();
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore nel salvataggio');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.saveFailed'));
     }
   };
 
   const deleteActivity = (activity: Activity) => {
     Alert.alert(
-      'Elimina Attività',
-      `Sei sicuro di voler eliminare questa attività del ${safeFormatDate(activity.date)}?`,
+      t('activity.deleteActivity'),
+      `${t('activity.deleteConfirm')} ${safeFormatDate(activity.date)}?`,
       [
-        { text: 'Annulla', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Elimina',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -269,11 +269,11 @@ export default function AthleteDetail() {
               await axios.delete(`${BASE_URL}/api/activities/${activity.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
               });
-              Alert.alert('Successo', 'Attività eliminata');
+              Alert.alert(t('common.success'), t('activity.activityDeleted'));
               loadActivities();
               loadWorkouts();
             } catch (error: any) {
-              Alert.alert('Errore', error.response?.data?.detail || 'Errore nell\'eliminazione');
+              Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.deleteFailed'));
             }
           }
         }
