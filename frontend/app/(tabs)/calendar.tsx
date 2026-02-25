@@ -291,14 +291,14 @@ export default function CalendarTab() {
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Calendario</Text>
+        <Text style={styles.headerTitle}>{t('calendar.title')}</Text>
         <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'month' && styles.toggleActive]}
             onPress={() => setViewMode('month')}
           >
             <Text style={[styles.toggleText, viewMode === 'month' && styles.toggleTextActive]}>
-              Mese
+              {t('calendar.month')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -306,7 +306,7 @@ export default function CalendarTab() {
             onPress={() => setViewMode('week')}
           >
             <Text style={[styles.toggleText, viewMode === 'week' && styles.toggleTextActive]}>
-              Settimana
+              {t('calendar.week')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -323,7 +323,7 @@ export default function CalendarTab() {
             onPress={() => setSelectedAthlete(null)}
           >
             <Text style={[styles.athleteChipText, !selectedAthlete && styles.athleteChipTextActive]}>
-              Tutti
+              {t('common.all')}
             </Text>
           </TouchableOpacity>
           {athletes.map((athlete) => (
