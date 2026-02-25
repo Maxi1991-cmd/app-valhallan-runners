@@ -337,7 +337,8 @@
     "week": "Settimana",
     "month": "Mese",
     "year": "Anno",
-    "all": "Tutto"
+    "all": "Tutto",
+    "subtitle": "Monitora le performance"
   },
   "errors": {
     "generic": "Si è verificato un errore",
