@@ -751,7 +751,7 @@ export default function AthleteHomeScreen() {
         return (
           <View>
             {/* Impostazioni */}
-            <Text style={styles.sectionTitle}>⚙️ Impostazioni</Text>
+            <Text style={styles.sectionTitle}>⚙️ {t('profile.settings')}</Text>
             <Card style={styles.infoCard}>
               <TouchableOpacity 
                 style={styles.settingsRow}
@@ -759,9 +759,29 @@ export default function AthleteHomeScreen() {
               >
                 <View style={styles.settingsInfo}>
                   <Ionicons name="notifications-outline" size={22} color="#FF6B35" />
-                  <Text style={styles.settingsText}>Notifiche</Text>
+                  <Text style={styles.settingsText}>{t('navigation.notifications')}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: '#333' }]}
+                onPress={() => setShowLanguageModal(true)}
+              >
+                <View style={styles.settingsInfo}>
+                  <Ionicons name="globe-outline" size={22} color="#FF6B35" />
+                  <Text style={styles.settingsText}>{t('settings.language')}</Text>
+                </View>
+                <View style={styles.languageCurrentRow}>
+                  <Text style={styles.languageCurrent}>
+                    {selectedLanguage.startsWith('it') ? '🇮🇹' : 
+                     selectedLanguage === 'en-US' ? '🇺🇸' :
+                     selectedLanguage.startsWith('en') ? '🇬🇧' :
+                     selectedLanguage.startsWith('fr') ? '🇫🇷' :
+                     selectedLanguage.startsWith('es') ? '🇪🇸' :
+                     selectedLanguage.startsWith('de') ? '🇩🇪' : '🌐'}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={20} color="#666" />
+                </View>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: '#333' }]}
@@ -769,7 +789,7 @@ export default function AthleteHomeScreen() {
               >
                 <View style={styles.settingsInfo}>
                   <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
-                  <Text style={styles.settingsText}>Privacy</Text>
+                  <Text style={styles.settingsText}>{t('profile.privacy')}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
               </TouchableOpacity>
@@ -779,19 +799,19 @@ export default function AthleteHomeScreen() {
               >
                 <View style={styles.settingsInfo}>
                   <Ionicons name="help-circle-outline" size={22} color="#FF6B35" />
-                  <Text style={styles.settingsText}>Supporto</Text>
+                  <Text style={styles.settingsText}>{t('profile.support')}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
               </TouchableOpacity>
             </Card>
 
             {/* Certificato Medico */}
-            <Text style={styles.sectionTitle}>🏥 Certificato Medico</Text>
+            <Text style={styles.sectionTitle}>🏥 {t('athlete.certificate')}</Text>
             <Card style={styles.infoCard}>
               {athleteProfile?.medical_certificate?.expiry_date ? (
                 <>
                   <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Scadenza:</Text>
+                    <Text style={styles.infoLabel}>{t('profile.expiresOn')}:</Text>
                     <Text style={[
                       styles.infoValue,
                       isDateExpired(athleteProfile.medical_certificate.expiry_date) && styles.expiredText
