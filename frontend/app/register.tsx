@@ -6,10 +6,12 @@ import { Input } from '../src/components/Input';
 import { Button } from '../src/components/Button';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../src/hooks/useTranslation';
 
 export default function Register() {
   const router = useRouter();
   const { register } = useAuthStore();
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,17 +21,17 @@ export default function Register() {
 
   const handleRegister = async () => {
     if (!name || !email || !password) {
-      Alert.alert('Errore', 'Compila tutti i campi');
+      Alert.alert(t('common.error'), t('auth.registerError'));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Errore', 'Le password non coincidono');
+      Alert.alert(t('common.error'), t('auth.passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Errore', 'La password deve essere di almeno 6 caratteri');
+      Alert.alert(t('common.error'), t('auth.passwordTooShort'));
       return;
     }
 
@@ -38,7 +40,7 @@ export default function Register() {
       await register(name, email, password, 'coach');
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Errore', error.message || 'Registrazione fallita');
+      Alert.alert(t('common.error'), error.message || t('errors.generic'));
     } finally {
       setLoading(false);
     }
@@ -57,13 +59,13 @@ export default function Register() {
 
           <View style={styles.header}>
             <Ionicons name="fitness" size={60} color="#FF6B35" />
-            <Text style={styles.title}>Crea Account</Text>
-            <Text style={styles.subtitle}>Registrati come Coach</Text>
+            <Text style={styles.title}>{t('auth.register')}</Text>
+            <Text style={styles.subtitle}>{t('auth.coachDesc')}</Text>
           </View>
 
           <View style={styles.form}>
             <Input
-              label="Nome Completo"
+              label={t('auth.fullName')}
               value={name}
               onChangeText={setName}
               placeholder="Mario Rossi"
@@ -71,7 +73,7 @@ export default function Register() {
             />
 
             <Input
-              label="Email"
+              label={t('auth.email')}
               value={email}
               onChangeText={setEmail}
               placeholder="coach@email.com"
@@ -81,10 +83,10 @@ export default function Register() {
 
             <View style={styles.passwordContainer}>
               <Input
-                label="Password"
+                label={t('auth.password')}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Minimo 6 caratteri"
+                placeholder={t('auth.passwordTooShort')}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity
@@ -100,15 +102,15 @@ export default function Register() {
             </View>
 
             <Input
-              label="Conferma Password"
+              label={t('auth.confirmPassword')}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
-              placeholder="Ripeti la password"
+              placeholder={t('auth.confirmPassword')}
               secureTextEntry={!showPassword}
             />
 
             <Button
-              title="Registrati"
+              title={t('auth.register')}
               onPress={handleRegister}
               loading={loading}
               size="large"
@@ -117,7 +119,7 @@ export default function Register() {
 
             <TouchableOpacity onPress={() => router.push('/login')}>
               <Text style={styles.loginLink}>
-                Hai già un account? <Text style={styles.loginLinkBold}>Accedi</Text>
+                {t('auth.haveAccount')} <Text style={styles.loginLinkBold}>{t('auth.login')}</Text>
               </Text>
             </TouchableOpacity>
           </View>
