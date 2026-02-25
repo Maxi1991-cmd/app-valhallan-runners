@@ -100,7 +100,8 @@
     "addFirstAthlete": "Aggiungi il tuo primo atleta per iniziare",
     "loading": "Caricamento atleti...",
     "payment": "Pagamento",
-    "certificateExpires": "Certificato scade"
+    "certificateExpires": "Certificato scade",
+    "certificate": "Certificato Medico"
   },
   "program": {
     "title": "Programma",
