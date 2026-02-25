@@ -16,7 +16,6 @@ export default function CreateAthlete() {
     phone: '',
     birth_date: '',
     notes: '',
-    password: '',
   });
 
   const handleCreate = async () => {
