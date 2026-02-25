@@ -108,7 +108,7 @@ export default function CompareTab() {
             )}
           </View>
           <View style={styles.statPeriod}>
-            <Text style={styles.periodLabel}>Periodo 2</Text>
+            <Text style={styles.periodLabel}>{t('compare.period2')}</Text>
             <Text style={styles.statValue}>
               {value2 !== null ? `${value2} ${unit}` : '--'}
             </Text>
@@ -122,13 +122,13 @@ export default function CompareTab() {
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Confronta Periodi</Text>
-          <Text style={styles.headerSubtitle}>Analizza i progressi nel tempo</Text>
+          <Text style={styles.headerTitle}>{t('navigation.compare')}</Text>
+          <Text style={styles.headerSubtitle}>{t('compare.subtitle')}</Text>
         </View>
 
         {/* Athlete Selector */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Seleziona Atleta</Text>
+          <Text style={styles.sectionTitle}>{t('program.selectAthlete')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {athletes.map((athlete) => (
               <TouchableOpacity
@@ -153,30 +153,30 @@ export default function CompareTab() {
         </View>
 
         {/* Period 1 */}
-        <Card title="Periodo 1 (Recente)" style={styles.periodCard}>
+        <Card title={t('compare.period1Recent')} style={styles.periodCard}>
           <View style={styles.dateRow}>
             <Input
-              label="Inizio"
+              label={t('compare.start')}
               value={period1Start}
               onChangeText={setPeriod1Start}
-              placeholder="GG/MM/AAAA"
+              placeholder="DD/MM/YYYY"
               containerStyle={styles.dateInput}
             />
             <Input
-              label="Fine"
+              label={t('compare.end')}
               value={period1End}
               onChangeText={setPeriod1End}
-              placeholder="GG/MM/AAAA"
+              placeholder="DD/MM/YYYY"
               containerStyle={styles.dateInput}
             />
           </View>
         </Card>
 
         {/* Period 2 */}
-        <Card title="Periodo 2 (Precedente)" style={styles.periodCard}>
+        <Card title={t('compare.period2Previous')} style={styles.periodCard}>
           <View style={styles.dateRow}>
             <Input
-              label="Inizio"
+              label={t('compare.start')}
               value={period2Start}
               onChangeText={setPeriod2Start}
               placeholder="GG/MM/AAAA"
