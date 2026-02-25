@@ -378,10 +378,10 @@ export default function CalendarTab() {
 
             <View style={styles.selectedDateSection}>
               <Text style={styles.selectedDateTitle}>
-                {format(parseISO(selectedDate), 'EEEE d MMMM', { locale: it })}
+                {format(parseISO(selectedDate), 'EEEE d MMMM', { locale: dateFnsLocale })}
               </Text>
               {getWorkoutsForDate(selectedDate).length === 0 ? (
-                <Text style={styles.noWorkouts}>Nessun allenamento programmato</Text>
+                <Text style={styles.noWorkouts}>{t('calendar.noWorkouts')}</Text>
               ) : (
                 renderDayWorkouts(selectedDate)
               )}
