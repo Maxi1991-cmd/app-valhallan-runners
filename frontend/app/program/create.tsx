@@ -10,8 +10,9 @@ import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WorkoutSession } from '../../src/types';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
-// Funzione helper per formattare data in YYYY-MM-DD
+// Helper function to format date in YYYY-MM-DD
 const formatDateToISO = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -19,21 +20,22 @@ const formatDateToISO = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Calcola data default: oggi
+// Calculate default date: today
 const getDefaultStartDate = (): string => {
   return formatDateToISO(new Date());
 };
 
-// Calcola data fine default: +4 settimane
+// Calculate default end date: +4 weeks
 const getDefaultEndDate = (): string => {
   const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 28); // 4 settimane
+  endDate.setDate(endDate.getDate() + 28); // 4 weeks
   return formatDateToISO(endDate);
 };
 
 export default function CreateOrEditProgram() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const { t } = useTranslation();
   const isEditMode = !!id;
   
   const { athletes, fetchAthletes, createProgram, updateProgram } = useDataStore();
@@ -52,7 +54,7 @@ export default function CreateOrEditProgram() {
   const [workouts, setWorkouts] = useState<Partial<WorkoutSession>[]>([]);
 
   const [newWorkout, setNewWorkout] = useState({
-    day: 'Settimana 1 - Lunedì 08:00',
+    day: 'Week 1 - Monday 08:00',
     date: getDefaultStartDate(),
     title: '',
     description: '',
