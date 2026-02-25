@@ -329,7 +329,9 @@
     "dataUsage": "Data Usage",
     "dataUsageDesc": "Your data is used exclusively to provide you with the coaching service and is not shared with third parties.",
     "dataProtection": "Data Protection",
-    "dataProtectionDesc": "We use industry-standard security measures to protect your data."
+    "dataProtectionDesc": "We use industry-standard security measures to protect your data.",
+    "whoCanSee": "Who can see personal data?",
+    "whoCanSeeAnswer": "Personal data is only visible to you and your athlete."
   },
   "compare": {
     "title": "Compare",
