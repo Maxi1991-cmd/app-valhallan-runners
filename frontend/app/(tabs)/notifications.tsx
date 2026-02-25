@@ -329,14 +329,14 @@ export default function NotificationsTab() {
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Notifiche</Text>
+          <Text style={styles.headerTitle}>{t('navigation.notifications')}</Text>
           <Text style={styles.headerSubtitle}>
-            {unreadCount > 0 ? `${unreadCount} non lette` : 'Tutto letto'}
+            {unreadCount > 0 ? `${unreadCount} ${t('notifications.unread')}` : t('notifications.allRead')}
           </Text>
         </View>
         {unreadCount > 0 && (
           <Button
-            title="Segna tutte"
+            title={t('notifications.markAll')}
             onPress={markAllNotificationsRead}
             variant="outline"
             size="small"
@@ -362,14 +362,14 @@ export default function NotificationsTab() {
         }
         ListHeaderComponent={
           warnings.length > 0 ? (
-            <Text style={styles.sectionHeader}>Avvisi Scadenze</Text>
+            <Text style={styles.sectionHeader}>{t('notifications.expiryWarnings')}</Text>
           ) : null
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="notifications-off-outline" size={64} color="#333" />
-            <Text style={styles.emptyText}>Nessuna notifica</Text>
-            <Text style={styles.emptySubtext}>Le tue notifiche appariranno qui</Text>
+            <Text style={styles.emptyText}>{t('notifications.noNotifications')}</Text>
+            <Text style={styles.emptySubtext}>{t('notifications.willAppearHere')}</Text>
           </View>
         }
       />
