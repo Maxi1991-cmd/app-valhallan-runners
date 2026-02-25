@@ -486,9 +486,9 @@ export default function ProfileTab() {
               <View style={styles.notificationSettingInfo}>
                 <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
                 <View style={styles.notificationSettingText}>
-                  <Text style={styles.notificationSettingTitle}>Scadenze certificati/pagamenti</Text>
+                  <Text style={styles.notificationSettingTitle}>{t('settings.notifications.expiryEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
-                    Ricevi notifica quando scadono certificati medici o pagamenti degli atleti
+                    {t('settings.notifications.expiryEnabledDesc')}
                   </Text>
                 </View>
               </View>
@@ -501,7 +501,7 @@ export default function ProfileTab() {
             </View>
 
             <Button
-              title={loadingSettings ? "Salvataggio..." : "Salva Impostazioni"}
+              title={loadingSettings ? t('common.loading') : t('common.save')}
               onPress={saveNotificationSettings}
               variant="primary"
               style={styles.saveSettingsBtn}
@@ -521,7 +521,7 @@ export default function ProfileTab() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Privacy</Text>
+              <Text style={styles.modalTitle}>{t('profile.privacy')}</Text>
               <TouchableOpacity onPress={() => setShowPrivacyModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
@@ -532,9 +532,9 @@ export default function ProfileTab() {
                 <View style={styles.privacyIconContainer}>
                   <Ionicons name="person-outline" size={28} color="#FF6B35" />
                 </View>
-                <Text style={styles.privacyQuestion}>Chi può vedere i dati personali?</Text>
+                <Text style={styles.privacyQuestion}>{t('privacy.whoCanSee')}</Text>
                 <Text style={styles.privacyAnswer}>
-                  I dati personali sono visibili solo a te e al tuo atleta.
+                  {t('privacy.whoCanSeeAnswer')}
                 </Text>
               </View>
 
