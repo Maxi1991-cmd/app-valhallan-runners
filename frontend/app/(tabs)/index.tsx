@@ -9,15 +9,16 @@ import { LoadingScreen } from '../../src/components/LoadingScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AthleteProfile } from '../../src/types';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
 export default function AthletesTab() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuthStore();
   const { athletes, fetchAthletes, isLoading, warnings } = useDataStore();
+  const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    // Solo se autenticato
     if (isAuthenticated) {
       fetchAthletes();
     }
@@ -70,8 +71,8 @@ export default function AthletesTab() {
                 />
                 <Text style={[styles.warningText, warning.urgent && styles.urgentText]}>
                   {warning.type === 'payment_due'
-                    ? `Pagamento ${warning.month}`
-                    : `Certificato scade ${warning.expiry_date}`}
+                    ? `${t('athlete.payment')} ${warning.month}`
+                    : `${t('athlete.certificateExpires')} ${warning.expiry_date}`}
                 </Text>
               </View>
             ))}
@@ -82,7 +83,7 @@ export default function AthletesTab() {
           <View style={styles.statItem}>
             <Ionicons name="heart" size={16} color="#FF6B35" />
             <Text style={styles.statText}>
-              {item.biometrics?.heart_rate_max || '--'} bpm max
+              {item.biometrics?.heart_rate_max || '--'} {t('units.bpmMax')}
             </Text>
           </View>
           <View style={styles.statItem}>
@@ -97,19 +98,19 @@ export default function AthletesTab() {
   };
 
   if (isLoading && athletes.length === 0) {
-    return <LoadingScreen message="Caricamento atleti..." />;
+    return <LoadingScreen message={t('athlete.loading')} />;
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>I Miei Atleti</Text>
-        <Text style={styles.headerSubtitle}>{athletes.length} atleti</Text>
+        <Text style={styles.headerTitle}>{t('athlete.myAthletes')}</Text>
+        <Text style={styles.headerSubtitle}>{athletes.length} {t('athlete.athletesCount')}</Text>
       </View>
 
       {user?.role === 'coach' && (
         <Button
-          title="Aggiungi Atleta"
+          title={t('athlete.addAthlete')}
           onPress={() => router.push('/athlete/create')}
           style={styles.addButton}
         />
@@ -130,9 +131,9 @@ export default function AthletesTab() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="people-outline" size={64} color="#333" />
-            <Text style={styles.emptyText}>Nessun atleta</Text>
+            <Text style={styles.emptyText}>{t('athlete.noAthletes')}</Text>
             <Text style={styles.emptySubtext}>
-              Aggiungi il tuo primo atleta per iniziare
+              {t('athlete.addFirstAthlete')}
             </Text>
           </View>
         }
