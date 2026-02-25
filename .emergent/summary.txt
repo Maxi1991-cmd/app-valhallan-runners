@@ -1,168 +1,135 @@
 <analysis>
+<original_problem_statement>
+The user, a running coach, requested a mobile application to manage their athletes. The core features include a dual-role system (Coach/Athlete), program creation, workout tracking, a subscription model, and a notification system.
 
-**original_problem_statement**: The user, a running coach, requested a mobile application to manage their athletes. The core features include a dual-role system (Coach/Athlete), program creation, workout tracking, a subscription model, and a notification system.
-
-Recent requests have focused on refining the user interface, fixing data-related bugs, and adding informational sections. Key requests from this session include:
-- Implementing user-configurable notification settings.
-- Fixing a bug where newly created activities were not appearing on the calendar.
-- Fixing multiple UI bugs related to duplicate Back buttons in headers.
-- Adding static informational pages for Privacy and Support (with an interactive FAQ) for both Coach and Athlete roles.
-- Making the support email a clickable  link.
-- Translating calendar components into Italian.
-- Fixing data aggregation in the Compare feature to include all completed workouts and activities.
-- Adding the ability for a coach to edit the finalized performance data of a workout directly from the program details page.
+Recent requests from this session include:
+- Removing the feeling (sensazione) section from the workout edit modal.
+- Implementing a colored-dot system in the calendar to indicate workout status: green (completed), orange (to-do/future), and red (not completed/past).
+- Fixing the layout on the program details page where edit/delete icons for workouts were poorly aligned.
+- Simplifying the Add Athlete form by removing optional app access and password fields.
+- A major feature request to implement internationalization (i18n) to support multiple languages (en-UK, en-US, fr, es, de), with automatic language detection and en-UK as a fallback.
+</original_problem_statement>
 
 **User's preferred language**: Italian. The next agent MUST respond in Italian.
 
 **what currently exists?**
-A full-stack Expo (React Native) and FastAPI application. The major features implemented are:
-- Role-based authentication (Coach/Athlete).
-- CRUD for athletes and training programs.
-- A two-step workout completion flow (athlete feedback -> coach finalization).
-- Creation and management of standalone activities outside of programs.
-- A calendar view showing both program workouts and standalone activities, now translated into Italian.
-- A Compare feature to analyze athlete performance between two periods, which now correctly aggregates data from both program workouts and standalone activities.
-- Notification settings for both Coach and Athlete roles are implemented, allowing users to toggle specific notifications.
-- Static Privacy and Support (with FAQ) pages are available as modals from the profile screens for both roles.
-- Coach's view of an athlete's profile () now lists assigned standalone activities with edit/delete functionality.
-- Coach's view of a program () now has icons to edit/delete individual workouts.
+A full-stack Expo (React Native) and FastAPI application.
+- The UI for the workout edit performance data modal is implemented as per user specifications.
+- The Add Athlete form has been simplified.
+- The program details page UI has been fixed.
+- The calendar now displays colored dots (green, orange, red) to represent the status of workouts and has an updated legend.
+- The foundation for internationalization (i18n) has been laid out:  and  libraries are installed, and the directory structure  has been created with empty JSON files for English, Spanish, French, German, and Italian.
 
 **Last working item**:
-- **Last item agent was working**: The user requested that the edit functionality for a workout on the program detail page () should allow the coach to modify the *actual performance data* (duration, distance, HR, etc.) that they enter after receiving athlete feedback. The UI for this modification should be identical to the finalization screen the coach is already familiar with (e.g., from the  page). The agent had previously implemented an incorrect version of this feature and was last seen acknowledging the user's specific clarification and starting to investigate the correct UI to replicate.
+- **Last item agent was working**: Implementing internationalization (i18n) across the entire application. The agent had just installed the necessary libraries and created the file structure and placeholder translation files. The immediate next step was to create a custom hook or start integrating the  hook into the components.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **User Testing Done**: N (User found the previous implementation was incorrect).
-- **Which testing method agent to use?**: Frontend testing agent. The test should involve:
-    1.  Navigating to a program detail page as a coach.
-    2.  Clicking the edit (pencil) icon on a completed workout.
-    3.  Verifying a modal opens that contains input fields for Actual Duration, Actual Distance, Average HR, etc.
-    4.  Modifying the data, saving it, and ensuring the UI and database are updated.
+- **User Testing Done**: N
+- **Which testing method agent to use?**: Frontend testing agent. This is a large-scale refactoring. The agent should be instructed to systematically replace hardcoded text with i18n keys and then run a test to verify that a few key screens display translated text correctly. Manual verification will also be crucial.
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0)**: Correctly implement the workout data modification feature.
-
-**Issues Detail**:
-- **Issue 1: (P0) Correctly Implement Workout Actual Data Modification**
-  - **Attempted fixes**: The agent first created a modal to edit the *planned* workout details (e.g., workout type). After user correction, the agent created a basic modal to edit the *actual* data, but the user clarified that the UI must be identical to the existing finalization card. This second implementation is also incorrect. The work stopped before the correct UI was implemented.
-  - **Next debug checklist**:
-    1.  In , find the  function and the .
-    2.  Review the UI for finalizing a workout, likely found in  or within the notification feedback modal logic, to understand its structure.
-    3.  Replace the current content of the  in  with a form that replicates that UI. It should contain fields for , , , , etc.
-    4.  Ensure the  of the pencil icon correctly populates the modal with the existing  of the selected workout.
-    5.  The Save button in the modal should call the existing  endpoint, sending the updated .
-  - **Why fix this issue and what will be achieved with the fix?**: This is a direct user request to allow coaches to correct or update performance data after it has been finalized, providing essential administrative control.
-  - **Status**: IN PROGRESS
-  - **Is recurring issue?**: Y (The agent has failed to implement this correctly twice).
-  - **Should Test frontend/backend/both after fix?**: both
-  - **Blocked on other issue**: None
+- There are no outstanding bugs. The primary pending item is the i18n feature implementation, which is listed as a task.
 
 **In progress Task List**:
-- **Task 1: (P0) Implement Correct Workout Edit UI**
-  - **Description**: Same as Issue 1 above. This is the highest priority.
-  - **Where to resume**: . The agent needs to build the correct modal UI for editing workout .
-  - **What will be achieved with this?**: The coach will have the ability to modify finalized workout data through an intuitive and consistent interface.
+- **Task 1: (P0) Complete Internationalization (i18n) Implementation**
+  - **Description**: The user requested full i18n support for the app, auto-detecting the device's language and supporting English (UK), English (US), French, Spanish, and German, with English (UK) as a fallback. All existing Italian text must be moved to translation files.
+  - **Where to resume**: The agent has already created the file structure in . The next steps are:
+    1.  Configure the  instance in  to detect the language and set the fallback.
+    2.  Wrap the root application component (likely in ) with the .
+    3.  Populate  with all the current hardcoded Italian strings from the app.
+    4.  Translate the keys into the other languages (, , , ).
+    5.  Systematically go through all  files in  and replace hardcoded text with the  function from the  hook.
+  - **What will be achieved with this?**: The application will become multilingual and accessible to a wider audience.
   - **Status**: IN PROGRESS
-  - **Should Test frontend/backend/both after fix?**: both
-  - **Blocked on something**: None
+  - **Should Test frontend/backend/both after fix?**: Frontend
+  - **Blocked on something**: Nothing.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-  - (P1) **Integrate workout/activity data into main analytics page**. The  endpoint was fixed, but the main analytics endpoint () mentioned in the previous handover was not touched. It still likely relies on an outdated data source and needs to be updated to aggregate data from both finalized program workouts and standalone activities for a complete performance overview. File: .
+  - (P1) **Integrate workout/activity data into main analytics page**. The  endpoint was not touched in the previous sessions and likely uses an outdated data source. It needs to be updated to aggregate data from both finalized program workouts and standalone activities for a complete performance overview. File: .
 - **Future Tasks**:
   - (P2) Implement real-time integration with fitness APIs (Garmin, Polar, Suunto).
   - (P2) Implement a real payment gateway (e.g., Stripe) for the coach subscription.
 
 **Completed work in this session**
-- **Feature: Notification Settings**: Implemented modals for both Coach and Athlete to configure their notification preferences, with corresponding backend endpoints to save the settings.
-- **Feature: Privacy & Support Pages**: Added static Privacy info modals and interactive Support FAQ modals for both Coach and Athlete roles. The support email was made a clickable  link.
-- **Feature: Standalone Activities in Athlete Profile**: Added a list of assigned standalone activities to the coach's view of an athlete's profile, with functionality to edit and delete them.
-- **Feature: Calendar Translation**: Localized the  component to display month and day names in Italian.
-- **Bug Fix: Activity Not Appearing**: Resolved a critical bug where created activities didn't appear on the calendar. This was a complex issue involving an incorrect database name in the agent's test scripts ( vs ), and inconsistent date formats ( vs ) being sent from the frontend and stored in the database. The agent fixed the frontend date parsing and ran a migration script to correct existing data.
-- **Bug Fix: Data in Compare Page**: Fixed the comparison logic to query both program workouts and standalone activities, and to correctly filter for completed items by checking the  boolean field instead of a non-existent  field. Also removed Total Elevation as requested.
-- **Bug Fix: Notification Crash/Navigation**: Fixed a bug where clicking Go to activity from a feedback notification would crash. This was resolved by correcting the component rendering logic in  and ensuring correct navigation handling in .
-- **UI Fix: Duplicate Indietro Headers**: Resolved issues with nested  navigators causing double headers by removing the redundant  file in .
-- **UI Fix: Custom Orange Indietro Button**: Removed a hardcoded custom back button from  to avoid duplication with the native header button.
+- **Feature: Calendar Dot System**: Implemented logic and UI in  to display green, orange, or red dots on calendar days to signify workout status (Completed, To-Do, Not Done).
+- **UI Fix: Program Page Layout**: Reworked the layout for individual workout items in  to correctly display the edit and delete icons, improving usability.
+- **UI Fix: Workout Edit Modal**: Removed the Sensazione (feeling) section from the workout edit modal in  as requested by the user.
+- **UI Fix: Create Athlete Form**: Simplified the form in  by removing the Accesso app and Password atleta fields.
+- **Feature (Started): Internationalization (i18n)**: Installed  and , and created the entire file structure under  to support 5 languages.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1**: The main athlete analytics page () is likely still out of sync with all data sources. The agent fixed the  endpoint but not this general one.
+- **Issue 1**: The main athlete analytics page endpoint () is likely out of sync with all data sources. The agent has previously fixed a similar  endpoint but not this general one.
   - **Debug checklist**:
-    1.  Review the  endpoint in .
-    2.  Modify the endpoint to query both the  collection and the  collection (for workouts where ).
-    3.  Ensure data from both sources is aggregated correctly to provide a complete performance picture.
+    1.  Review the  function in .
+    2.  Modify the function to query and aggregate data from both the  collection and the  collection (for workouts where ).
   - **Why to solve this issue and what will be achieved with this?**: To ensure the primary data analysis feature of the app is accurate and reliable for the coach.
   - **Should Test frontend/backend/both after fix?**: backend
-  - **Is recurring issue?**: N
+  - **Is recurring issue?**: Y (This has been carried over from a previous handover).
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork**: The agent repeatedly struggled with data-related issues stemming from the forked environment.
-  - **Recurrence count**: 3+ instances.
-  - **Details**:
-    1.  The agent initially couldn't find any data because it was testing against an empty DB (), while the app was writing to a different one () specified in an  file.
-    2.  The agent then found that data was not appearing on the calendar due to inconsistent date formats (, , ) being stored in the database.
-    3.  A similar issue occurred with the Compare feature, where the agent's code was looking for  when the database schema used a boolean .
-  - **Status**: RESOLVED (but the pattern is important). The next agent must be extremely careful about database names and data formats, and should verify data directly in the database when bugs appear.
+- **Issue recurrence in previous fork**: The agent in a previous fork repeatedly struggled with data-related issues stemming from the forked environment (e.g., wrong database name, inconsistent date formats).
+- **Recurrence count**: 3+ instances in the past.
+- **Status**: RESOLVED (but the pattern is important). The next agent must be careful about database names and data formats and should verify data directly in the database when data-related bugs appear.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend**: React Native, Expo, Expo Router, Zustand, .
+- **Frontend**: React Native, Expo, Expo Router, Zustand, , , .
 - **Backend**: FastAPI, Pydantic, MongoDB (, ).
-- **Data Handling**: The agent had to perform a one-time data migration script using  to fix inconsistent date formats in the MongoDB database.
+- **State Management**: Zustand.
 
 **key DB schema**
-- :  (new  object).
--  > :  (The  boolean is the source of truth for completed status).
-- :  (The Thu Feb 12 11:08:04 UTC 2026 format is now consistently ).
+- No changes to the database schema were made in this session.
 
 **changes in tech stack**
-- None.
+- Added  and  for internationalization.
 
 **All files of reference**
-- : **CRITICAL**. Last file being worked on. The edit modal for workouts needs to be corrected here.
-- : **CRITICAL**. Contains the target UI that the user wants to replicate for the workout edit modal.
-- : **CRITICAL**. Was heavily modified to add/fix multiple endpoints (, , etc.). Still needs a review of the main  endpoint.
-- : Modified to add Settings, Privacy, and Support modals.
-- : Modified to add Settings, Privacy, and Support modals.
-- : Modified multiple times to fix navigation bugs.
-- : UI was updated.
-- : Date formatting was fixed.
-- : Routing was modified to fix header issues.
+- : **CRITICAL**. Directory containing all new internationalization configuration and translation files. Work must resume here.
+- : **CRITICAL**. Will need to be wrapped with the .
+- : Was modified to implement the colored dot system for workout status.
+- : Was modified to fix a list item layout and remove a section from a modal.
+- : Was modified to remove form fields.
+- : Needs review for the  endpoint.
 
 **Critical Info for New Agent**
-- **User is very specific**: The user provides detailed feedback and will notice if an implementation does not match their request exactly. Pay close attention to the details, especially regarding UI replication.
-- **Database Environment**: The environment is forked, so the database might be empty or in an inconsistent state. When a data-related bug occurs, **do not trust API responses alone**. Use  with  to directly inspect the contents of the correct database () and verify data formats and presence.
-- **Date Formats**: Be vigilant about date formats. The frontend uses  for display, but the backend and database queries strictly expect . Ensure all dates sent to the backend are correctly formatted.
-- **Expo Router Layouts**: The agent had trouble with nested layouts ( files). Be careful when modifying routing structure, as it can lead to UI bugs like duplicate headers. Removing the nested layout in  was the final, correct fix.
+- **i18n is the top priority**: The user has confirmed the plan for a full i18n implementation. This is a large refactoring task that will touch almost every UI file. It must be done systematically.
+- **User is very specific**: The user continues to provide detailed, specific feedback on UI/UX. Pay close attention to requests.
+- **Carry-over tech debt**: Do not forget the pending task to fix the main analytics endpoint () after the i18n work is complete.
 
 **documents created in this job**
-- A temporary  was created and then removed. The agent primarily edited existing files.
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Fix the Compare data; it's not counting completed workouts correctly. (Completed)
-2.  **User**: Remove Export PDF from the program page and add edit/delete icons to each workout. (In Progress - implementation was wrong)
-3.  **User**: Clarification: The edit function should modify the *actual performance data* entered by the coach, not the planned workout. (In Progress - implementation was still not right)
-4.  **User**: Final clarification: The edit UI must be *identical* to the card used for finalization (like in notifications or activity details). (PENDING - This is the current task)
-5.  **User**: In the coach profile, add a Support section with a specific FAQ accordion. (Completed)
-6.  **User**: Update the support email address. (Completed)
-7.  **User**: Make the support email a clickable  link. (Completed)
-8.  **User**: Add introductory text before the support email link. (Completed)
-9.  **User**: Add the same Support/FAQ section to the athlete's profile. (Completed)
-10. **User**: Bug report: Opening a workout notification causes an error. (Completed, after several attempts)
+1.  **User**: Asks to implement i18n for multiple languages. (Status: IN PROGRESS)
+2.  **User**: Confirms the plan to proceed with the full i18n implementation. (Status: Handled)
+3.  **User**: Asks to remove app access and password fields from the create athlete form. (Status: Completed)
+4.  **User**: Reports that edit/delete icons on the program page are misaligned and need a UI fix. (Status: Completed)
+5.  **User**: Asks to remove the feeling/emoji section from the workout edit modal and implement a new colored-dot system for the calendar. (Status: Completed)
+6.  **User**: confermo - Confirmed the initial plan at the start of the session. (Status: Handled)
 
 **Project Health Check:**
-- **Broken**: The workout edit functionality on the program detail page is not implemented as per the user's latest, very specific request.
+- **Broken**: Nothing is outright broken, but the entire frontend is in a state of partial refactoring due to the in-progress i18n implementation. Hardcoded strings exist alongside the new i18n structure.
 - **Mocked**: None.
 
 **3rd Party Integrations**
 - 
 - 
+-  (new)
+-  (new)
 
 **Testing status**
 - **Testing agent used after significant changes**: NO
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**: None.
-- **Known regressions**: The agent fixed multiple bugs that were introduced during development, including data inconsistencies and UI/navigation issues. The lack of automated or rigorous testing led to multiple back-and-forth interactions with the user to fix the same feature.
+- **Known regressions**: None observed in this session.
 
 **Credentials to test flow:**
 - **Owner/Coach**: Register with email  for a lifetime Owner plan.
@@ -170,6 +137,5 @@ A full-stack Expo (React Native) and FastAPI application. The major features imp
 - **Athlete**: Create an athlete from a coach account. The  will be displayed on the athlete's profile (coach view) and can be used to log in.
 
 **What agent forgot to execute**
-- The agent never went back to fix the main analytics endpoint () as noted in the previous handover summary. It only fixed the related  endpoint. This is still an outstanding piece of technical debt.
-
+- The agent has not yet addressed the pending task from the previous handover to fix the main analytics endpoint:  in . This task remains outstanding.
 </analysis>
