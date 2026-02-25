@@ -180,12 +180,12 @@ export default function NotificationsTab() {
   // Elimina singola notifica
   const handleDeleteNotification = (id: string) => {
     Alert.alert(
-      'Elimina Notifica',
-      'Vuoi eliminare questa notifica?',
+      t('notifications.deleteTitle'),
+      t('notifications.deleteConfirm'),
       [
-        { text: 'Annulla', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Elimina',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => deleteNotification(id),
         },
@@ -212,19 +212,19 @@ export default function NotificationsTab() {
           <View style={styles.notificationText}>
             <Text style={styles.notificationTitle}>
               {item.type === 'payment_due'
-                ? `Pagamento in sospeso - ${item.athlete_name}`
-                : `Certificato in scadenza - ${item.athlete_name}`}
+                ? `${t('notifications.paymentPending')} - ${item.athlete_name}`
+                : `${t('notifications.certificateExpiring')} - ${item.athlete_name}`}
             </Text>
             <Text style={styles.notificationMessage}>
               {item.type === 'payment_due'
-                ? `Mese: ${item.month} - €${item.amount}${item.days_overdue > 0 ? ` (${item.days_overdue} giorni di ritardo)` : ''}`
-                : `Scade il ${item.expiry_date}${item.days_until <= 7 ? ` (${item.days_until} giorni)` : ''}`}
+                ? `${t('notifications.month')}: ${item.month} - €${item.amount}${item.days_overdue > 0 ? ` (${item.days_overdue} ${t('notifications.daysOverdue')})` : ''}`
+                : `${t('notifications.expiresOn')} ${item.expiry_date}${item.days_until <= 7 ? ` (${item.days_until} ${t('time.days')})` : ''}`}
             </Text>
-            <Text style={styles.tapHint}>Tocca per visualizzare</Text>
+            <Text style={styles.tapHint}>{t('notifications.tapToView')}</Text>
           </View>
           {item.urgent && (
             <View style={styles.urgentBadge}>
-              <Text style={styles.urgentText}>Urgente</Text>
+              <Text style={styles.urgentText}>{t('notifications.urgent')}</Text>
             </View>
           )}
           <Ionicons name="chevron-forward" size={20} color="#666" style={styles.chevron} />
