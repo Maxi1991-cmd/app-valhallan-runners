@@ -168,7 +168,7 @@ export default function ProfileTab() {
 
         {/* Subscription Card - Solo per Coach */}
         {user?.role === 'coach' && (
-          <Card title="Abbonamento" style={styles.subscriptionCard}>
+          <Card title={t('profile.subscription')} style={styles.subscriptionCard}>
             <View style={styles.subscriptionHeader}>
               <View style={styles.subscriptionStatus}>
                 <View style={[styles.statusDot, { backgroundColor: getSubscriptionStatusColor() }]} />
@@ -180,7 +180,7 @@ export default function ProfileTab() {
                 <View style={styles.warningBanner}>
                   <Ionicons name="warning" size={16} color="#DC3545" />
                   <Text style={styles.warningText}>
-                    Abbonamento scaduto: non puoi modificare dati
+                    {t('profile.expired')}
                   </Text>
                 </View>
               )}
