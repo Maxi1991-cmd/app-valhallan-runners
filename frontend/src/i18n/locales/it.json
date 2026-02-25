@@ -352,7 +352,12 @@
     "km": "km",
     "bpm": "bpm",
     "kcal": "kcal",
-    "minKm": "min/km"
+    "minKm": "min/km",
+    "bpmMax": "bpm max"
+  },
+  "time": {
+    "now": "Adesso",
+    "days": "giorni"
   },
   "dates": {
     "today": "Oggi",
