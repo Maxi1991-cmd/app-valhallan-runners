@@ -2175,4 +2175,39 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textDecorationLine: 'underline',
   },
+  // Language selector styles
+  languageCurrentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  languageCurrent: {
+    fontSize: 20,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#252525',
+    borderRadius: 12,
+    marginBottom: 8,
+    gap: 12,
+  },
+  languageOptionActive: {
+    backgroundColor: '#2A2A2A',
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+  },
+  languageFlag: {
+    fontSize: 28,
+  },
+  languageName: {
+    fontSize: 16,
+    color: '#FFF',
+    flex: 1,
+  },
+  languageNameActive: {
+    color: '#FF6B35',
+    fontWeight: '600',
+  },
 });
