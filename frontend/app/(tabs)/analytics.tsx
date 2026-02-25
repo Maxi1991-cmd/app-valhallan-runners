@@ -5,9 +5,11 @@ import { analyticsAPI } from '../../src/services/api';
 import { Card } from '../../src/components/Card';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from '../../src/hooks/useTranslation';
 
 export default function AnalyticsTab() {
   const { athletes, fetchAthletes } = useDataStore();
+  const { t } = useTranslation();
   const [selectedAthlete, setSelectedAthlete] = useState<string | null>(null);
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
   const [analytics, setAnalytics] = useState<any>(null);
@@ -43,9 +45,9 @@ export default function AnalyticsTab() {
   };
 
   const periodLabels = {
-    week: 'Settimana',
-    month: 'Mese',
-    year: 'Anno',
+    week: t('analytics.week'),
+    month: t('analytics.month'),
+    year: t('analytics.year'),
   };
 
   return (
