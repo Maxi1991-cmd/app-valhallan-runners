@@ -10,17 +10,31 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrainingProgram } from '../../src/types';
 import { format } from 'date-fns';
-import { it } from 'date-fns/locale';
+import { it, enGB, enUS, fr, es, de } from 'date-fns/locale';
+import { useTranslation } from '../../src/hooks/useTranslation';
+import i18n from '../../src/i18n';
 
-// Funzione safe per formattare date
+// Get date-fns locale based on i18n
+const getDateFnsLocale = () => {
+  const locale = i18n.locale;
+  if (locale.startsWith('it')) return it;
+  if (locale === 'en-US') return enUS;
+  if (locale.startsWith('en')) return enGB;
+  if (locale.startsWith('fr')) return fr;
+  if (locale.startsWith('es')) return es;
+  if (locale.startsWith('de')) return de;
+  return enGB;
+};
+
+// Safe date format function
 const safeFormatDate = (dateString?: string | null, formatStr: string = 'd MMM yyyy'): string => {
   try {
     if (!dateString || dateString === '') return '--';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return '--';
-    return format(date, formatStr, { locale: it });
+    return format(date, formatStr, { locale: getDateFnsLocale() });
   } catch (e) {
-    console.warn('Errore formattazione data:', dateString, e);
+    console.warn('Date format error:', dateString, e);
     return '--';
   }
 };
@@ -29,6 +43,7 @@ export default function ProgramsTab() {
   const router = useRouter();
   const { user } = useAuthStore();
   const { programs, athletes, fetchPrograms, fetchAthletes, isLoading } = useDataStore();
+  const { t } = useTranslation();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -44,7 +59,7 @@ export default function ProgramsTab() {
 
   const getAthleteName = (athleteId: string) => {
     const athlete = athletes.find(a => a.id === athleteId);
-    return athlete?.name || 'Atleta';
+    return athlete?.name || t('athlete.title');
   };
 
   const getCompletedWorkouts = (program: TrainingProgram) => {
@@ -70,7 +85,7 @@ export default function ProgramsTab() {
             </Text>
           </View>
           <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>{totalWorkouts} allenamenti</Text>
+            <Text style={styles.statusText}>{totalWorkouts} {t('program.workouts')}</Text>
           </View>
         </View>
 
@@ -95,7 +110,7 @@ export default function ProgramsTab() {
             <View style={[styles.progressFill, { width: `${progress}%` }]} />
           </View>
           <Text style={styles.progressText}>
-            {completedCount}/{totalWorkouts} completati
+            {completedCount}/{totalWorkouts} {t('program.completed')}
           </Text>
         </View>
       </Card>
@@ -103,19 +118,19 @@ export default function ProgramsTab() {
   };
 
   if (isLoading && programs.length === 0) {
-    return <LoadingScreen message="Caricamento programmi..." />;
+    return <LoadingScreen message={t('program.loading')} />;
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Programmi</Text>
-        <Text style={styles.headerSubtitle}>{programs.length} programmi attivi</Text>
+        <Text style={styles.headerTitle}>{t('navigation.programs')}</Text>
+        <Text style={styles.headerSubtitle}>{programs.length} {t('program.activePrograms')}</Text>
       </View>
 
       {user?.role === 'coach' && athletes.length > 0 && (
         <Button
-          title="Nuovo Programma"
+          title={t('program.newProgram')}
           onPress={() => router.push('/program/create')}
           style={styles.addButton}
         />
@@ -136,11 +151,11 @@ export default function ProgramsTab() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="calendar-outline" size={64} color="#333" />
-            <Text style={styles.emptyText}>Nessun programma</Text>
+            <Text style={styles.emptyText}>{t('program.noPrograms')}</Text>
             <Text style={styles.emptySubtext}>
               {athletes.length === 0
-                ? 'Aggiungi prima un atleta'
-                : 'Crea il primo programma di allenamento'}
+                ? t('program.addAthleteFirst')
+                : t('program.createFirst')}
             </Text>
           </View>
         }
