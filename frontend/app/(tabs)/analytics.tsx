@@ -63,13 +63,13 @@ export default function AnalyticsTab() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Analisi Dati</Text>
-          <Text style={styles.headerSubtitle}>Monitora le performance</Text>
+          <Text style={styles.headerTitle}>{t('analytics.title')}</Text>
+          <Text style={styles.headerSubtitle}>{t('analytics.subtitle')}</Text>
         </View>
 
         {/* Athlete Selector */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Seleziona Atleta</Text>
+          <Text style={styles.sectionTitle}>{t('program.selectAthlete')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.athleteScroll}>
             {athletes.map((athlete) => (
               <TouchableOpacity
