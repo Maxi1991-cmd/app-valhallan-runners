@@ -9,7 +9,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../src/hooks/useTranslation';
-import i18n from '../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
