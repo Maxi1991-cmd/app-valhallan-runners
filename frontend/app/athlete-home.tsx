@@ -731,7 +731,7 @@ export default function AthleteHomeScreen() {
                         styles.statusPillText,
                         w.completed ? styles.statusCompletedText : styles.statusMissedText
                       ]}>
-                        {w.completed ? "Completato" : "Non eseguito"}
+                        {w.completed ? t('athleteHome.completed') : t('athleteHome.notDone')}
                       </Text>
                     </View>
 
