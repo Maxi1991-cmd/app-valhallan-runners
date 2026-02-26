@@ -859,32 +859,32 @@ export default function AthleteHomeScreen() {
                   })()}
                 </>
               ) : (
-                <Text style={styles.emptyText}>Nessun certificato registrato</Text>
+                <Text style={styles.emptyText}>{t('athleteHome.noCertificate')}</Text>
               )}
             </Card>
 
             {/* Pagamenti */}
-            <Text style={styles.sectionTitle}>💳 Pagamenti</Text>
+            <Text style={styles.sectionTitle}>💳 {t('athleteHome.payments')}</Text>
             <Card style={styles.infoCard}>
               {athleteProfile?.payments && athleteProfile.payments.length > 0 ? (
                 athleteProfile.payments.map((payment) => (
                   <View key={payment.id} style={[styles.paymentRow, !payment.paid && styles.unpaidRow]}>
                     <View>
                       <Text style={styles.paymentMonth}>{payment.month}</Text>
-                      <Text style={styles.paymentDue}>Scadenza: {formatDate(payment.due_date)}</Text>
+                      <Text style={styles.paymentDue}>{t('athleteHome.dueDate')}: {formatDate(payment.due_date)}</Text>
                     </View>
                     <View style={styles.paymentRight}>
                       <Text style={styles.paymentAmount}>€{payment.amount}</Text>
                       <View style={[styles.paymentStatus, payment.paid ? styles.paidStatus : styles.unpaidStatus]}>
                         <Text style={[styles.paymentStatusText, payment.paid ? styles.paidText : styles.unpaidText]}>
-                          {payment.paid ? 'Pagato' : 'Da pagare'}
+                          {payment.paid ? t('athleteHome.paid') : t('athleteHome.toPay')}
                         </Text>
                       </View>
                     </View>
                   </View>
                 ))
               ) : (
-                <Text style={styles.emptyText}>Nessun pagamento registrato</Text>
+                <Text style={styles.emptyText}>{t('athleteHome.noPayments')}</Text>
               )}
             </Card>
           </View>
