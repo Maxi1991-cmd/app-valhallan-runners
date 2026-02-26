@@ -113,6 +113,7 @@
     "editProgram": "Modifica Programma",
     "deleteProgram": "Elimina Programma",
     "deleteConfirm": "Sei sicuro di voler eliminare questo programma?",
+    "deleteError": "Impossibile eliminare programma",
     "programName": "Nome Programma",
     "description": "Descrizione",
     "goal": "Obiettivo",
