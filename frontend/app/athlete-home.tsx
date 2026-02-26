@@ -904,7 +904,7 @@ export default function AthleteHomeScreen() {
         <View style={styles.header}>
           <View style={styles.headerRight}>
             <View>
-              <Text style={styles.greeting}>Ciao, {user?.name?.split(' ')[0]}!</Text>
+              <Text style={styles.greeting}>{t('athleteHome.greeting')}, {user?.name?.split(' ')[0]}!</Text>
               <Text style={styles.dateText}>
                 {dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}, {new Date().toLocaleDateString('it-IT')}
               </Text>
@@ -918,11 +918,11 @@ export default function AthleteHomeScreen() {
         {/* Tabs */}
         <View style={styles.tabsContainer}>
           {[
-            { key: 'today', label: 'Oggi', icon: 'today' },
-            { key: 'week', label: 'Settimana', icon: 'calendar' },
-            { key: 'month', label: 'Mese', icon: 'calendar-outline' },
-            { key: 'history', label: 'Storico', icon: 'time' },
-            { key: 'info', label: 'Info', icon: 'information-circle' },
+            { key: 'today', label: t('athleteHome.tabs.today'), icon: 'today' },
+            { key: 'week', label: t('athleteHome.tabs.week'), icon: 'calendar' },
+            { key: 'month', label: t('athleteHome.tabs.month'), icon: 'calendar-outline' },
+            { key: 'history', label: t('athleteHome.tabs.history'), icon: 'time' },
+            { key: 'info', label: t('athleteHome.tabs.info'), icon: 'information-circle' },
           ].map(tab => (
             <TouchableOpacity
               key={tab.key}
