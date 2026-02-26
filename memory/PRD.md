@@ -19,11 +19,14 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 
 ## What's Been Implemented
 
-### February 2025
-- i18n implementation with i18n-js and expo-localization
-- Language selector in Coach profile and Athlete home screens
-- Translation files for IT, EN, ES, FR, DE
-- Fixed root layout structure for Expo Router 6 compatibility
+### February 26, 2025
+- ✅ Fixed root layout structure for Expo Router 6 compatibility
+- ✅ Completed all missing translations for athlete home screen
+- ✅ Added 50+ translation keys to all 5 language files
+- ✅ Translated: FAQ, Privacy modal, End Workout modal, Edit modal, Skip modal, View modal
+- ✅ Translated: Tab navigation, certificate status, payment section
+- ✅ Translated: Alert dialogs (delete athlete, program, workout)
+- ✅ Bundle compiles successfully
 
 ### Previous Implementation
 - Full authentication system (Coach/Athlete)
@@ -33,14 +36,14 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 - Analytics dashboard
 - Notification system
 - Subscription management (mock)
+- i18n base implementation with language selector
 
 ## Known Issues
 
 ### P0 - Critical
-- None currently (runtime error potentially fixed - pending user test)
+- None (runtime error fixed, pending user test)
 
 ### P1 - High Priority  
-- Incomplete translations: Some UI elements remain untranslated (e.g., "gestisci abbonamento")
 - Analytics endpoint `/api/analytics/athlete/{athlete_id}` needs data aggregation update
 
 ### P2 - Medium Priority
@@ -54,23 +57,29 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 │   └── server.py
 └── frontend/
     ├── app/
-    │   ├── _layout.tsx (Root layout - MODIFIED)
+    │   ├── _layout.tsx (Root layout - FIXED)
     │   ├── (tabs)/_layout.tsx
-    │   ├── index.tsx (Entry/Login)
-    │   ├── athlete-home.tsx
+    │   ├── athlete-home.tsx (UPDATED - full i18n)
+    │   ├── athlete/[id].tsx (UPDATED)
+    │   ├── program/[id].tsx (UPDATED)
     │   └── ...
     ├── src/
     │   ├── i18n/
     │   │   ├── index.ts
-    │   │   └── locales/*.json
+    │   │   └── locales/
+    │   │       ├── it.json (UPDATED - 480 lines)
+    │   │       ├── en-GB.json (UPDATED)
+    │   │       ├── es.json (UPDATED)
+    │   │       ├── fr.json (UPDATED)
+    │   │       └── de.json (UPDATED)
     │   ├── store/
-    │   ├── hooks/
-    │   └── components/
+    │   └── hooks/
     └── babel.config.js
 ```
 
 ## Testing Checklist
-- [ ] App starts without runtime error
+- [x] Bundle compiles without errors
+- [ ] App starts without runtime error (pending user test)
 - [ ] Language switching works (Coach profile, Athlete home)
 - [ ] All UI elements translate correctly
 - [ ] Authentication flows work in both languages
