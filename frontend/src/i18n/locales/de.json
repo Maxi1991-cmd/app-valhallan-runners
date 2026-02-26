@@ -344,6 +344,32 @@
       "history": "Verlauf",
       "info": "Info"
     },
+    "sections": {
+      "todayWorkout": "Heutiges Training",
+      "weeklyWorkouts": "Wöchentliche Trainings",
+      "monthlyWorkouts": "Monatliche Trainings",
+      "workoutHistory": "Trainingsverlauf"
+    },
+    "empty": {
+      "restDay": "Ruhetag",
+      "noWorkoutScheduled": "Kein Training geplant",
+      "noWorkoutThisWeek": "Keine Trainings diese Woche",
+      "noWorkoutThisMonth": "Keine Trainings diesen Monat",
+      "noWorkoutHistory": "Keine vergangenen Trainings"
+    },
+    "workoutTypes": {
+      "easy": "Leicht",
+      "tempo": "Tempo",
+      "interval": "Intervalle",
+      "long": "Lang",
+      "recovery": "Erholung"
+    },
+    "actions": {
+      "completed": "Abgeschlossen",
+      "notDoneBtn": "Nicht durchgeführt",
+      "editOnce": "Bearbeiten (einmalig)",
+      "feedbackSent": "Feedback an Coach gesendet"
+    },
     "recordedData": "Aufgezeichnete Daten",
     "duration": "Dauer",
     "fatigue": "Erschöpfung",
