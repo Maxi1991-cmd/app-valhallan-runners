@@ -218,6 +218,13 @@ export default function AthleteHomeScreen() {
   useEffect(() => {
     fetchData();
     loadNotificationSettings();
+    // Load saved language preference
+    AsyncStorage.getItem('userLanguage').then(lang => {
+      if (lang) {
+        setSelectedLanguage(lang);
+        changeLanguage(lang);
+      }
+    });
   }, []);
 
   const onRefresh = async () => {
