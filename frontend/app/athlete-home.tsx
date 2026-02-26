@@ -630,9 +630,9 @@ export default function AthleteHomeScreen() {
         const weekWorkouts = getWeekWorkouts();
         return (
           <View>
-            <Text style={styles.sectionTitle}>📅 Allenamenti Settimanali</Text>
+            <Text style={styles.sectionTitle}>📅 {t('athleteHome.sections.weeklyWorkouts')}</Text>
             {weekWorkouts.length === 0 ? (
-              <Text style={styles.emptyText}>Nessun allenamento questa settimana</Text>
+              <Text style={styles.emptyText}>{t('athleteHome.empty.noWorkoutThisWeek')}</Text>
             ) : (
               weekWorkouts.map(w => renderWorkoutCard(w, false))
             )}
@@ -643,9 +643,9 @@ export default function AthleteHomeScreen() {
         const monthWorkouts = getMonthWorkouts();
         return (
           <View>
-            <Text style={styles.sectionTitle}>📆 Allenamenti Mensili</Text>
+            <Text style={styles.sectionTitle}>📆 {t('athleteHome.sections.monthlyWorkouts')}</Text>
             {monthWorkouts.length === 0 ? (
-              <Text style={styles.emptyText}>Nessun allenamento questo mese</Text>
+              <Text style={styles.emptyText}>{t('athleteHome.empty.noWorkoutThisMonth')}</Text>
             ) : (
               monthWorkouts.map(w => renderWorkoutCard(w, false))
             )}
@@ -656,9 +656,9 @@ export default function AthleteHomeScreen() {
         const historyWorkouts = getHistoryWorkouts();
         return (
           <View>
-            <Text style={styles.sectionTitle}>📚 Storico Allenamenti</Text>
+            <Text style={styles.sectionTitle}>📚 {t('athleteHome.sections.workoutHistory')}</Text>
             {historyWorkouts.length === 0 ? (
-              <Text style={styles.emptyText}>Nessun allenamento passato</Text>
+              <Text style={styles.emptyText}>{t('athleteHome.empty.noWorkoutHistory')}</Text>
             ) : (
               historyWorkouts.map(w => (
                 <Card key={w.id} style={[styles.workoutCard, w.completed && styles.completedCard]}>
