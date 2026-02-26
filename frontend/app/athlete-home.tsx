@@ -1038,24 +1038,24 @@ export default function AthleteHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Allenamento Non Eseguito</Text>
+              <Text style={styles.modalTitle}>{t('athleteHome.workoutNotDone')}</Text>
               <TouchableOpacity onPress={() => setShowSkipModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.inputLabel}>Motivazione</Text>
+            <Text style={styles.inputLabel}>{t('athleteHome.motivation')}</Text>
             <TextInput
               style={[styles.textInput, styles.textArea]}
               value={skipReason}
               onChangeText={setSkipReason}
-              placeholder="Perché non hai potuto allenarti?"
+              placeholder={t('athleteHome.whyNotTrain')}
               placeholderTextColor="#666"
               multiline
               numberOfLines={4}
             />
 
-            <Button title="Invia al Coach" onPress={submitSkipWorkout} variant="danger" style={styles.submitBtn} />
+            <Button title={t('athleteHome.sendToCoach')} onPress={submitSkipWorkout} variant="danger" style={styles.submitBtn} />
           </View>
         </View>
       </Modal>
