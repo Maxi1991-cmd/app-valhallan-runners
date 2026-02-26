@@ -1434,7 +1434,7 @@ export default function AthleteHomeScreen() {
               >
                 <Ionicons name="mail-outline" size={20} color="#FF6B35" />
                 <View style={styles.supportFooterTextContainer}>
-                  <Text style={styles.supportFooterText}>Hai altre domande o suggerimenti? Contattaci a</Text>
+                  <Text style={styles.supportFooterText}>{t('athleteHome.contactSupport')}</Text>
                   <Text style={styles.supportEmail}>valhallanrunners@gmail.com</Text>
                 </View>
               </TouchableOpacity>
