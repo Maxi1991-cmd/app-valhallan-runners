@@ -145,12 +145,12 @@ export default function AthleteHomeScreen() {
             // Update programs to include standalone activities as "workouts"
             const standaloneProgram = {
               id: 'standalone-activities',
-              name: 'Fuori Programma',
+              name: t('athleteHome.outOfProgram'),
               workouts: activities.map((activity: any) => ({
                 id: activity.id,
                 date: activity.date,
-                title: `${(activity.activity_type || 'Attività').charAt(0).toUpperCase() + (activity.activity_type || 'attività').slice(1)}`,
-                description: `Durata: ${activity.duration_minutes || 0} min, Distanza: ${activity.distance_km || 0} km`,
+                title: `${(activity.activity_type || t('workout.activity')).charAt(0).toUpperCase() + (activity.activity_type || t('workout.activity')).slice(1)}`,
+                description: `${t('athleteHome.duration')}: ${activity.duration_minutes || 0} min, ${t('workout.distance')}: ${activity.distance_km || 0} km`,
                 workout_type: activity.activity_type || 'other',
                 duration_minutes: activity.duration_minutes,
                 distance_km: activity.distance_km,
