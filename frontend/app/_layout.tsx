@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, StyleSheet } from 'react-native';
 import { useAuthStore } from '../src/store/authStore';
 import { LoadingScreen } from '../src/components/LoadingScreen';
 import i18n from '../src/i18n';
@@ -18,7 +17,7 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={styles.container}>
+    <>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -42,13 +41,6 @@ export default function RootLayout() {
         <Stack.Screen name="program/create" options={{ title: i18n.t('program.createProgram') }} />
         <Stack.Screen name="activity" options={{ headerShown: false }} />
       </Stack>
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F0F0F',
-  },
-});
