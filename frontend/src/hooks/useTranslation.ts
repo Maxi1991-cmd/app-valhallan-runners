@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import i18n from '../i18n';
 
 // Global listeners for language changes
@@ -12,11 +12,13 @@ export const useTranslation = () => {
   const [, forceUpdate] = useState(0);
 
   // Subscribe to language changes
-  useState(() => {
+  useEffect(() => {
     const update = () => forceUpdate(n => n + 1);
     listeners.add(update);
-    return () => listeners.delete(update);
-  });
+    return () => {
+      listeners.delete(update);
+    };
+  }, []);
 
   const t = useCallback((key: string, options?: Record<string, any>) => {
     return i18n.t(key, options);
