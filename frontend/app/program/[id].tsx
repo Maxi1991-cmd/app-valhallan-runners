@@ -107,19 +107,19 @@ export default function ProgramDetail() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Elimina Programma',
-      'Sei sicuro di voler eliminare questo programma?',
+      t('program.deleteProgram'),
+      t('program.deleteConfirm'),
       [
-        { text: 'Annulla', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Elimina',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
               await deleteProgram(id!);
               router.back();
             } catch (error) {
-              Alert.alert('Errore', 'Impossibile eliminare programma');
+              Alert.alert(t('common.error'), t('program.deleteError'));
             }
           },
         },
