@@ -836,21 +836,21 @@ export default function AthleteHomeScreen() {
                         return (
                           <View style={[styles.statusBanner, styles.expiredBanner]}>
                             <Ionicons name="warning" size={18} color="#DC3545" />
-                            <Text style={styles.expiredBannerText}>Scaduto da {Math.abs(days)} giorni</Text>
+                            <Text style={styles.expiredBannerText}>{t('athleteHome.expiredDays', { days: Math.abs(days) })}</Text>
                           </View>
                         );
                       } else if (days <= 30) {
                         return (
                           <View style={[styles.statusBanner, styles.warningBanner]}>
                             <Ionicons name="alert-circle" size={18} color="#FF9800" />
-                            <Text style={styles.warningBannerText}>Scade tra {days} giorni</Text>
+                            <Text style={styles.warningBannerText}>{t('athleteHome.expiresInDays', { days })}</Text>
                           </View>
                         );
                       } else {
                         return (
                           <View style={[styles.statusBanner, styles.validBanner]}>
                             <Ionicons name="checkmark-circle" size={18} color="#4CAF50" />
-                            <Text style={styles.validBannerText}>Valido</Text>
+                            <Text style={styles.validBannerText}>{t('athleteHome.valid')}</Text>
                           </View>
                         );
                       }
