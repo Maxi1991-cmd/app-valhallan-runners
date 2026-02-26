@@ -98,16 +98,16 @@ export default function AthleteHomeScreen() {
   // FAQ data for athlete
   const faqData = [
     {
-      question: "Posso usare l'app senza coach?",
-      answer: "No. Valhallan Runners è una piattaforma guidata. L'accesso è possibile solo tramite un codice personale fornito dal tuo coach. Qui non si improvvisa, si lavora insieme."
+      question: t('athleteHome.faq.q1'),
+      answer: t('athleteHome.faq.a1')
     },
     {
-      question: "A cosa mi serve l'app come atleta?",
-      answer: "L'app è il tuo campo da battaglia digitale. Visualizzi il programma/attività creato per te, registri ogni allenamento e tieni traccia dei tuoi progressi. Ogni dato è un passo verso la tua evoluzione."
+      question: t('athleteHome.faq.q2'),
+      answer: t('athleteHome.faq.a2')
     },
     {
-      question: "Posso modificare da solo il mio programma/attività?",
-      answer: "No. Il programma viene costruito e aggiornato dal tuo coach. Tu devi concentrarti su una cosa sola: eseguire, registrare, migliorare."
+      question: t('athleteHome.faq.q3'),
+      answer: t('athleteHome.faq.a3')
     }
   ];
 
