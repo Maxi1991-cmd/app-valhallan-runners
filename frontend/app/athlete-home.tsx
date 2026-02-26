@@ -1321,12 +1321,9 @@ export default function AthleteHomeScreen() {
                 ]}
                 onPress={() => {
                   setSelectedLanguage(lang.code);
-                  i18n.locale = lang.code;
+                  changeLanguage(lang.code);
                   AsyncStorage.setItem('userLanguage', lang.code);
                   setShowLanguageModal(false);
-                  // Force re-render
-                  setRefreshing(true);
-                  setTimeout(() => setRefreshing(false), 100);
                 }}
               >
                 <Text style={styles.languageFlag}>{lang.flag}</Text>
