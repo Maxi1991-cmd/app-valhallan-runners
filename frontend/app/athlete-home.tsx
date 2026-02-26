@@ -980,30 +980,30 @@ export default function AthleteHomeScreen() {
                   ))}
                 </View>
 
-                <Text style={styles.inputLabel}>Dolori?</Text>
+                <Text style={styles.inputLabel}>{t('athleteHome.pain')}</Text>
                 <View style={styles.painToggle}>
                   <TouchableOpacity
                     style={[styles.painOption, !hasPain && styles.painOptionActive]}
                     onPress={() => setHasPain(false)}
                   >
-                    <Text style={[styles.painOptionText, !hasPain && styles.painOptionTextActive]}>No</Text>
+                    <Text style={[styles.painOptionText, !hasPain && styles.painOptionTextActive]}>{t('common.no')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.painOption, hasPain && styles.painOptionActive]}
                     onPress={() => setHasPain(true)}
                   >
-                    <Text style={[styles.painOptionText, hasPain && styles.painOptionTextActive]}>Sì</Text>
+                    <Text style={[styles.painOptionText, hasPain && styles.painOptionTextActive]}>{t('common.yes')}</Text>
                   </TouchableOpacity>
                 </View>
 
                 {hasPain && (
                   <>
-                    <Text style={styles.inputLabel}>Dove?</Text>
+                    <Text style={styles.inputLabel}>{t('athleteHome.where')}</Text>
                     <TextInput
                       style={styles.textInput}
                       value={painLocation}
                       onChangeText={setPainLocation}
-                      placeholder="Es: ginocchio destro..."
+                      placeholder={t('athleteHome.painPlaceholder')}
                       placeholderTextColor="#666"
                       returnKeyType="done"
                       onSubmitEditing={() => Keyboard.dismiss()}
@@ -1011,12 +1011,12 @@ export default function AthleteHomeScreen() {
                   </>
                 )}
 
-                <Text style={styles.inputLabel}>Note (opzionale)</Text>
+                <Text style={styles.inputLabel}>{t('athleteHome.notesOptional')}</Text>
                 <TextInput
                   style={[styles.textInput, styles.textArea]}
                   value={notes}
                   onChangeText={setNotes}
-                  placeholder="Come ti sei sentito?"
+                  placeholder={t('athleteHome.howDidYouFeel')}
                   placeholderTextColor="#666"
                   multiline
                   numberOfLines={3}
@@ -1024,7 +1024,7 @@ export default function AthleteHomeScreen() {
                   returnKeyType="done"
                 />
 
-                <Button title="Invia al Coach" onPress={submitCompleteWorkout} style={styles.submitBtn} />
+                <Button title={t('athleteHome.sendToCoach')} onPress={submitCompleteWorkout} style={styles.submitBtn} />
                 
                 <View style={styles.modalBottomSpacer} />
               </ScrollView>
