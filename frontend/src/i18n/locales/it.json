@@ -486,6 +486,8 @@
     "additionalNotes": "Note aggiuntive...",
     "saveChanges": "Salva Modifiche",
     "outOfProgram": "Fuori Programma",
+    "notEditable": "Non modificabile",
+    "alreadyModifiedOnce": "Hai già modificato questo allenamento. La modifica è consentita una sola volta.",
     "faq": {
       "title": "Domande Frequenti",
       "q1": "Posso usare l'app senza coach?",
