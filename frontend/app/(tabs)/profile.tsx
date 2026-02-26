@@ -9,14 +9,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useTranslation } from '../../src/hooks/useTranslation';
-import i18n from '../../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
 export default function ProfileTab() {
   const router = useRouter();
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, i18n, changeLanguage } = useTranslation();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -26,7 +25,6 @@ export default function ProfileTab() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.locale);
-  const [forceUpdate, setForceUpdate] = useState(0);
   
   // Notification settings for Coach
   const [notifyAthleteFeedback, setNotifyAthleteFeedback] = useState(true);
@@ -37,18 +35,16 @@ export default function ProfileTab() {
     AsyncStorage.getItem('userLanguage').then(lang => {
       if (lang) {
         setSelectedLanguage(lang);
-        i18n.locale = lang;
+        changeLanguage(lang);
       }
     });
   }, []);
 
   const handleLanguageChange = async (langCode: string) => {
     setSelectedLanguage(langCode);
-    i18n.locale = langCode;
+    changeLanguage(langCode);
     await AsyncStorage.setItem('userLanguage', langCode);
     setShowLanguageModal(false);
-    // Force re-render
-    setForceUpdate(prev => prev + 1);
   };
 
   // FAQ data
