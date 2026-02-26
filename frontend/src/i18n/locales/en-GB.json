@@ -133,6 +133,7 @@
     "title": "Workout",
     "workout": "Workout",
     "workouts": "Workouts",
+    "activity": "Activity",
     "createWorkout": "Create Workout",
     "editWorkout": "Edit Workout",
     "deleteWorkout": "Delete Workout",
