@@ -742,12 +742,12 @@ export default function AthleteHomeScreen() {
                         onPress={() => openEditModal(w)}
                       >
                         <Ionicons name="pencil" size={16} color="#FF6B35" />
-                        <Text style={styles.historyEditText}>Modifica</Text>
+                        <Text style={styles.historyEditText}>{t('athleteHome.modify')}</Text>
                       </TouchableOpacity>
                     ) : (
                       <View style={styles.alreadyModifiedBadge}>
                         <Ionicons name="checkmark" size={12} color="#4CAF50" />
-                        <Text style={styles.alreadyModifiedText}>Già modificato</Text>
+                        <Text style={styles.alreadyModifiedText}>{t('athleteHome.alreadyModified')}</Text>
                       </View>
                     )}
                   </View>
