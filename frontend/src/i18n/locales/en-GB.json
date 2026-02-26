@@ -423,6 +423,32 @@
       "history": "History",
       "info": "Info"
     },
+    "sections": {
+      "todayWorkout": "Today's Workout",
+      "weeklyWorkouts": "Weekly Workouts",
+      "monthlyWorkouts": "Monthly Workouts",
+      "workoutHistory": "Workout History"
+    },
+    "empty": {
+      "restDay": "Rest day",
+      "noWorkoutScheduled": "No workout scheduled",
+      "noWorkoutThisWeek": "No workouts this week",
+      "noWorkoutThisMonth": "No workouts this month",
+      "noWorkoutHistory": "No past workouts"
+    },
+    "workoutTypes": {
+      "easy": "Easy",
+      "tempo": "Tempo",
+      "interval": "Intervals",
+      "long": "Long",
+      "recovery": "Recovery"
+    },
+    "actions": {
+      "completed": "Completed",
+      "notDoneBtn": "Not done",
+      "editOnce": "Edit (once only)",
+      "feedbackSent": "Feedback sent to coach"
+    },
     "recordedData": "Recorded data",
     "duration": "Duration",
     "fatigue": "Fatigue",
