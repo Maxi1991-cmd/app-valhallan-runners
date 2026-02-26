@@ -1158,7 +1158,7 @@ export default function AthleteHomeScreen() {
                   </TouchableOpacity>
                 </View>
 
-                <Text style={styles.inputLabel}>Distanza (km)</Text>
+                <Text style={styles.inputLabel}>{t('athleteHome.distanceKm')}</Text>
                 <View style={styles.inputRow}>
                   <TextInput
                     style={[styles.textInput, styles.inputWithButton]}
@@ -1193,12 +1193,12 @@ export default function AthleteHomeScreen() {
                   ))}
                 </View>
 
-                <Text style={styles.inputLabel}>Note</Text>
+                <Text style={styles.inputLabel}>{t('athleteHome.notes')}</Text>
                 <TextInput
                   style={[styles.textInput, styles.textArea]}
                   value={editNotes}
                   onChangeText={setEditNotes}
-                  placeholder="Note aggiuntive..."
+                  placeholder={t('athleteHome.additionalNotes')}
                   placeholderTextColor="#666"
                   multiline
                   numberOfLines={3}
@@ -1206,7 +1206,7 @@ export default function AthleteHomeScreen() {
                   blurOnSubmit={true}
                 />
 
-                <Button title="Salva Modifiche" onPress={submitEditWorkout} style={styles.editSubmitBtn} />
+                <Button title={t('athleteHome.saveChanges')} onPress={submitEditWorkout} style={styles.editSubmitBtn} />
                 
                 <View style={styles.bottomSpacer} />
               </ScrollView>
