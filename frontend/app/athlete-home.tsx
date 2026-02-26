@@ -55,7 +55,7 @@ interface Payment {
 export default function AthleteHomeScreen() {
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, i18n, changeLanguage } = useTranslation();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [athleteProfile, setAthleteProfile] = useState<AthleteProfile | null>(null);
   const [refreshing, setRefreshing] = useState(false);
