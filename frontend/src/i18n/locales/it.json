@@ -423,6 +423,32 @@
       "history": "Storico",
       "info": "Info"
     },
+    "sections": {
+      "todayWorkout": "Allenamento di Oggi",
+      "weeklyWorkouts": "Allenamenti Settimanali",
+      "monthlyWorkouts": "Allenamenti Mensili",
+      "workoutHistory": "Storico Allenamenti"
+    },
+    "empty": {
+      "restDay": "Giorno di riposo",
+      "noWorkoutScheduled": "Nessun allenamento programmato",
+      "noWorkoutThisWeek": "Nessun allenamento questa settimana",
+      "noWorkoutThisMonth": "Nessun allenamento questo mese",
+      "noWorkoutHistory": "Nessun allenamento passato"
+    },
+    "workoutTypes": {
+      "easy": "Facile",
+      "tempo": "Tempo",
+      "interval": "Intervalli",
+      "long": "Lungo",
+      "recovery": "Recupero"
+    },
+    "actions": {
+      "completed": "Completato",
+      "notDoneBtn": "Non eseguito",
+      "editOnce": "Modifica (una sola volta)",
+      "feedbackSent": "Feedback inviato al coach"
+    },
     "recordedData": "Dati registrati",
     "duration": "Durata",
     "fatigue": "Fatica",
