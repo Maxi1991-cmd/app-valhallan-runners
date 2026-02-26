@@ -390,6 +390,7 @@
     "loadingFailed": "Caricamento fallito",
     "saveFailed": "Salvataggio fallito",
     "deleteFailed": "Eliminazione fallita",
+    "editFailed": "Errore nella modifica",
     "requiredFields": "Compila tutti i campi obbligatori",
     "invalidEmail": "Email non valida",
     "invalidDate": "Data non valida"
