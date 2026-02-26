@@ -1065,7 +1065,7 @@ export default function AthleteHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Dettagli Allenamento</Text>
+              <Text style={styles.modalTitle}>{t('athleteHome.workoutDetails')}</Text>
               <TouchableOpacity onPress={() => setShowViewModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
@@ -1077,20 +1077,20 @@ export default function AthleteHomeScreen() {
                 <Text style={styles.viewDescription}>{selectedWorkout.workout.description}</Text>
                 
                 <View style={styles.viewSection}>
-                  <Text style={styles.viewSectionTitle}>Dati Registrati</Text>
+                  <Text style={styles.viewSectionTitle}>{t('athleteHome.recordedData')}</Text>
                   {selectedWorkout.workout.actual_data && (
                     <>
                       {selectedWorkout.workout.actual_data.duration_minutes && (
-                        <Text style={styles.viewData}>Durata: {selectedWorkout.workout.actual_data.duration_minutes} min</Text>
+                        <Text style={styles.viewData}>{t('athleteHome.duration')}: {selectedWorkout.workout.actual_data.duration_minutes} min</Text>
                       )}
                       {selectedWorkout.workout.actual_data.distance_km && (
-                        <Text style={styles.viewData}>Distanza: {selectedWorkout.workout.actual_data.distance_km} km</Text>
+                        <Text style={styles.viewData}>{t('workout.distance')}: {selectedWorkout.workout.actual_data.distance_km} km</Text>
                       )}
                       {selectedWorkout.workout.actual_data.fatigue_level && (
-                        <Text style={styles.viewData}>Fatica: {selectedWorkout.workout.actual_data.fatigue_level}/10</Text>
+                        <Text style={styles.viewData}>{t('athleteHome.fatigue')}: {selectedWorkout.workout.actual_data.fatigue_level}/10</Text>
                       )}
                       {selectedWorkout.workout.actual_data.notes && (
-                        <Text style={styles.viewData}>Note: {selectedWorkout.workout.actual_data.notes}</Text>
+                        <Text style={styles.viewData}>{t('athleteHome.notes')}: {selectedWorkout.workout.actual_data.notes}</Text>
                       )}
                     </>
                   )}
@@ -1098,7 +1098,7 @@ export default function AthleteHomeScreen() {
 
                 {!selectedWorkout.workout.modified_by_athlete && (
                   <Button 
-                    title="Modifica Dati" 
+                    title={t('athleteHome.editData')} 
                     onPress={() => {
                       setShowViewModal(false);
                       openEditModal(selectedWorkout.workout);
