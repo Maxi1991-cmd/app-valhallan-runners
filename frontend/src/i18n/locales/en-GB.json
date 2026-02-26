@@ -390,6 +390,7 @@
     "loadingFailed": "Loading failed",
     "saveFailed": "Save failed",
     "deleteFailed": "Delete failed",
+    "editFailed": "Edit failed",
     "requiredFields": "Please fill in all required fields",
     "invalidEmail": "Invalid email",
     "invalidDate": "Invalid date"
