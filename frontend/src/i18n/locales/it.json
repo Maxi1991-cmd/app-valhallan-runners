@@ -142,6 +142,7 @@
     "editWorkout": "Modifica Allenamento",
     "deleteWorkout": "Elimina Allenamento",
     "deleteConfirm": "Sei sicuro di voler eliminare questo allenamento?",
+    "deleteWorkoutConfirm": "Sei sicuro di voler eliminare \"{{title}}\"?",
     "completeWorkout": "Completa Allenamento",
     "markComplete": "Segna come completato",
     "workoutName": "Nome Allenamento",
