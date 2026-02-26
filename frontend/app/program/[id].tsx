@@ -201,12 +201,12 @@ export default function ProgramDetail() {
 
   const handleDeleteWorkout = (workout: WorkoutSession) => {
     Alert.alert(
-      'Elimina Allenamento',
-      `Sei sicuro di voler eliminare "${workout.title}"?`,
+      t('workout.deleteWorkout'),
+      t('workout.deleteWorkoutConfirm', { title: workout.title }),
       [
-        { text: 'Annulla', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Elimina',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
