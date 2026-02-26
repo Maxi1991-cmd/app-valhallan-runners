@@ -1351,7 +1351,7 @@ export default function AthleteHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Privacy</Text>
+              <Text style={styles.modalTitle}>{t('profile.privacy')}</Text>
               <TouchableOpacity onPress={() => setShowPrivacyModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
@@ -1362,9 +1362,9 @@ export default function AthleteHomeScreen() {
                 <View style={styles.privacyIconContainer}>
                   <Ionicons name="person-outline" size={28} color="#FF6B35" />
                 </View>
-                <Text style={styles.privacyQuestion}>Chi può vedere i dati personali?</Text>
+                <Text style={styles.privacyQuestion}>{t('athleteHome.privacyPersonal')}</Text>
                 <Text style={styles.privacyAnswer}>
-                  I dati sono visibili tra te e il tuo coach.
+                  {t('athleteHome.privacyPersonalAnswer')}
                 </Text>
               </View>
 
@@ -1374,16 +1374,16 @@ export default function AthleteHomeScreen() {
                 <View style={styles.privacyIconContainer}>
                   <Ionicons name="fitness-outline" size={28} color="#FF6B35" />
                 </View>
-                <Text style={styles.privacyQuestion}>Chi può vedere i dati allenamento?</Text>
+                <Text style={styles.privacyQuestion}>{t('athleteHome.privacyWorkout')}</Text>
                 <Text style={styles.privacyAnswer}>
-                  Gli allenamenti sono condivisibili tra te e il tuo coach.
+                  {t('athleteHome.privacyWorkoutAnswer')}
                 </Text>
               </View>
 
               <View style={styles.privacyFooter}>
                 <Ionicons name="shield-checkmark" size={20} color="#4CAF50" />
                 <Text style={styles.privacyFooterText}>
-                  I tuoi dati sono protetti e non vengono condivisi con terze parti.
+                  {t('athleteHome.privacyFooter')}
                 </Text>
               </View>
             </ScrollView>
@@ -1396,14 +1396,14 @@ export default function AthleteHomeScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Supporto</Text>
+              <Text style={styles.modalTitle}>{t('profile.support')}</Text>
               <TouchableOpacity onPress={() => setShowSupportModal(false)}>
                 <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
 
             <ScrollView style={styles.faqContent}>
-              <Text style={styles.faqTitle}>Domande Frequenti</Text>
+              <Text style={styles.faqTitle}>{t('athleteHome.faq.title')}</Text>
               
               {faqData.map((faq, index) => (
                 <View key={index} style={styles.faqItem}>
