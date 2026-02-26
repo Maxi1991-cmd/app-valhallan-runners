@@ -697,16 +697,16 @@ export default function AthleteHomeScreen() {
                   {/* Dati registrati se completato */}
                   {w.completed && w.actual_data && (
                     <View style={styles.actualDataContainer}>
-                      <Text style={styles.actualDataTitle}>Dati registrati:</Text>
+                      <Text style={styles.actualDataTitle}>{t('athleteHome.recordedData')}:</Text>
                       <View style={styles.actualDataRow}>
                         {w.actual_data.duration_minutes && (
                           <Text style={styles.actualDataText}>
-                            Durata: {w.actual_data.duration_minutes} min
+                            {t('athleteHome.duration')}: {w.actual_data.duration_minutes} min
                           </Text>
                         )}
                         {w.actual_data.fatigue_level && (
                           <Text style={styles.actualDataText}>
-                            Fatica: {w.actual_data.fatigue_level}/10
+                            {t('athleteHome.fatigue')}: {w.actual_data.fatigue_level}/10
                           </Text>
                         )}
                       </View>
