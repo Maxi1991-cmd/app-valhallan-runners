@@ -954,7 +954,7 @@ export default function AthleteHomeScreen() {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Fine Allenamento</Text>
+                <Text style={styles.modalTitle}>{t('athleteHome.endWorkout')}</Text>
                 <TouchableOpacity onPress={() => setShowCompleteModal(false)}>
                   <Ionicons name="close" size={24} color="#FFF" />
                 </TouchableOpacity>
@@ -965,7 +965,7 @@ export default function AthleteHomeScreen() {
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
               >
-                <Text style={styles.inputLabel}>Livello di Fatica (1-10)</Text>
+                <Text style={styles.inputLabel}>{t('athleteHome.fatigueLevel')}</Text>
                 <View style={styles.fatigueContainer}>
                   {[1,2,3,4,5,6,7,8,9,10].map(num => (
                     <TouchableOpacity
