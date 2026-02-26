@@ -4,12 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
 import { useAuthStore } from '../../src/store/authStore';
 import { useDataStore } from '../../src/store/dataStore';
-import { useTranslation } from '../../src/hooks/useTranslation';
+import i18n from '../../src/i18n';
 
 export default function TabLayout() {
   const { isAuthenticated, user } = useAuthStore();
   const { unreadCount, fetchNotifications, checkExpiries } = useDataStore();
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -47,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('navigation.athletes'),
+          title: i18n.t('navigation.athletes'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="people" size={size} color={color} />
           ),
@@ -56,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: t('navigation.calendar'),
+          title: i18n.t('navigation.calendar'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size} color={color} />
           ),
@@ -65,7 +64,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="programs"
         options={{
-          title: t('navigation.programs'),
+          title: i18n.t('navigation.programs'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="fitness" size={size} color={color} />
           ),
@@ -74,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="compare"
         options={{
-          title: t('navigation.compare'),
+          title: i18n.t('navigation.compare'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="git-compare" size={size} color={color} />
           ),
@@ -83,7 +82,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="analytics"
         options={{
-          title: t('analytics.title'),
+          title: i18n.t('analytics.title'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="analytics" size={size} color={color} />
           ),
@@ -92,7 +91,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notifications"
         options={{
-          title: t('navigation.notifications'),
+          title: i18n.t('navigation.notifications'),
           tabBarIcon: ({ color, size }) => (
             <View>
               <Ionicons name="notifications" size={size} color={color} />
@@ -110,7 +109,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: t('navigation.profile'),
+          title: i18n.t('navigation.profile'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
