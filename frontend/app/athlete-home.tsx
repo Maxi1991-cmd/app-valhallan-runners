@@ -342,7 +342,7 @@ export default function AthleteHomeScreen() {
 
   const openEditModal = (workout: any) => {
     if (workout.modified_by_athlete) {
-      Alert.alert('Non modificabile', 'Hai già modificato questo allenamento. La modifica è consentita una sola volta.');
+      Alert.alert(t('athleteHome.notEditable'), t('athleteHome.alreadyModifiedOnce'));
       return;
     }
     setSelectedWorkout({ workout });
@@ -454,7 +454,7 @@ export default function AthleteHomeScreen() {
       setShowEditModal(false);
       fetchData();
     } catch (error: any) {
-      Alert.alert('Errore', error.response?.data?.detail || 'Errore nella modifica');
+      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.editFailed'));
     }
   };
 
