@@ -560,7 +560,7 @@ export default function AthleteHomeScreen() {
         {hasFeedback && !workout.completed && (
           <View style={styles.feedbackSentBadge}>
             <Ionicons name="send" size={12} color="#4CAF50" />
-            <Text style={styles.feedbackSentText}>Feedback inviato al coach</Text>
+            <Text style={styles.feedbackSentText}>{t('athleteHome.actions.feedbackSent')}</Text>
           </View>
         )}
 
@@ -572,7 +572,7 @@ export default function AthleteHomeScreen() {
               onPress={() => openCompleteModal(workout)}
             >
               <Ionicons name="checkmark-circle" size={18} color="#FFF" />
-              <Text style={styles.actionBtnText}>Completato</Text>
+              <Text style={styles.actionBtnText}>{t('athleteHome.actions.completed')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -580,7 +580,7 @@ export default function AthleteHomeScreen() {
               onPress={() => openSkipModal(workout)}
             >
               <Ionicons name="close-circle" size={18} color="#FFF" />
-              <Text style={styles.actionBtnText}>Non eseguito</Text>
+              <Text style={styles.actionBtnText}>{t('athleteHome.actions.notDoneBtn')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -592,14 +592,14 @@ export default function AthleteHomeScreen() {
             onPress={() => openEditModal(workout)}
           >
             <Ionicons name="pencil" size={16} color="#FF6B35" />
-            <Text style={styles.editButtonText}>Modifica (una sola volta)</Text>
+            <Text style={styles.editButtonText}>{t('athleteHome.actions.editOnce')}</Text>
           </TouchableOpacity>
         )}
 
         {workout.modified_by_athlete && (
           <View style={styles.modifiedBadge}>
             <Ionicons name="checkmark" size={12} color="#4CAF50" />
-            <Text style={styles.modifiedText}>Già modificato</Text>
+            <Text style={styles.modifiedText}>{t('athleteHome.alreadyModified')}</Text>
           </View>
         )}
       </Card>
