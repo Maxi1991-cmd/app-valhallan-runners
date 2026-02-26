@@ -465,11 +465,11 @@ export default function AthleteHomeScreen() {
 
   const getWorkoutTypeLabel = (type: string) => {
     switch (type) {
-      case 'easy': return 'Facile';
-      case 'tempo': return 'Tempo';
-      case 'interval': return 'Intervalli';
-      case 'long': return 'Lungo';
-      case 'recovery': return 'Recupero';
+      case 'easy': return t('athleteHome.workoutTypes.easy');
+      case 'tempo': return t('athleteHome.workoutTypes.tempo');
+      case 'interval': return t('athleteHome.workoutTypes.interval');
+      case 'long': return t('athleteHome.workoutTypes.long');
+      case 'recovery': return t('athleteHome.workoutTypes.recovery');
       default: return type;
     }
   };
