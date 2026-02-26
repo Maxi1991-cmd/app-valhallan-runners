@@ -1122,7 +1122,7 @@ export default function AthleteHomeScreen() {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.editModalContent}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Modifica Allenamento</Text>
+                <Text style={styles.modalTitle}>{t('athleteHome.editWorkout')}</Text>
                 <TouchableOpacity onPress={() => setShowEditModal(false)}>
                   <Ionicons name="close" size={24} color="#FFF" />
                 </TouchableOpacity>
@@ -1135,10 +1135,10 @@ export default function AthleteHomeScreen() {
               >
                 <View style={styles.warningBox}>
                   <Ionicons name="warning" size={18} color="#FF9800" />
-                  <Text style={styles.warningText}>Puoi modificare una sola volta</Text>
+                  <Text style={styles.warningText}>{t('athleteHome.editOnceWarning')}</Text>
                 </View>
 
-                <Text style={styles.inputLabel}>Durata (minuti)</Text>
+                <Text style={styles.inputLabel}>{t('athleteHome.durationMinutes')}</Text>
                 <View style={styles.inputRow}>
                   <TextInput
                     style={[styles.textInput, styles.inputWithButton]}
