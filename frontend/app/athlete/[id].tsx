@@ -294,19 +294,19 @@ export default function AthleteDetail() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Elimina Atleta',
-      'Sei sicuro di voler eliminare questo atleta e tutti i suoi dati? Questa azione non può essere annullata.',
+      t('athlete.deleteAthlete'),
+      t('athlete.deleteConfirm'),
       [
-        { text: 'No', style: 'cancel' },
+        { text: t('common.no'), style: 'cancel' },
         {
-          text: 'Sì, elimina',
+          text: t('athlete.yesDelete'),
           style: 'destructive',
           onPress: async () => {
             try {
               await deleteAthlete(id!);
               // Refresh della lista atleti
               await fetchAthletes();
-              Alert.alert('Eliminato', 'Atleta eliminato con successo');
+              Alert.alert(t('common.deleted'), t('athlete.athleteDeleted'));
               router.replace('/(tabs)');
             } catch (error) {
               Alert.alert('Errore', 'Impossibile eliminare atleta');
