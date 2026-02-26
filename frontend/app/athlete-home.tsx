@@ -613,12 +613,12 @@ export default function AthleteHomeScreen() {
         const todayWorkouts = getTodayWorkouts();
         return (
           <View>
-            <Text style={styles.sectionTitle}>🏃 Allenamento di Oggi</Text>
+            <Text style={styles.sectionTitle}>🏃 {t('athleteHome.sections.todayWorkout')}</Text>
             {todayWorkouts.length === 0 ? (
               <Card style={styles.restDayCard}>
                 <Ionicons name="bed" size={48} color="#4CAF50" />
-                <Text style={styles.restDayText}>Giorno di riposo</Text>
-                <Text style={styles.restDaySubtext}>Nessun allenamento programmato</Text>
+                <Text style={styles.restDayText}>{t('athleteHome.empty.restDay')}</Text>
+                <Text style={styles.restDaySubtext}>{t('athleteHome.empty.noWorkoutScheduled')}</Text>
               </Card>
             ) : (
               todayWorkouts.map(w => renderWorkoutCard(w, true))
