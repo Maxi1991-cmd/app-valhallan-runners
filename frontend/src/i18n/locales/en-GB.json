@@ -381,6 +381,19 @@
     "year": "Year",
     "all": "All"
   },
+  "payment": {
+    "paymentDue": "Payment due",
+    "paymentOverdue": "Payment overdue",
+    "paymentReminder": "Payment reminder",
+    "paymentExpiring": "Payment of €{{amount}} for {{month}} due in {{days}} days",
+    "paymentExpired": "Payment of €{{amount}} for {{month}} is overdue",
+    "contactCoach": "Contact your coach for renewal",
+    "athletePaymentExpiring": "{{athlete}}'s payment (€{{amount}} - {{month}}) due in {{days}} days",
+    "athletePaymentExpired": "{{athlete}}'s payment (€{{amount}} - {{month}}) is overdue",
+    "checkPayments": "Check Payment Expiries",
+    "paymentsChecked": "Check completed",
+    "notificationsSent": "{{count}} notifications sent"
+  },
   "errors": {
     "generic": "An error occurred",
     "network": "Connection error",

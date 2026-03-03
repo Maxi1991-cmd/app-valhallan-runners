@@ -381,6 +381,19 @@
     "all": "Tutto",
     "subtitle": "Monitora le performance"
   },
+  "payment": {
+    "paymentDue": "Pagamento in scadenza",
+    "paymentOverdue": "Pagamento scaduto",
+    "paymentReminder": "Promemoria pagamento",
+    "paymentExpiring": "Il pagamento di €{{amount}} per {{month}} scade tra {{days}} giorni",
+    "paymentExpired": "Il pagamento di €{{amount}} per {{month}} è scaduto",
+    "contactCoach": "Contatta il tuo coach per il rinnovo",
+    "athletePaymentExpiring": "Il pagamento di {{athlete}} (€{{amount}} - {{month}}) scade tra {{days}} giorni",
+    "athletePaymentExpired": "Il pagamento di {{athlete}} (€{{amount}} - {{month}}) è scaduto",
+    "checkPayments": "Controlla Scadenze Pagamenti",
+    "paymentsChecked": "Controllo completato",
+    "notificationsSent": "{{count}} notifiche inviate"
+  },
   "errors": {
     "generic": "Si è verificato un errore",
     "network": "Errore di connessione",

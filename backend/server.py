@@ -2046,7 +2046,8 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "coach":
         return {"warnings": []}
     
-    athletes = await db.athletes.find({"coach_id": current_user["id"]}).to_list(1000)
+    coach_id = current_user["id"]
+    athletes = await db.athletes.find({"coach_id": coach_id}).to_list(1000)
     
     warnings = []
     today = datetime.utcnow().date()
@@ -2062,6 +2063,83 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
             except ValueError:
                 continue
         return None
+    
+    # Automatically check and send payment notifications
+    for athlete in athletes:
+        athlete_user = await db.users.find_one({"athlete_id": athlete["id"]})
+        
+        for payment in athlete.get("payments", []):
+            if payment.get("paid"):
+                continue
+                
+            due_date = parse_date_safe(payment.get("due_date"))
+            if not due_date:
+                continue
+            
+            days_until_due = (due_date - today).days
+            
+            # Check if we should send notification (10 days before OR 3 days to due date)
+            should_notify = False
+            if days_until_due == 10:
+                should_notify = True
+            elif 0 <= days_until_due <= 3:
+                should_notify = True
+            
+            if should_notify:
+                notification_key = f"payment_{payment['id']}_{today.isoformat()}"
+                
+                # Check if notification was already sent today
+                existing = await db.notifications.find_one({
+                    "related_data.notification_key": notification_key
+                })
+                
+                if not existing:
+                    # Send notification to ATHLETE
+                    if athlete_user:
+                        athlete_notification = {
+                            "id": str(uuid.uuid4()),
+                            "title": f"Pagamento in scadenza - {payment['month']}",
+                            "message": f"Il pagamento di €{payment['amount']} per {payment['month']} scade tra {days_until_due} giorni ({payment['due_date']}). Contatta il tuo coach." if days_until_due > 0 else f"Il pagamento di €{payment['amount']} per {payment['month']} è scaduto il {payment['due_date']}.",
+                            "notification_type": "payment_due",
+                            "recipient_id": athlete_user["id"],
+                            "sender_id": coach_id,
+                            "read": False,
+                            "related_data": {
+                                "payment_id": payment["id"],
+                                "athlete_id": athlete["id"],
+                                "athlete_name": athlete["name"],
+                                "amount": payment["amount"],
+                                "month": payment["month"],
+                                "due_date": payment["due_date"],
+                                "days_until_due": days_until_due,
+                                "notification_key": notification_key
+                            },
+                            "created_at": datetime.utcnow()
+                        }
+                        await db.notifications.insert_one(athlete_notification)
+                    
+                    # Send notification to COACH
+                    coach_notification = {
+                        "id": str(uuid.uuid4()),
+                        "title": f"Pagamento atleta in scadenza - {athlete['name']}",
+                        "message": f"Il pagamento di {athlete['name']} (€{payment['amount']} - {payment['month']}) scade tra {days_until_due} giorni." if days_until_due > 0 else f"Il pagamento di {athlete['name']} (€{payment['amount']} - {payment['month']}) è scaduto.",
+                        "notification_type": "payment_due",
+                        "recipient_id": coach_id,
+                        "sender_id": None,
+                        "read": False,
+                        "related_data": {
+                            "payment_id": payment["id"],
+                            "athlete_id": athlete["id"],
+                            "athlete_name": athlete["name"],
+                            "amount": payment["amount"],
+                            "month": payment["month"],
+                            "due_date": payment["due_date"],
+                            "days_until_due": days_until_due,
+                            "notification_key": f"coach_{notification_key}"
+                        },
+                        "created_at": datetime.utcnow()
+                    }
+                    await db.notifications.insert_one(coach_notification)
     
     for athlete in athletes:
         # Check medical certificate
@@ -2099,6 +2177,181 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
                         })
     
     return {"warnings": warnings}
+
+# ==================== PAYMENT EXPIRY NOTIFICATIONS ====================
+
+@api_router.post("/check-payment-expiries")
+async def check_payment_expiries(current_user: dict = Depends(get_current_user)):
+    """
+    Check payment due dates and send notifications:
+    - 10 days before: First notification to athlete and coach
+    - 3 days before until due date: Daily notifications
+    """
+    if current_user.get("role") != "coach":
+        raise HTTPException(status_code=403, detail="Only coaches can trigger payment checks")
+    
+    coach_id = current_user["id"]
+    today = datetime.utcnow().date()
+    notifications_sent = []
+    
+    # Get all athletes for this coach
+    athletes = await db.athletes.find({"coach_id": coach_id}).to_list(length=None)
+    
+    for athlete in athletes:
+        athlete_user = await db.users.find_one({"athlete_id": athlete["id"]})
+        
+        for payment in athlete.get("payments", []):
+            if payment.get("paid"):
+                continue  # Skip paid payments
+                
+            due_date = parse_date_safe(payment.get("due_date"))
+            if not due_date:
+                continue
+            
+            days_until_due = (due_date - today).days
+            
+            # Check if we should send notification
+            should_notify = False
+            notification_key = f"payment_{payment['id']}_{today.isoformat()}"
+            
+            if days_until_due == 10:
+                # First notification - 10 days before
+                should_notify = True
+            elif 0 <= days_until_due <= 3:
+                # Daily notifications from 3 days before until due date
+                should_notify = True
+            
+            if not should_notify:
+                continue
+            
+            # Check if notification was already sent today
+            existing = await db.notifications.find_one({
+                "related_data.notification_key": notification_key
+            })
+            if existing:
+                continue
+            
+            # Determine urgency level
+            if days_until_due <= 0:
+                urgency = "scaduto"
+                urgency_en = "overdue"
+            elif days_until_due <= 3:
+                urgency = "urgente"
+                urgency_en = "urgent"
+            else:
+                urgency = "promemoria"
+                urgency_en = "reminder"
+            
+            # Create notification for ATHLETE
+            if athlete_user:
+                athlete_notification = {
+                    "id": str(uuid.uuid4()),
+                    "title": f"Pagamento in scadenza - {payment['month']}",
+                    "message": f"Il pagamento di €{payment['amount']} per {payment['month']} scade tra {days_until_due} giorni ({payment['due_date']}). Contatta il tuo coach per il rinnovo." if days_until_due > 0 else f"Il pagamento di €{payment['amount']} per {payment['month']} è scaduto il {payment['due_date']}. Contatta il tuo coach.",
+                    "notification_type": "payment_due",
+                    "recipient_id": athlete_user["id"],
+                    "sender_id": coach_id,
+                    "read": False,
+                    "related_data": {
+                        "payment_id": payment["id"],
+                        "athlete_id": athlete["id"],
+                        "athlete_name": athlete["name"],
+                        "amount": payment["amount"],
+                        "month": payment["month"],
+                        "due_date": payment["due_date"],
+                        "days_until_due": days_until_due,
+                        "urgency": urgency,
+                        "notification_key": notification_key
+                    },
+                    "created_at": datetime.utcnow()
+                }
+                await db.notifications.insert_one(athlete_notification)
+                notifications_sent.append({
+                    "type": "athlete",
+                    "athlete_name": athlete["name"],
+                    "payment_month": payment["month"]
+                })
+            
+            # Create notification for COACH
+            coach_notification = {
+                "id": str(uuid.uuid4()),
+                "title": f"Pagamento atleta in scadenza - {athlete['name']}",
+                "message": f"Il pagamento di {athlete['name']} (€{payment['amount']} - {payment['month']}) scade tra {days_until_due} giorni ({payment['due_date']})." if days_until_due > 0 else f"Il pagamento di {athlete['name']} (€{payment['amount']} - {payment['month']}) è scaduto il {payment['due_date']}.",
+                "notification_type": "payment_due",
+                "recipient_id": coach_id,
+                "sender_id": None,
+                "read": False,
+                "related_data": {
+                    "payment_id": payment["id"],
+                    "athlete_id": athlete["id"],
+                    "athlete_name": athlete["name"],
+                    "amount": payment["amount"],
+                    "month": payment["month"],
+                    "due_date": payment["due_date"],
+                    "days_until_due": days_until_due,
+                    "urgency": urgency,
+                    "notification_key": f"coach_{notification_key}"
+                },
+                "created_at": datetime.utcnow()
+            }
+            await db.notifications.insert_one(coach_notification)
+            notifications_sent.append({
+                "type": "coach",
+                "athlete_name": athlete["name"],
+                "payment_month": payment["month"]
+            })
+    
+    return {
+        "message": f"Controllo completato. {len(notifications_sent)} notifiche inviate.",
+        "notifications_sent": notifications_sent
+    }
+
+@api_router.get("/payment-expiries")
+async def get_payment_expiries(current_user: dict = Depends(get_current_user)):
+    """
+    Get upcoming payment expiries for dashboard display.
+    Returns payments expiring in the next 30 days.
+    """
+    coach_id = current_user["id"]
+    today = datetime.utcnow().date()
+    expiries = []
+    
+    if current_user.get("role") == "coach":
+        athletes = await db.athletes.find({"coach_id": coach_id}).to_list(length=None)
+    else:
+        # Athlete viewing their own expiries
+        athlete = await db.athletes.find_one({"id": current_user.get("athlete_id")})
+        athletes = [athlete] if athlete else []
+    
+    for athlete in athletes:
+        if not athlete:
+            continue
+        for payment in athlete.get("payments", []):
+            if payment.get("paid"):
+                continue
+                
+            due_date = parse_date_safe(payment.get("due_date"))
+            if not due_date:
+                continue
+            
+            days_until_due = (due_date - today).days
+            
+            if days_until_due <= 30:  # Show expiries within 30 days
+                expiries.append({
+                    "athlete_id": athlete["id"],
+                    "athlete_name": athlete["name"],
+                    "payment_id": payment["id"],
+                    "month": payment["month"],
+                    "amount": payment["amount"],
+                    "due_date": payment["due_date"],
+                    "days_until_due": days_until_due,
+                    "urgency": "overdue" if days_until_due < 0 else "urgent" if days_until_due <= 3 else "warning" if days_until_due <= 10 else "normal"
+                })
+    
+    # Sort by days until due (most urgent first)
+    expiries.sort(key=lambda x: x["days_until_due"])
+    
+    return {"expiries": expiries}
 
 # ==================== HEALTH CHECK ====================
 

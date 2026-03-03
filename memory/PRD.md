@@ -19,6 +19,15 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 
 ## What's Been Implemented
 
+### March 3, 2025
+- ✅ Implemented payment expiry notification system
+  - Notifications sent 10 days before due date
+  - Daily notifications from 3 days before until due date
+  - Notifications sent to both coach and athlete
+  - Auto-triggered when coach opens app
+- ✅ Added endpoints: `/api/check-payment-expiries`, `/api/payment-expiries`
+- ✅ Added payment translations to IT and EN
+
 ### February 26, 2025 (Update 2)
 - ✅ Completed all missing translations for athlete home tabs (Today, Week, Month, History)
 - ✅ Translated workout types (Easy, Tempo, Intervals, Long, Recovery)
