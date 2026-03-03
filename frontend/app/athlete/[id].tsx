@@ -335,7 +335,7 @@ export default function AthleteDetail() {
   if (!athlete) return null;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Back Button Header */}
       <View style={styles.backHeader}>
         <TouchableOpacity 
@@ -839,7 +839,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
+    paddingTop: 10,
+    backgroundColor: '#0F0F0F',
     borderBottomWidth: 1,
     borderBottomColor: '#222',
   },

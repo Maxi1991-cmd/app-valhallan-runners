@@ -125,5 +125,6 @@ export interface ExpiryWarning {
   payment_id?: string;
   month?: string;
   amount?: number;
+  due_date?: string;
   urgent: boolean;
 }
