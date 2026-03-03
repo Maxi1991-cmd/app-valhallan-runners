@@ -2172,6 +2172,7 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
                             "payment_id": payment["id"],
                             "month": payment["month"],
                             "amount": payment["amount"],
+                            "due_date": payment.get("due_date"),
                             "days_overdue": days_overdue,
                             "urgent": days_overdue >= 7
                         })

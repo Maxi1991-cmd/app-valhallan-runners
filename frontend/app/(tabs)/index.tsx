@@ -71,7 +71,7 @@ export default function AthletesTab() {
                 />
                 <Text style={[styles.warningText, warning.urgent && styles.urgentText]}>
                   {warning.type === 'payment_due'
-                    ? `${t('athlete.payment')} ${warning.month}`
+                    ? `${t('athlete.payment')} - ${t('athlete.dueDate')}: ${warning.due_date || warning.month}`
                     : `${t('athlete.certificateExpires')} ${warning.expiry_date}`}
                 </Text>
               </View>

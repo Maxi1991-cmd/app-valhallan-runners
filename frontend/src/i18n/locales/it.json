@@ -104,6 +104,7 @@
     "addFirstAthlete": "Aggiungi il tuo primo atleta per iniziare",
     "loading": "Caricamento atleti...",
     "payment": "Pagamento",
+    "dueDate": "Scadenza",
     "certificateExpires": "Certificato scade",
     "certificate": "Certificato Medico"
   },

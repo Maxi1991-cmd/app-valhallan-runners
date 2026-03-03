@@ -104,6 +104,7 @@
     "addFirstAthlete": "Add your first athlete to get started",
     "loading": "Loading athletes...",
     "payment": "Payment",
+    "dueDate": "Due date",
     "certificateExpires": "Certificate expires",
     "certificate": "Medical Certificate"
   },

@@ -336,6 +336,17 @@ export default function AthleteDetail() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      {/* Back Button Header */}
+      <View style={styles.backHeader}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Text style={styles.backButtonText}>{t('common.back')}</Text>
+        </TouchableOpacity>
+      </View>
+      
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -823,6 +834,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F0F0F',
+  },
+  backHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#222',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FF6B35',
+    fontSize: 16,
+    fontWeight: '600',
   },
   scrollContent: {
     padding: 20,
