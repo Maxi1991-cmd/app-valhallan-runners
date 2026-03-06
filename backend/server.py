@@ -2158,24 +2158,35 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
                         "urgent": days_until <= 7
                     })
         
-        # Check unpaid payments
-        for payment in athlete.get("payments", []):
-            if not payment.get("paid"):
-                due_date = parse_date_safe(payment.get("due_date"))
-                if due_date:
-                    days_overdue = (today - due_date).days
-                    if days_overdue >= 0:
-                        warnings.append({
-                            "type": "payment_due",
-                            "athlete_id": athlete["id"],
-                            "athlete_name": athlete["name"],
-                            "payment_id": payment["id"],
-                            "month": payment["month"],
-                            "amount": payment["amount"],
-                            "due_date": payment.get("due_date"),
-                            "days_overdue": days_overdue,
-                            "urgent": days_overdue >= 7
-                        })
+        # Check payments - show the next due date (from the most recent payment)
+        payments = athlete.get("payments", [])
+        if payments:
+            # Sort payments by due_date to find the most recent one
+            def get_payment_date(p):
+                d = parse_date_safe(p.get("due_date"))
+                return d if d else today
+            
+            sorted_payments = sorted(payments, key=get_payment_date, reverse=True)
+            latest_payment = sorted_payments[0]
+            
+            due_date = parse_date_safe(latest_payment.get("due_date"))
+            if due_date:
+                days_until = (due_date - today).days
+                # Show warning if payment is upcoming (within 30 days) or overdue
+                if days_until <= 30:
+                    warnings.append({
+                        "type": "payment_due",
+                        "athlete_id": athlete["id"],
+                        "athlete_name": athlete["name"],
+                        "payment_id": latest_payment.get("id"),
+                        "month": latest_payment.get("month"),
+                        "amount": latest_payment.get("amount"),
+                        "due_date": latest_payment.get("due_date"),
+                        "paid": latest_payment.get("paid", False),
+                        "days_until": days_until,
+                        "days_overdue": -days_until if days_until < 0 else 0,
+                        "urgent": days_until <= 7 and not latest_payment.get("paid", False)
+                    })
     
     return {"warnings": warnings}
 

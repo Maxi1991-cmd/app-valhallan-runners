@@ -36,19 +36,7 @@ interface Activity {
   actual_data?: any;
 }
 
-// Get locale string based on i18n
-const getLocaleString = () => {
-  const locale = i18n.locale;
-  if (locale.startsWith('it')) return 'it-IT';
-  if (locale === 'en-US') return 'en-US';
-  if (locale.startsWith('en')) return 'en-GB';
-  if (locale.startsWith('fr')) return 'fr-FR';
-  if (locale.startsWith('es')) return 'es-ES';
-  if (locale.startsWith('de')) return 'de-DE';
-  return 'en-GB';
-};
-
-const safeFormatDate = (dateString?: string | null, format?: string) => {
+const safeFormatDate = (dateString?: string | null, format?: string, localeStr: string = 'it-IT') => {
   try {
     if (!dateString || dateString === '') return '--';
 
@@ -57,8 +45,6 @@ const safeFormatDate = (dateString?: string | null, format?: string) => {
     if (isNaN(date.getTime())) {
       return '--';
     }
-
-    const localeStr = getLocaleString();
     
     if (format === 'short') {
       return date.toLocaleDateString(localeStr, { day: '2-digit', month: 'short' });
