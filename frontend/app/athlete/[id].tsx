@@ -14,7 +14,6 @@ import * as Sharing from 'expo-sharing';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from '../../src/hooks/useTranslation';
-import i18n from '../../src/i18n';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
 
@@ -340,7 +339,7 @@ export default function AthleteDetail() {
       <View style={styles.backHeader}>
         <TouchableOpacity 
           style={styles.backButton} 
-          onPress={() => router.back()}
+          onPress={() => router.push('/(tabs)')}
         >
           <Ionicons name="arrow-back" size={24} color="#FFF" />
           <Text style={styles.backButtonText}>{t('common.back')}</Text>
