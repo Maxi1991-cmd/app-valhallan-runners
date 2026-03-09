@@ -159,14 +159,6 @@ export default function ProfileTab() {
     }
   };
 
-  const platformStatus = [
-    { name: 'Garmin', icon: 'watch', connected: false },
-    { name: 'Polar', icon: 'heart', connected: false },
-    { name: 'Suunto', icon: 'compass', connected: false },
-    { name: 'Strava', icon: 'bicycle', connected: false },
-    { name: 'Fitbit', icon: 'fitness', connected: false },
-  ];
-
   return (
     <SafeAreaView style={styles.container} edges={['left', 'right']}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -237,35 +229,6 @@ export default function ProfileTab() {
             />
           </Card>
         )}
-
-        <Card title={t('profile.connectedPlatforms')} style={styles.platformsCard}>
-          <Text style={styles.platformNote}>
-            {t('profile.platformsComingSoon')}
-          </Text>
-          {platformStatus.map((platform, index) => (
-            <TouchableOpacity key={index} style={styles.platformRow}>
-              <View style={styles.platformInfo}>
-                <Ionicons name={platform.icon as any} size={22} color="#FF6B35" />
-                <Text style={styles.platformName}>{platform.name}</Text>
-              </View>
-              <View
-                style={[
-                  styles.statusBadge,
-                  platform.connected ? styles.connectedBadge : styles.disconnectedBadge,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.badgeStatusText,
-                    platform.connected ? styles.connectedText : styles.disconnectedText,
-                  ]}
-                >
-                  {platform.connected ? t('profile.connected') : t('profile.comingSoon')}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </Card>
 
         <Card title={t('profile.settings')} style={styles.settingsCard}>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowNotificationsModal(true)}>

@@ -872,26 +872,39 @@ export default function AthleteHomeScreen() {
             {/* Pagamenti */}
             <Text style={styles.sectionTitle}>💳 {t('athleteHome.payments')}</Text>
             <Card style={styles.infoCard}>
-              {athleteProfile?.payments && athleteProfile.payments.length > 0 ? (
-                athleteProfile.payments.map((payment) => (
-                  <View key={payment.id} style={[styles.paymentRow, !payment.paid && styles.unpaidRow]}>
+              {(() => {
+                // Mostra solo il pagamento più recente (con due_date più recente)
+                const payments = athleteProfile?.payments || [];
+                if (payments.length === 0) {
+                  return <Text style={styles.emptyText}>{t('athleteHome.noPayments')}</Text>;
+                }
+                
+                // Ordina per due_date decrescente e prendi il primo
+                const sortedPayments = [...payments].sort((a, b) => {
+                  const dateA = new Date(a.due_date || '1900-01-01');
+                  const dateB = new Date(b.due_date || '1900-01-01');
+                  return dateB.getTime() - dateA.getTime();
+                });
+                
+                const currentPayment = sortedPayments[0];
+                
+                return (
+                  <View key={currentPayment.id} style={[styles.paymentRow, !currentPayment.paid && styles.unpaidRow]}>
                     <View>
-                      <Text style={styles.paymentMonth}>{payment.month}</Text>
-                      <Text style={styles.paymentDue}>{t('athleteHome.dueDate')}: {formatDate(payment.due_date)}</Text>
+                      <Text style={styles.paymentMonth}>{currentPayment.month}</Text>
+                      <Text style={styles.paymentDue}>{t('athleteHome.dueDate')}: {formatDate(currentPayment.due_date)}</Text>
                     </View>
                     <View style={styles.paymentRight}>
-                      <Text style={styles.paymentAmount}>€{payment.amount}</Text>
-                      <View style={[styles.paymentStatus, payment.paid ? styles.paidStatus : styles.unpaidStatus]}>
-                        <Text style={[styles.paymentStatusText, payment.paid ? styles.paidText : styles.unpaidText]}>
-                          {payment.paid ? t('athleteHome.paid') : t('athleteHome.toPay')}
+                      <Text style={styles.paymentAmount}>€{currentPayment.amount}</Text>
+                      <View style={[styles.paymentStatus, currentPayment.paid ? styles.paidStatus : styles.unpaidStatus]}>
+                        <Text style={[styles.paymentStatusText, currentPayment.paid ? styles.paidText : styles.unpaidText]}>
+                          {currentPayment.paid ? t('athleteHome.paid') : t('athleteHome.toPay')}
                         </Text>
                       </View>
                     </View>
                   </View>
-                ))
-              ) : (
-                <Text style={styles.emptyText}>{t('athleteHome.noPayments')}</Text>
-              )}
+                );
+              })()}
             </Card>
           </View>
         );
