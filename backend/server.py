@@ -2056,7 +2056,7 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
     def parse_date_safe(date_string):
         if not date_string:
             return None
-        formats = ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d"]
+        formats = ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%Y/%m/%d", "%m/%d/%Y"]
         for fmt in formats:
             try:
                 return datetime.strptime(date_string, fmt).date()

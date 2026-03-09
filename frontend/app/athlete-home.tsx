@@ -480,10 +480,38 @@ export default function AthleteHomeScreen() {
     }
   };
 
+  // Funzione per parsare date in vari formati
+  const parseDateString = (dateStr?: string): Date | null => {
+    if (!dateStr) return null;
+    
+    // Prova formato ISO (YYYY-MM-DD)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return new Date(dateStr);
+    }
+    
+    // Prova formato DD/MM/YYYY o DD-MM-YYYY
+    const match1 = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (match1) {
+      const [, day, month, year] = match1;
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    // Prova formato YYYY/MM/DD
+    const match2 = dateStr.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+    if (match2) {
+      const [, year, month, day] = match2;
+      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    return new Date(dateStr);
+  };
+
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '--';
     try {
-      return new Date(dateStr).toLocaleDateString('it-IT', { 
+      const date = parseDateString(dateStr);
+      if (!date || isNaN(date.getTime())) return dateStr;
+      return date.toLocaleDateString('it-IT', { 
         day: '2-digit', 
         month: 'short',
         year: 'numeric'
@@ -496,7 +524,9 @@ export default function AthleteHomeScreen() {
   const isDateExpired = (dateStr?: string) => {
     if (!dateStr) return false;
     try {
-      return new Date(dateStr) < new Date();
+      const date = parseDateString(dateStr);
+      if (!date) return false;
+      return date < new Date();
     } catch {
       return false;
     }
@@ -505,7 +535,9 @@ export default function AthleteHomeScreen() {
   const getDaysUntil = (dateStr?: string) => {
     if (!dateStr) return null;
     try {
-      const diff = Math.ceil((new Date(dateStr).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+      const date = parseDateString(dateStr);
+      if (!date) return null;
+      const diff = Math.ceil((date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
       return diff;
     } catch {
       return null;
@@ -881,8 +913,8 @@ export default function AthleteHomeScreen() {
                 
                 // Ordina per due_date decrescente e prendi il primo
                 const sortedPayments = [...payments].sort((a, b) => {
-                  const dateA = new Date(a.due_date || '1900-01-01');
-                  const dateB = new Date(b.due_date || '1900-01-01');
+                  const dateA = parseDateString(a.due_date || '') || new Date(0);
+                  const dateB = parseDateString(b.due_date || '') || new Date(0);
                   return dateB.getTime() - dateA.getTime();
                 });
                 
