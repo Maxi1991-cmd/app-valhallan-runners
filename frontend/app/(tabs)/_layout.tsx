@@ -122,18 +122,21 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
-    right: -8,
-    top: -4,
-    backgroundColor: '#FF6B35',
-    borderRadius: 10,
-    minWidth: 18,
-    height: 18,
+    right: -10,
+    top: -5,
+    backgroundColor: '#FF3B30',
+    borderRadius: 12,
+    minWidth: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#1A1A1A',
+    paddingHorizontal: 4,
   },
   badgeText: {
     color: '#FFF',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
   },
 });
