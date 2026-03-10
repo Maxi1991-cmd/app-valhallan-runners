@@ -12,6 +12,26 @@ import { useTranslation } from '../../src/hooks/useTranslation';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
+// Types for subscription
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  interval: string;
+  description: string;
+  savings?: string;
+}
+
+interface SubscriptionStatus {
+  is_premium: boolean;
+  plan: string;
+  expires_at: string | null;
+  athlete_count: number;
+  athlete_limit: number | null;
+  can_add_athlete: boolean;
+}
+
 export default function ProfileTab() {
   const router = useRouter();
   const { user, logout, subscription, isSubscriptionActive, refreshSubscription, updateSubscription } = useAuthStore();
@@ -26,11 +46,17 @@ export default function ProfileTab() {
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.locale);
   
+  // Subscription states
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus | null>(null);
+  const [loadingPlans, setLoadingPlans] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  
   // Notification settings for Coach
   const [notifyAthleteFeedback, setNotifyAthleteFeedback] = useState(true);
   const [notifyExpirations, setNotifyExpirations] = useState(true);
 
-  // Load saved language
+  // Load saved language and subscription status
   useEffect(() => {
     AsyncStorage.getItem('userLanguage').then(lang => {
       if (lang) {
@@ -38,7 +64,64 @@ export default function ProfileTab() {
         changeLanguage(lang);
       }
     });
+    
+    // Load subscription data
+    loadSubscriptionData();
   }, []);
+
+  const loadSubscriptionData = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) return;
+      
+      // Fetch plans
+      const plansRes = await axios.get(`${BASE_URL}/api/subscription/plans`);
+      setSubscriptionPlans(plansRes.data.plans);
+      
+      // Fetch status
+      const statusRes = await axios.get(`${BASE_URL}/api/subscription/status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSubscriptionStatus(statusRes.data);
+    } catch (error) {
+      console.log('Error loading subscription data:', error);
+    }
+  };
+
+  const handleSubscribe = async (planId: string) => {
+    try {
+      setProcessingPayment(true);
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Errore', 'Sessione scaduta, effettua il login');
+        return;
+      }
+      
+      // Create checkout session
+      const response = await axios.post(
+        `${BASE_URL}/api/subscription/checkout`,
+        {
+          plan_id: planId,
+          origin_url: BASE_URL
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      // Open Stripe checkout in browser
+      const { checkout_url } = response.data;
+      if (checkout_url) {
+        await Linking.openURL(checkout_url);
+        setShowSubscriptionModal(false);
+      }
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      Alert.alert('Errore', error.response?.data?.detail || 'Errore durante il pagamento');
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
 
   const handleLanguageChange = async (langCode: string) => {
     setSelectedLanguage(langCode);
@@ -347,59 +430,64 @@ export default function ProfileTab() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalSubtitle}>{t('subscription.selectPlan')}</Text>
-
-            <TouchableOpacity
-              style={styles.planOption}
-              onPress={() => handleUpdateSubscription('monthly', 'active')}
-              disabled={isUpdating}
-            >
-              <View style={styles.planInfo}>
-                <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
-                <View style={styles.planDetails}>
-                  <Text style={styles.planName}>{t('subscription.monthlyPlan')}</Text>
-                  <Text style={styles.planDescription}>{t('subscription.monthlyDesc')}</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#666" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.planOption}
-              onPress={() => handleUpdateSubscription('annual', 'active')}
-              disabled={isUpdating}
-            >
-              <View style={styles.planInfo}>
-                <Ionicons name="star" size={24} color="#FFD700" />
-                <View style={styles.planDetails}>
-                  <Text style={styles.planName}>{t('subscription.annualPlan')}</Text>
-                  <Text style={styles.planDescription}>{t('subscription.annualDesc')}</Text>
-                  <Text style={styles.planSaving}>{t('subscription.save2months')}</Text>
-                </View>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="#666" />
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity
-              style={[styles.planOption, styles.deactivateOption]}
-              onPress={() => handleUpdateSubscription(subscription?.plan || 'none', 'inactive')}
-              disabled={isUpdating}
-            >
-              <View style={styles.planInfo}>
-                <Ionicons name="pause-circle-outline" size={24} color="#DC3545" />
-                <View style={styles.planDetails}>
-                  <Text style={[styles.planName, { color: '#DC3545' }]}>{t('subscription.deactivate')}</Text>
-                  <Text style={styles.planDescription}>
-                    {t('subscription.dataKept')}
+            {/* Current Status */}
+            {subscriptionStatus && (
+              <View style={styles.statusBanner}>
+                <Ionicons 
+                  name={subscriptionStatus.is_premium ? "checkmark-circle" : "information-circle"} 
+                  size={24} 
+                  color={subscriptionStatus.is_premium ? "#4CAF50" : "#FF9800"} 
+                />
+                <View style={styles.statusInfo}>
+                  <Text style={styles.statusTitle}>
+                    {subscriptionStatus.is_premium ? t('subscription.premiumActive') : t('subscription.freePlan')}
+                  </Text>
+                  <Text style={styles.statusDesc}>
+                    {subscriptionStatus.is_premium 
+                      ? `${t('subscription.expiresOn')}: ${new Date(subscriptionStatus.expires_at!).toLocaleDateString('it-IT')}`
+                      : `${subscriptionStatus.athlete_count}/${subscriptionStatus.athlete_limit} ${t('subscription.athletesUsed')}`
+                    }
                   </Text>
                 </View>
               </View>
-            </TouchableOpacity>
+            )}
+
+            <Text style={styles.modalSubtitle}>{t('subscription.selectPlan')}</Text>
+
+            {/* Monthly Plan */}
+            {subscriptionPlans.map((plan) => (
+              <TouchableOpacity
+                key={plan.id}
+                style={[
+                  styles.planOption,
+                  subscriptionStatus?.plan === plan.id && styles.planOptionActive
+                ]}
+                onPress={() => handleSubscribe(plan.id)}
+                disabled={processingPayment}
+              >
+                <View style={styles.planInfo}>
+                  <Ionicons 
+                    name={plan.id === 'annual' ? "star" : "calendar-outline"} 
+                    size={24} 
+                    color={plan.id === 'annual' ? "#FFD700" : "#FF6B35"} 
+                  />
+                  <View style={styles.planDetails}>
+                    <Text style={styles.planName}>{plan.name}</Text>
+                    <Text style={styles.planPrice}>€{plan.price}/{plan.interval === 'month' ? t('subscription.month') : t('subscription.year')}</Text>
+                    <Text style={styles.planDescription}>{plan.description}</Text>
+                    {plan.savings && <Text style={styles.planSaving}>{plan.savings}</Text>}
+                  </View>
+                </View>
+                {processingPayment ? (
+                  <ActivityIndicator color="#FF6B35" />
+                ) : (
+                  <Ionicons name="chevron-forward" size={20} color="#666" />
+                )}
+              </TouchableOpacity>
+            ))}
 
             <Text style={styles.noteText}>
-              {t('subscription.note')}
+              {t('subscription.stripeNote')}
             </Text>
           </View>
         </View>
@@ -826,6 +914,38 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#4CAF50',
     fontWeight: '600',
+    marginTop: 4,
+  },
+  planOptionActive: {
+    borderWidth: 2,
+    borderColor: '#FF6B35',
+  },
+  planPrice: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FF6B35',
+    marginTop: 4,
+  },
+  statusBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#252525',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 12,
+  },
+  statusInfo: {
+    flex: 1,
+  },
+  statusTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  statusDesc: {
+    fontSize: 12,
+    color: '#999',
     marginTop: 4,
   },
   divider: {

@@ -117,7 +117,7 @@ export default function AthleteDetail() {
       await loadActivities();
     } catch (error) {
       Alert.alert('Errore', 'Impossibile caricare atleta');
-      router.back();
+      router.replace('/(tabs)');
     } finally {
       setLoading(false);
     }

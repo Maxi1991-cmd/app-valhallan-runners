@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -7,7 +7,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional
+from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
@@ -16,6 +16,9 @@ from bson import ObjectId
 import gpxpy
 import io
 import base64
+
+# Stripe Integration
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -524,12 +527,52 @@ async def ensure_coach_has_subscription(user: dict) -> dict:
     return user
 
 # Dependency per verificare abbonamento attivo per operazioni di scrittura
+# Free tier constant
+FREE_TIER_ATHLETE_LIMIT = 1
+
 async def require_active_subscription(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") == "coach" and not check_subscription_active(current_user):
+    """
+    Freemium model:
+    - Free: max 1 athlete
+    - Premium: unlimited athletes
+    """
+    if current_user.get("role") != "coach":
+        return current_user
+    
+    coach_id = current_user["id"]
+    
+    # Check for active subscription in new subscriptions collection
+    subscription = await db.subscriptions.find_one({
+        "coach_id": coach_id,
+        "status": "active",
+        "expires_at": {"$gt": datetime.utcnow()}
+    })
+    
+    # Also check old subscription model
+    old_sub = current_user.get("subscription", {})
+    old_sub_active = False
+    if old_sub:
+        try:
+            end_date = datetime.strptime(old_sub.get("end_date", "2000-01-01"), "%Y-%m-%d")
+            old_sub_active = end_date > datetime.utcnow() and old_sub.get("status") == "active"
+        except:
+            pass
+    
+    is_premium = subscription is not None or old_sub_active
+    
+    if is_premium:
+        return current_user
+    
+    # Free tier - check athlete count
+    athlete_count = await db.athletes.count_documents({"coach_id": coach_id})
+    
+    # Allow max 1 athlete for free tier
+    if athlete_count >= FREE_TIER_ATHLETE_LIMIT:
         raise HTTPException(
             status_code=403, 
-            detail="Abbonamento scaduto o non attivo. Rinnova per modificare i dati."
+            detail=f"Piano gratuito limitato a {FREE_TIER_ATHLETE_LIMIT} atleta. Passa a Premium per aggiungere più atleti."
         )
+    
     return current_user
 
 @api_router.post("/auth/register", response_model=Token)
@@ -2364,6 +2407,262 @@ async def get_payment_expiries(current_user: dict = Depends(get_current_user)):
     expiries.sort(key=lambda x: x["days_until_due"])
     
     return {"expiries": expiries}
+
+# ==================== STRIPE SUBSCRIPTION ====================
+
+# Subscription Plans (prezzi fissi definiti lato server)
+SUBSCRIPTION_PLANS = {
+    "monthly": {
+        "name": "Abbonamento Mensile",
+        "amount": 9.99,
+        "currency": "eur",
+        "interval": "month"
+    },
+    "annual": {
+        "name": "Abbonamento Annuale", 
+        "amount": 79.99,
+        "currency": "eur",
+        "interval": "year"
+    }
+}
+
+class CreateCheckoutRequest(BaseModel):
+    plan_id: str  # "monthly" or "annual"
+    origin_url: str  # Frontend URL for redirects
+
+@api_router.get("/subscription/plans")
+async def get_subscription_plans():
+    """Get available subscription plans"""
+    return {
+        "plans": [
+            {
+                "id": "monthly",
+                "name": SUBSCRIPTION_PLANS["monthly"]["name"],
+                "price": SUBSCRIPTION_PLANS["monthly"]["amount"],
+                "currency": SUBSCRIPTION_PLANS["monthly"]["currency"],
+                "interval": "month",
+                "description": "Atleti illimitati, fatturazione mensile"
+            },
+            {
+                "id": "annual",
+                "name": SUBSCRIPTION_PLANS["annual"]["name"],
+                "price": SUBSCRIPTION_PLANS["annual"]["amount"],
+                "currency": SUBSCRIPTION_PLANS["annual"]["currency"],
+                "interval": "year",
+                "description": "Atleti illimitati, risparmia 2 mesi",
+                "savings": "Risparmi €39.89/anno"
+            }
+        ],
+        "free_tier": {
+            "athlete_limit": FREE_TIER_ATHLETE_LIMIT,
+            "description": f"Gratuito con max {FREE_TIER_ATHLETE_LIMIT} atleta"
+        }
+    }
+
+@api_router.get("/subscription/status")
+async def get_subscription_status(current_user: dict = Depends(get_current_user)):
+    """Check if coach has active subscription"""
+    if current_user["role"] != "coach":
+        raise HTTPException(status_code=403, detail="Only coaches can have subscriptions")
+    
+    coach_id = current_user["id"]
+    
+    # Check for active subscription
+    subscription = await db.subscriptions.find_one({
+        "coach_id": coach_id,
+        "status": "active",
+        "expires_at": {"$gt": datetime.utcnow()}
+    })
+    
+    # Count athletes
+    athlete_count = await db.athletes.count_documents({"coach_id": coach_id})
+    
+    if subscription:
+        return {
+            "is_premium": True,
+            "plan": subscription.get("plan_id"),
+            "expires_at": subscription.get("expires_at").isoformat() if subscription.get("expires_at") else None,
+            "athlete_count": athlete_count,
+            "athlete_limit": None,  # Unlimited
+            "can_add_athlete": True
+        }
+    else:
+        return {
+            "is_premium": False,
+            "plan": "free",
+            "expires_at": None,
+            "athlete_count": athlete_count,
+            "athlete_limit": FREE_TIER_ATHLETE_LIMIT,
+            "can_add_athlete": athlete_count < FREE_TIER_ATHLETE_LIMIT
+        }
+
+@api_router.post("/subscription/checkout")
+async def create_checkout_session(request: CreateCheckoutRequest, http_request: Request, current_user: dict = Depends(get_current_user)):
+    """Create Stripe checkout session for subscription"""
+    if current_user["role"] != "coach":
+        raise HTTPException(status_code=403, detail="Only coaches can subscribe")
+    
+    if request.plan_id not in SUBSCRIPTION_PLANS:
+        raise HTTPException(status_code=400, detail="Invalid plan ID")
+    
+    plan = SUBSCRIPTION_PLANS[request.plan_id]
+    coach_id = current_user["id"]
+    coach_email = current_user.get("email", "")
+    
+    # Get Stripe API key
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    
+    # Build URLs from origin
+    success_url = f"{request.origin_url}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{request.origin_url}/subscription/cancel"
+    
+    # Initialize Stripe
+    host_url = str(http_request.base_url)
+    webhook_url = f"{host_url}api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+    
+    # Create checkout session
+    checkout_request = CheckoutSessionRequest(
+        amount=float(plan["amount"]),
+        currency=plan["currency"],
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
+            "coach_id": coach_id,
+            "coach_email": coach_email,
+            "plan_id": request.plan_id,
+            "plan_name": plan["name"],
+            "type": "subscription"
+        }
+    )
+    
+    try:
+        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Create payment transaction record
+        transaction = {
+            "id": str(uuid.uuid4()),
+            "session_id": session.session_id,
+            "coach_id": coach_id,
+            "coach_email": coach_email,
+            "plan_id": request.plan_id,
+            "amount": plan["amount"],
+            "currency": plan["currency"],
+            "payment_status": "pending",
+            "created_at": datetime.utcnow()
+        }
+        await db.payment_transactions.insert_one(transaction)
+        
+        return {
+            "checkout_url": session.url,
+            "session_id": session.session_id
+        }
+    except Exception as e:
+        logger.error(f"Stripe checkout error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Checkout error: {str(e)}")
+
+@api_router.get("/subscription/checkout/status/{session_id}")
+async def get_checkout_status(session_id: str, current_user: dict = Depends(get_current_user)):
+    """Get status of checkout session and activate subscription if paid"""
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    
+    stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url="")
+    
+    try:
+        status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Get transaction
+        transaction = await db.payment_transactions.find_one({"session_id": session_id})
+        
+        if transaction and status.payment_status == "paid":
+            # Check if already processed
+            if transaction.get("payment_status") != "paid":
+                # Update transaction
+                await db.payment_transactions.update_one(
+                    {"session_id": session_id},
+                    {"$set": {
+                        "payment_status": "paid",
+                        "paid_at": datetime.utcnow()
+                    }}
+                )
+                
+                # Create/update subscription
+                plan_id = transaction.get("plan_id")
+                coach_id = transaction.get("coach_id")
+                
+                # Calculate expiration
+                if plan_id == "monthly":
+                    expires_at = datetime.utcnow() + timedelta(days=30)
+                else:  # annual
+                    expires_at = datetime.utcnow() + timedelta(days=365)
+                
+                # Check for existing subscription
+                existing = await db.subscriptions.find_one({"coach_id": coach_id})
+                
+                if existing:
+                    # Extend subscription
+                    new_expires = max(existing.get("expires_at", datetime.utcnow()), datetime.utcnow())
+                    if plan_id == "monthly":
+                        new_expires += timedelta(days=30)
+                    else:
+                        new_expires += timedelta(days=365)
+                    
+                    await db.subscriptions.update_one(
+                        {"coach_id": coach_id},
+                        {"$set": {
+                            "plan_id": plan_id,
+                            "status": "active",
+                            "expires_at": new_expires,
+                            "updated_at": datetime.utcnow()
+                        }}
+                    )
+                else:
+                    # Create new subscription
+                    subscription = {
+                        "id": str(uuid.uuid4()),
+                        "coach_id": coach_id,
+                        "plan_id": plan_id,
+                        "status": "active",
+                        "started_at": datetime.utcnow(),
+                        "expires_at": expires_at,
+                        "created_at": datetime.utcnow()
+                    }
+                    await db.subscriptions.insert_one(subscription)
+        
+        return {
+            "status": status.status,
+            "payment_status": status.payment_status,
+            "amount_total": status.amount_total,
+            "currency": status.currency
+        }
+    except Exception as e:
+        logger.error(f"Checkout status error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Status check error: {str(e)}")
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhooks"""
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        return {"status": "error", "message": "Stripe not configured"}
+    
+    try:
+        body = await request.body()
+        signature = request.headers.get("Stripe-Signature")
+        
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url="")
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        logger.info(f"Webhook received: {webhook_response.event_type}")
+        
+        return {"status": "ok"}
+    except Exception as e:
+        logger.error(f"Webhook error: {str(e)}")
+        return {"status": "error", "message": str(e)}
 
 # ==================== HEALTH CHECK ====================
 
