@@ -2672,8 +2672,10 @@ async def _process_checkout_status(session_id: str):
 
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
-    """Handle Stripe webhooks for subscription events"""
+    """Handle Stripe webhooks for subscription events with signature verification"""
     stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+    
     if not stripe_api_key:
         return {"status": "error", "message": "Stripe not configured"}
     
@@ -2681,51 +2683,70 @@ async def stripe_webhook(request: Request):
     
     try:
         body = await request.body()
-        event = stripe.Event.construct_from(
-            json.loads(body), stripe_api_key
-        )
+        sig_header = request.headers.get("Stripe-Signature")
+        
+        # Verify webhook signature if secret is configured
+        if webhook_secret and sig_header:
+            try:
+                event = stripe.Webhook.construct_event(body, sig_header, webhook_secret)
+                logger.info(f"Webhook signature verified for event: {event.type}")
+            except stripe.error.SignatureVerificationError as e:
+                logger.error(f"Webhook signature verification failed: {str(e)}")
+                return {"status": "error", "message": "Invalid signature"}
+        else:
+            # Fallback without signature verification (dev mode)
+            event = stripe.Event.construct_from(json.loads(body), stripe_api_key)
         
         logger.info(f"Webhook received: {event.type}")
         
         # Handle checkout.session.completed
         if event.type == "checkout.session.completed":
             session = event.data.object
+            logger.info(f"Processing checkout.session.completed for session: {session.id}")
             
             # Get transaction and update if exists
             transaction = await db.payment_transactions.find_one({"session_id": session.id})
-            if transaction and session.payment_status == "paid":
-                await db.payment_transactions.update_one(
-                    {"session_id": session.id},
-                    {"$set": {"payment_status": "paid", "paid_at": datetime.utcnow()}}
-                )
+            if transaction:
+                payment_status = getattr(session, 'payment_status', None)
+                logger.info(f"Transaction found, payment_status: {payment_status}")
                 
-                # Activate subscription
-                plan_id = transaction.get("plan_id")
-                coach_id = transaction.get("coach_id")
-                
-                if plan_id == "monthly":
-                    expires_at = datetime.utcnow() + timedelta(days=30)
-                else:
-                    expires_at = datetime.utcnow() + timedelta(days=365)
-                
-                existing = await db.subscriptions.find_one({"coach_id": coach_id})
-                if existing:
-                    new_expires = max(existing.get("expires_at", datetime.utcnow()), datetime.utcnow())
-                    new_expires += timedelta(days=30) if plan_id == "monthly" else timedelta(days=365)
-                    await db.subscriptions.update_one(
-                        {"coach_id": coach_id},
-                        {"$set": {"plan_id": plan_id, "status": "active", "expires_at": new_expires, "updated_at": datetime.utcnow()}}
+                if payment_status == "paid":
+                    await db.payment_transactions.update_one(
+                        {"session_id": session.id},
+                        {"$set": {"payment_status": "paid", "paid_at": datetime.utcnow()}}
                     )
-                else:
-                    await db.subscriptions.insert_one({
-                        "id": str(uuid.uuid4()),
-                        "coach_id": coach_id,
-                        "plan_id": plan_id,
-                        "status": "active",
-                        "started_at": datetime.utcnow(),
-                        "expires_at": expires_at,
-                        "created_at": datetime.utcnow()
-                    })
+                    
+                    # Activate subscription
+                    plan_id = transaction.get("plan_id")
+                    coach_id = transaction.get("coach_id")
+                    
+                    if plan_id == "monthly":
+                        expires_at = datetime.utcnow() + timedelta(days=30)
+                    else:
+                        expires_at = datetime.utcnow() + timedelta(days=365)
+                    
+                    existing = await db.subscriptions.find_one({"coach_id": coach_id})
+                    if existing:
+                        new_expires = max(existing.get("expires_at", datetime.utcnow()), datetime.utcnow())
+                        new_expires += timedelta(days=30) if plan_id == "monthly" else timedelta(days=365)
+                        await db.subscriptions.update_one(
+                            {"coach_id": coach_id},
+                            {"$set": {"plan_id": plan_id, "status": "active", "expires_at": new_expires, "updated_at": datetime.utcnow()}}
+                        )
+                    else:
+                        await db.subscriptions.insert_one({
+                            "id": str(uuid.uuid4()),
+                            "coach_id": coach_id,
+                            "plan_id": plan_id,
+                            "status": "active",
+                            "started_at": datetime.utcnow(),
+                            "expires_at": expires_at,
+                            "created_at": datetime.utcnow()
+                        })
+                    
+                    logger.info(f"Subscription activated via webhook for coach: {coach_id}, plan: {plan_id}")
+            else:
+                logger.warning(f"No transaction found for session: {session.id}")
         
         # Handle subscription cancellation
         elif event.type == "customer.subscription.deleted":
