@@ -4,7 +4,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../src/components/Button';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useAuthStore } from '../../src/store/authStore';
 import { useTranslation } from '../../src/hooks/useTranslation';
@@ -18,43 +17,65 @@ export default function SubscriptionSuccessScreen() {
   const { refreshSubscription, loadUser } = useAuthStore();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    verifyPayment();
-  }, [session_id]);
+    if (session_id) {
+      verifyPayment();
+    } else {
+      // Se non c'è session_id, aspetta un po' (potrebbe essere in caricamento)
+      const timer = setTimeout(() => {
+        if (!session_id) {
+          setStatus('error');
+          setMessage(t('subscription.invalidSession') || 'Sessione non valida');
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [session_id, retryCount]);
 
   const verifyPayment = async () => {
-    if (!session_id) {
-      setStatus('error');
-      setMessage(t('subscription.invalidSession') || 'Sessione non valida');
-      return;
-    }
-
     try {
-      const token = await AsyncStorage.getItem('token');
+      console.log('Verifying payment for session:', session_id);
+      
+      // Usa l'endpoint pubblico che non richiede autenticazione
       const response = await axios.get(
-        `${BASE_URL}/api/subscription/checkout/status/${session_id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        `${BASE_URL}/api/subscription/verify/${session_id}`
       );
+
+      console.log('Verify response:', response.data);
 
       if (response.data.payment_status === 'paid') {
         // Aggiorna lo stato dell'abbonamento nello store Zustand
-        await refreshSubscription();
-        // Ricarica anche i dati utente per sicurezza
-        await loadUser();
+        try {
+          await refreshSubscription();
+          await loadUser();
+        } catch (refreshError) {
+          console.log('Refresh error (non-blocking):', refreshError);
+          // Non bloccare se il refresh fallisce - l'abbonamento è stato comunque attivato
+        }
         
         setStatus('success');
         setMessage(t('subscription.activatedSuccess') || 'Abbonamento attivato con successo!');
       } else {
-        setStatus('error');
-        setMessage(t('subscription.paymentNotCompleted') || 'Pagamento non completato');
+        // Se non è ancora paid, potrebbe essere in elaborazione - riprova
+        if (retryCount < 3) {
+          setTimeout(() => setRetryCount(prev => prev + 1), 2000);
+        } else {
+          setStatus('error');
+          setMessage(t('subscription.paymentNotCompleted') || 'Pagamento non completato');
+        }
       }
-    } catch (error) {
-      console.error('Verify payment error:', error);
-      setStatus('error');
-      setMessage(t('subscription.verificationError') || 'Errore durante la verifica del pagamento');
+    } catch (error: any) {
+      console.error('Verify payment error:', error?.response?.data || error?.message || error);
+      
+      // Riprova automaticamente in caso di errore temporaneo
+      if (retryCount < 3) {
+        setTimeout(() => setRetryCount(prev => prev + 1), 2000);
+      } else {
+        setStatus('error');
+        setMessage(t('subscription.verificationError') || 'Errore durante la verifica del pagamento');
+      }
     }
   };
 

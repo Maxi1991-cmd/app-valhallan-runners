@@ -2576,7 +2576,17 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
 
 @api_router.get("/subscription/checkout/status/{session_id}")
 async def get_checkout_status(session_id: str, current_user: dict = Depends(get_current_user)):
-    """Get status of checkout session and activate subscription if paid"""
+    """Get status of checkout session and activate subscription if paid (authenticated)"""
+    return await _process_checkout_status(session_id)
+
+@api_router.get("/subscription/verify/{session_id}")
+async def verify_checkout_public(session_id: str):
+    """Public endpoint to verify and activate subscription after Stripe redirect.
+    The session_id itself serves as authentication since only the payer knows it."""
+    return await _process_checkout_status(session_id)
+
+async def _process_checkout_status(session_id: str):
+    """Internal function to process checkout status"""
     stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
     if not stripe_api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
@@ -2646,12 +2656,15 @@ async def get_checkout_status(session_id: str, current_user: dict = Depends(get_
                         "created_at": datetime.utcnow()
                     }
                     await db.subscriptions.insert_one(subscription)
+                
+                logger.info(f"Subscription activated for coach {coach_id}, plan: {plan_id}")
         
         return {
             "status": session.status,
             "payment_status": payment_status,
             "amount_total": session.amount_total,
-            "currency": session.currency
+            "currency": session.currency,
+            "coach_id": transaction.get("coach_id") if transaction else None
         }
     except Exception as e:
         logger.error(f"Checkout status error: {str(e)}")
