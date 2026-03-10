@@ -2510,7 +2510,7 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
     coach_email = current_user.get("email", "")
     
     # Get Stripe API key
-    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
     if not stripe_api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
@@ -2566,7 +2566,7 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
 @api_router.get("/subscription/checkout/status/{session_id}")
 async def get_checkout_status(session_id: str, current_user: dict = Depends(get_current_user)):
     """Get status of checkout session and activate subscription if paid"""
-    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
     if not stripe_api_key:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
@@ -2646,7 +2646,7 @@ async def get_checkout_status(session_id: str, current_user: dict = Depends(get_
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
     """Handle Stripe webhooks"""
-    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
     if not stripe_api_key:
         return {"status": "error", "message": "Stripe not configured"}
     
