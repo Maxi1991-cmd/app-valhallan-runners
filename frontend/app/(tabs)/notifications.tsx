@@ -107,10 +107,10 @@ export default function NotificationsTab() {
   };
 
   // Navigazione al contenuto correlato per le notifiche
-  const handleNotificationPress = (item: Notification) => {
-    // Segna come letta se non lo è
+  const handleNotificationPress = async (item: Notification) => {
+    // Elimina la notifica quando viene cliccata (letta)
     if (!item.read) {
-      markNotificationRead(item.id);
+      await deleteNotification(item.id);
     }
 
     const relatedData = (item as any).related_data;
@@ -336,7 +336,7 @@ export default function NotificationsTab() {
         </View>
         {unreadCount > 0 && (
           <Button
-            title={t('notifications.markAll')}
+            title={t('notifications.clearAll')}
             onPress={markAllNotificationsRead}
             variant="outline"
             size="small"

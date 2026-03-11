@@ -256,6 +256,7 @@
     "unread": "unread",
     "allRead": "All read",
     "markAll": "Mark all",
+    "clearAll": "Clear all",
     "expiryWarnings": "Expiry Warnings",
     "willAppearHere": "Your notifications will appear here"
   },

@@ -145,11 +145,9 @@ export const useDataStore = create<DataState>((set, get) => ({
   },
 
   markAllNotificationsRead: async () => {
-    await notificationAPI.markAllRead();
-    set((state) => ({
-      notifications: state.notifications.map((n) => ({ ...n, read: true })),
-      unreadCount: 0,
-    }));
+    // Elimina tutte le notifiche invece di solo marcarle come lette
+    await notificationAPI.deleteAll();
+    set({ notifications: [], unreadCount: 0 });
   },
 
   deleteNotification: async (id: string) => {
