@@ -26,6 +26,7 @@ interface SubscriptionPlan {
 
 interface SubscriptionStatus {
   is_premium: boolean;
+  is_admin: boolean;
   plan: string;
   expires_at: string | null;
   athlete_count: number;
@@ -462,12 +463,20 @@ export default function ProfileTab() {
                 />
                 <View style={styles.statusInfo}>
                   <Text style={styles.statusTitle}>
-                    {subscriptionStatus.is_premium ? t('subscription.premiumActive') : t('subscription.freePlan')}
+                    {subscriptionStatus.is_admin 
+                      ? 'Admin (Illimitato)'
+                      : subscriptionStatus.is_premium 
+                        ? t('subscription.premiumActive') 
+                        : t('subscription.freePlan')}
                   </Text>
                   <Text style={styles.statusDesc}>
-                    {subscriptionStatus.is_premium 
-                      ? `${t('subscription.expiresOn')}: ${new Date(subscriptionStatus.expires_at!).toLocaleDateString('it-IT')}`
-                      : `${subscriptionStatus.athlete_count}/${subscriptionStatus.athlete_limit} ${t('subscription.athletesUsed')}`
+                    {subscriptionStatus.is_admin
+                      ? 'Nessuna scadenza - Account Creator'
+                      : subscriptionStatus.is_premium 
+                        ? subscriptionStatus.expires_at
+                          ? `${t('subscription.expiresOn')}: ${new Date(subscriptionStatus.expires_at).toLocaleDateString('it-IT')}`
+                          : 'Abbonamento attivo'
+                        : `${subscriptionStatus.athlete_count}/${subscriptionStatus.athlete_limit} ${t('subscription.athletesUsed')}`
                     }
                   </Text>
                 </View>
