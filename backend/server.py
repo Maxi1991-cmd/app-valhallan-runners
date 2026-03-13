@@ -2486,14 +2486,14 @@ STRIPE_PRICE_IDS = {
 SUBSCRIPTION_PLANS = {
     "monthly": {
         "name": "Abbonamento Mensile",
-        "amount": 9.99,
+        "amount": 5.90,
         "currency": "eur",
         "interval": "month",
         "price_id": STRIPE_PRICE_IDS["monthly"]
     },
     "annual": {
         "name": "Abbonamento Annuale", 
-        "amount": 79.99,
+        "amount": 59.90,
         "currency": "eur",
         "interval": "year",
         "price_id": STRIPE_PRICE_IDS["annual"]
@@ -2525,7 +2525,7 @@ async def get_subscription_plans():
                 "currency": SUBSCRIPTION_PLANS["annual"]["currency"],
                 "interval": "year",
                 "description": "Atleti illimitati, risparmia 2 mesi",
-                "savings": "Risparmi €39.89/anno"
+                "savings": "Risparmi €10,90/anno"
             }
         ],
         "free_tier": {
