@@ -328,6 +328,7 @@
     "invalidSession": "Sessione non valida",
     "unlimitedAthletes": "Ora puoi aggiungere atleti illimitati alla tua squadra.",
     "backToHome": "Torna alla Home",
+    "redirecting": "Reindirizzamento alla dashboard...",
     "paymentCanceled": "Pagamento Annullato",
     "paymentCanceledDesc": "Hai annullato il processo di pagamento.",
     "retryFromProfile": "Puoi riprovare in qualsiasi momento dalla pagina del profilo.",

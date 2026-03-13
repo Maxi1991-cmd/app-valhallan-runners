@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, Switch, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Modal, Switch, ActivityIndicator, Linking, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../src/store/authStore';
 import { Card } from '../../src/components/Card';
@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useTranslation } from '../../src/hooks/useTranslation';
+import * as WebBrowser from 'expo-web-browser';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || '';
 
@@ -97,22 +98,32 @@ export default function ProfileTab() {
         return;
       }
       
+      // Check if we're on a native mobile platform (iOS or Android)
+      const isMobile = Platform.OS === 'ios' || Platform.OS === 'android';
+      
       // Create checkout session
       const response = await axios.post(
         `${BASE_URL}/api/subscription/checkout`,
         {
           plan_id: planId,
-          origin_url: BASE_URL
+          origin_url: BASE_URL,
+          use_deep_link: isMobile  // Use deep links on mobile for app redirect
         },
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
       
-      // Open Stripe checkout in browser
+      // Open Stripe checkout
       const { checkout_url } = response.data;
       if (checkout_url) {
-        await Linking.openURL(checkout_url);
+        if (isMobile) {
+          // On mobile, use WebBrowser for better deep link handling
+          await WebBrowser.openBrowserAsync(checkout_url);
+        } else {
+          // On web, just open the URL
+          await Linking.openURL(checkout_url);
+        }
         setShowSubscriptionModal(false);
       }
     } catch (error: any) {

@@ -57,6 +57,11 @@ export default function SubscriptionSuccessScreen() {
         
         setStatus('success');
         setMessage(t('subscription.activatedSuccess') || 'Abbonamento attivato con successo!');
+        
+        // Auto-redirect alla dashboard dopo 3 secondi
+        setTimeout(() => {
+          router.replace('/(tabs)');
+        }, 3000);
       } else {
         // Se non è ancora paid, potrebbe essere in elaborazione - riprova
         if (retryCount < 3) {
@@ -98,6 +103,9 @@ export default function SubscriptionSuccessScreen() {
             <Text style={styles.message}>{message}</Text>
             <Text style={styles.subMessage}>
               {t('subscription.unlimitedAthletes') || 'Ora puoi aggiungere atleti illimitati alla tua squadra.'}
+            </Text>
+            <Text style={styles.redirectText}>
+              {t('subscription.redirecting') || 'Reindirizzamento alla dashboard...'}
             </Text>
           </>
         )}
@@ -153,7 +161,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#999',
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 16,
+  },
+  redirectText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 16,
+    fontStyle: 'italic',
   },
   button: {
     width: '100%',

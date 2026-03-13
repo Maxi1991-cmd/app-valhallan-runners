@@ -328,6 +328,7 @@
     "invalidSession": "Invalid session",
     "unlimitedAthletes": "You can now add unlimited athletes to your team.",
     "backToHome": "Back to Home",
+    "redirecting": "Redirecting to dashboard...",
     "paymentCanceled": "Payment Canceled",
     "paymentCanceledDesc": "You have canceled the payment process.",
     "retryFromProfile": "You can retry anytime from the profile page.",

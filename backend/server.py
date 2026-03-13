@@ -2500,6 +2500,7 @@ SUBSCRIPTION_PLANS = {
 class CreateCheckoutRequest(BaseModel):
     plan_id: str  # "monthly" or "annual"
     origin_url: str  # Frontend URL for redirects
+    use_deep_link: bool = False  # If True, use deep links for mobile app redirect
 
 @api_router.get("/subscription/plans")
 async def get_subscription_plans():
@@ -2588,9 +2589,19 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
     # Configure Stripe
     stripe.api_key = stripe_api_key
     
-    # Build URLs from origin
-    success_url = f"{request.origin_url}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
-    cancel_url = f"{request.origin_url}/subscription/cancel"
+    # Build URLs - Use deep links for mobile app
+    # Deep link scheme: valhallan://
+    
+    if request.use_deep_link:
+        # Mobile app with deep links - redirect directly to app
+        success_url = f"valhallan://subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = "valhallan://subscription/cancel"
+        logger.info(f"Using deep links for checkout: success={success_url}")
+    else:
+        # Web version
+        web_base = request.origin_url or "https://freemium-coach-2.preview.emergentagent.com"
+        success_url = f"{web_base}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{web_base}/subscription/cancel"
     
     try:
         # Create Stripe checkout session with real Price ID
