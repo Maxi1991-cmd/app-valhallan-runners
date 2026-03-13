@@ -2589,20 +2589,15 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
     # Configure Stripe
     stripe.api_key = stripe_api_key
     
-    # Get the base URL for redirect endpoints
-    # Use the backend URL for the redirect page that will handle deep links
-    backend_base = str(http_request.base_url).rstrip('/')
+    # Get the base URL for redirect
     web_base = request.origin_url or "https://freemium-coach-2.preview.emergentagent.com"
     
-    if request.use_deep_link:
-        # Mobile app - use backend redirect endpoint that will redirect to deep link
-        success_url = f"{backend_base}api/stripe/redirect/success?session_id={{CHECKOUT_SESSION_ID}}"
-        cancel_url = f"{backend_base}api/stripe/redirect/cancel"
-        logger.info(f"Using redirect endpoints for mobile: success={success_url}")
-    else:
-        # Web version - direct to frontend pages
-        success_url = f"{web_base}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
-        cancel_url = f"{web_base}/subscription/cancel"
+    # Usa sempre la pagina frontend /payment-success che gestisce il deep link
+    # Questo URL funziona sia su web che su mobile
+    success_url = f"{web_base}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{web_base}/subscription/cancel"
+    
+    logger.info(f"Checkout URLs - success: {success_url}, cancel: {cancel_url}")
     
     try:
         # Create Stripe checkout session with real Price ID
