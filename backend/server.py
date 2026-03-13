@@ -2589,17 +2589,18 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
     # Configure Stripe
     stripe.api_key = stripe_api_key
     
-    # Build URLs - Use deep links for mobile app
-    # Deep link scheme: valhallan://
+    # Get the base URL for redirect endpoints
+    # Use the backend URL for the redirect page that will handle deep links
+    backend_base = str(http_request.base_url).rstrip('/')
+    web_base = request.origin_url or "https://freemium-coach-2.preview.emergentagent.com"
     
     if request.use_deep_link:
-        # Mobile app with deep links - redirect directly to app
-        success_url = f"valhallan://subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
-        cancel_url = "valhallan://subscription/cancel"
-        logger.info(f"Using deep links for checkout: success={success_url}")
+        # Mobile app - use backend redirect endpoint that will redirect to deep link
+        success_url = f"{backend_base}api/stripe/redirect/success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{backend_base}api/stripe/redirect/cancel"
+        logger.info(f"Using redirect endpoints for mobile: success={success_url}")
     else:
-        # Web version
-        web_base = request.origin_url or "https://freemium-coach-2.preview.emergentagent.com"
+        # Web version - direct to frontend pages
         success_url = f"{web_base}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{web_base}/subscription/cancel"
     
@@ -2836,6 +2837,251 @@ async def stripe_webhook(request: Request):
     except Exception as e:
         logger.error(f"Webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
+
+# ==================== STRIPE REDIRECT ENDPOINTS ====================
+# These endpoints handle Stripe redirects and automatically redirect to deep links
+
+from fastapi.responses import HTMLResponse
+
+@api_router.get("/stripe/redirect/success", response_class=HTMLResponse)
+async def stripe_redirect_success(session_id: str):
+    """
+    Redirect page after successful Stripe payment.
+    This page automatically redirects to the app via deep link.
+    """
+    # Verify and process the payment
+    stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
+    if stripe_api_key:
+        stripe.api_key = stripe_api_key
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+            if session.payment_status == "paid":
+                # Payment verified, activate subscription via the verify endpoint
+                await _process_checkout_status(session_id)
+        except Exception as e:
+            logger.error(f"Error verifying payment in redirect: {e}")
+    
+    # Return HTML that redirects to the deep link
+    deep_link = f"valhallan://subscription/success?session_id={session_id}"
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pagamento Completato - Valhallan Runners</title>
+        <style>
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                min-height: 100vh;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white;
+            }}
+            .container {{
+                text-align: center;
+                padding: 40px;
+                max-width: 400px;
+            }}
+            .checkmark {{
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: #4CAF50;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 auto 24px;
+                animation: scale-in 0.5s ease-out;
+            }}
+            .checkmark svg {{
+                width: 40px;
+                height: 40px;
+                fill: white;
+            }}
+            h1 {{
+                font-size: 24px;
+                margin-bottom: 16px;
+            }}
+            p {{
+                color: #aaa;
+                margin-bottom: 24px;
+            }}
+            .spinner {{
+                width: 24px;
+                height: 24px;
+                border: 3px solid rgba(255,255,255,0.3);
+                border-top-color: #FF6B35;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: 0 auto;
+            }}
+            @keyframes spin {{
+                to {{ transform: rotate(360deg); }}
+            }}
+            @keyframes scale-in {{
+                from {{ transform: scale(0); }}
+                to {{ transform: scale(1); }}
+            }}
+            .button {{
+                display: inline-block;
+                background: #FF6B35;
+                color: white;
+                padding: 12px 32px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 600;
+                margin-top: 16px;
+            }}
+        </style>
+        <script>
+            // Redirect automaticamente al deep link dopo 1 secondo
+            setTimeout(function() {{
+                window.location.href = "{deep_link}";
+            }}, 1000);
+            
+            // Fallback: se il deep link non funziona dopo 3 secondi, mostra il bottone
+            setTimeout(function() {{
+                document.getElementById('fallback').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+            }}, 3000);
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="checkmark">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <h1>Pagamento Completato!</h1>
+            <p>Il tuo abbonamento è stato attivato con successo.</p>
+            <div id="loading">
+                <p>Ritorno all'app in corso...</p>
+                <div class="spinner"></div>
+            </div>
+            <div id="fallback" style="display: none;">
+                <p>Se l'app non si apre automaticamente:</p>
+                <a href="{deep_link}" class="button">Apri l'App</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
+
+@api_router.get("/stripe/redirect/cancel", response_class=HTMLResponse)
+async def stripe_redirect_cancel():
+    """
+    Redirect page when payment is cancelled.
+    This page automatically redirects to the app via deep link.
+    """
+    deep_link = "valhallan://subscription/cancel"
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pagamento Annullato - Valhallan Runners</title>
+        <style>
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                min-height: 100vh;
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white;
+            }}
+            .container {{
+                text-align: center;
+                padding: 40px;
+                max-width: 400px;
+            }}
+            .icon {{
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: #FF9800;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 auto 24px;
+            }}
+            .icon svg {{
+                width: 40px;
+                height: 40px;
+                fill: white;
+            }}
+            h1 {{
+                font-size: 24px;
+                margin-bottom: 16px;
+            }}
+            p {{
+                color: #aaa;
+                margin-bottom: 24px;
+            }}
+            .spinner {{
+                width: 24px;
+                height: 24px;
+                border: 3px solid rgba(255,255,255,0.3);
+                border-top-color: #FF6B35;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin: 0 auto;
+            }}
+            @keyframes spin {{
+                to {{ transform: rotate(360deg); }}
+            }}
+            .button {{
+                display: inline-block;
+                background: #FF6B35;
+                color: white;
+                padding: 12px 32px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 600;
+                margin-top: 16px;
+            }}
+        </style>
+        <script>
+            // Redirect automaticamente al deep link dopo 1 secondo
+            setTimeout(function() {{
+                window.location.href = "{deep_link}";
+            }}, 1000);
+            
+            // Fallback: se il deep link non funziona dopo 3 secondi, mostra il bottone
+            setTimeout(function() {{
+                document.getElementById('fallback').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+            }}, 3000);
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="icon">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </div>
+            <h1>Pagamento Annullato</h1>
+            <p>Hai annullato il processo di pagamento. Puoi riprovare quando vuoi.</p>
+            <div id="loading">
+                <p>Ritorno all'app in corso...</p>
+                <div class="spinner"></div>
+            </div>
+            <div id="fallback" style="display: none;">
+                <p>Se l'app non si apre automaticamente:</p>
+                <a href="{deep_link}" class="button">Apri l'App</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return HTMLResponse(content=html_content)
 
 # ==================== STRIPE WEBHOOK (NEW ENDPOINT) ====================
 
