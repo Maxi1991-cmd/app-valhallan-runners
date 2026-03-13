@@ -559,7 +559,10 @@ async def require_active_subscription(current_user: dict = Depends(get_current_u
         except:
             pass
     
-    is_premium = subscription is not None or old_sub_active
+    # Check if user is admin/creator (always has premium access)
+    is_admin = current_user.get("is_admin", False)
+    
+    is_premium = subscription is not None or old_sub_active or is_admin
     
     if is_premium:
         return current_user
@@ -2538,6 +2541,7 @@ async def get_subscription_status(current_user: dict = Depends(get_current_user)
         raise HTTPException(status_code=403, detail="Only coaches can have subscriptions")
     
     coach_id = current_user["id"]
+    is_admin = current_user.get("is_admin", False)
     
     # Check for active subscription
     subscription = await db.subscriptions.find_one({
@@ -2549,9 +2553,22 @@ async def get_subscription_status(current_user: dict = Depends(get_current_user)
     # Count athletes
     athlete_count = await db.athletes.count_documents({"coach_id": coach_id})
     
+    # Admin/Creator has unlimited premium access
+    if is_admin:
+        return {
+            "is_premium": True,
+            "is_admin": True,
+            "plan": "admin",
+            "expires_at": None,  # Never expires for admin
+            "athlete_count": athlete_count,
+            "athlete_limit": None,  # Unlimited
+            "can_add_athlete": True
+        }
+    
     if subscription:
         return {
             "is_premium": True,
+            "is_admin": False,
             "plan": subscription.get("plan_id"),
             "expires_at": subscription.get("expires_at").isoformat() if subscription.get("expires_at") else None,
             "athlete_count": athlete_count,
@@ -2561,6 +2578,7 @@ async def get_subscription_status(current_user: dict = Depends(get_current_user)
     else:
         return {
             "is_premium": False,
+            "is_admin": False,
             "plan": "free",
             "expires_at": None,
             "athlete_count": athlete_count,
