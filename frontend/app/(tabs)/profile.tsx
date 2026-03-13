@@ -244,13 +244,15 @@ export default function ProfileTab() {
     return t('profile.active');
   };
 
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '--';
+  const formatDate = (dateStr?: string | null) => {
+    if (!dateStr || dateStr === 'None' || dateStr === 'null') return '--';
     try {
       const date = new Date(dateStr);
+      // Check for invalid date (1970 or NaN)
+      if (isNaN(date.getTime()) || date.getFullYear() < 1990) return '--';
       return date.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
     } catch {
-      return dateStr;
+      return '--';
     }
   };
 
