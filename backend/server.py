@@ -2826,6 +2826,223 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
 
+# ==================== STRIPE WEBHOOK (NEW ENDPOINT) ====================
+
+@api_router.post("/stripe/webhook")
+async def stripe_webhook_new(request: Request):
+    """
+    Stripe Webhook endpoint for subscription events.
+    URL: /api/stripe/webhook
+    
+    Handles events:
+    - checkout.session.completed: Activates subscription after payment
+    - invoice.paid: Confirms recurring payment
+    - customer.subscription.created: New subscription created
+    - customer.subscription.updated: Subscription plan changed
+    - customer.subscription.deleted: Subscription cancelled
+    """
+    stripe_api_key = os.environ.get("STRIPE_SECRET_KEY")
+    webhook_secret = os.environ.get("STRIPE_WEBHOOK_SECRET")
+    
+    if not stripe_api_key:
+        logger.error("Stripe API key not configured")
+        return {"status": "error", "message": "Stripe not configured"}
+    
+    stripe.api_key = stripe_api_key
+    
+    try:
+        body = await request.body()
+        sig_header = request.headers.get("Stripe-Signature")
+        
+        # Verify webhook signature
+        if webhook_secret and sig_header:
+            try:
+                event = stripe.Webhook.construct_event(body, sig_header, webhook_secret)
+                logger.info(f"[STRIPE WEBHOOK] Signature verified for event: {event.type}")
+            except stripe.error.SignatureVerificationError as e:
+                logger.error(f"[STRIPE WEBHOOK] Signature verification failed: {str(e)}")
+                return {"status": "error", "message": "Invalid signature"}, 400
+        else:
+            # Fallback for testing without signature
+            event = stripe.Event.construct_from(json.loads(body), stripe_api_key)
+            logger.warning("[STRIPE WEBHOOK] Processing without signature verification")
+        
+        logger.info(f"[STRIPE WEBHOOK] Received event: {event.type}")
+        
+        # ===== checkout.session.completed =====
+        if event.type == "checkout.session.completed":
+            session = event.data.object
+            logger.info(f"[STRIPE WEBHOOK] checkout.session.completed - Session ID: {session.id}")
+            
+            # Find transaction by session_id
+            transaction = await db.payment_transactions.find_one({"session_id": session.id})
+            
+            if transaction:
+                payment_status = getattr(session, 'payment_status', None)
+                logger.info(f"[STRIPE WEBHOOK] Transaction found - Payment status: {payment_status}")
+                
+                if payment_status == "paid":
+                    # Update transaction status
+                    await db.payment_transactions.update_one(
+                        {"session_id": session.id},
+                        {"$set": {
+                            "payment_status": "paid",
+                            "paid_at": datetime.utcnow(),
+                            "stripe_payment_intent": getattr(session, 'payment_intent', None)
+                        }}
+                    )
+                    
+                    # Activate subscription
+                    plan_id = transaction.get("plan_id")
+                    coach_id = transaction.get("coach_id")
+                    
+                    # Calculate expiration based on plan
+                    if plan_id == "monthly":
+                        expires_at = datetime.utcnow() + timedelta(days=30)
+                    else:  # annual
+                        expires_at = datetime.utcnow() + timedelta(days=365)
+                    
+                    # Check for existing subscription
+                    existing = await db.subscriptions.find_one({"coach_id": coach_id})
+                    
+                    if existing:
+                        # Extend existing subscription
+                        current_expires = existing.get("expires_at", datetime.utcnow())
+                        if isinstance(current_expires, datetime):
+                            new_expires = max(current_expires, datetime.utcnow())
+                        else:
+                            new_expires = datetime.utcnow()
+                        
+                        if plan_id == "monthly":
+                            new_expires += timedelta(days=30)
+                        else:
+                            new_expires += timedelta(days=365)
+                        
+                        await db.subscriptions.update_one(
+                            {"coach_id": coach_id},
+                            {"$set": {
+                                "plan_id": plan_id,
+                                "status": "active",
+                                "expires_at": new_expires,
+                                "updated_at": datetime.utcnow(),
+                                "stripe_subscription_id": getattr(session, 'subscription', None)
+                            }}
+                        )
+                        logger.info(f"[STRIPE WEBHOOK] Subscription extended for coach {coach_id} until {new_expires}")
+                    else:
+                        # Create new subscription
+                        new_subscription = {
+                            "id": str(uuid.uuid4()),
+                            "coach_id": coach_id,
+                            "plan_id": plan_id,
+                            "status": "active",
+                            "started_at": datetime.utcnow(),
+                            "expires_at": expires_at,
+                            "created_at": datetime.utcnow(),
+                            "stripe_subscription_id": getattr(session, 'subscription', None)
+                        }
+                        await db.subscriptions.insert_one(new_subscription)
+                        logger.info(f"[STRIPE WEBHOOK] New subscription created for coach {coach_id}, expires: {expires_at}")
+            else:
+                logger.warning(f"[STRIPE WEBHOOK] No transaction found for session: {session.id}")
+        
+        # ===== invoice.paid =====
+        elif event.type == "invoice.paid":
+            invoice = event.data.object
+            customer_email = getattr(invoice, 'customer_email', None)
+            subscription_id = getattr(invoice, 'subscription', None)
+            
+            logger.info(f"[STRIPE WEBHOOK] invoice.paid - Customer: {customer_email}, Subscription: {subscription_id}")
+            
+            if customer_email:
+                # Find user by email
+                user = await db.users.find_one({"email": customer_email})
+                if user:
+                    # Update subscription status to active
+                    await db.subscriptions.update_one(
+                        {"coach_id": user["id"]},
+                        {"$set": {
+                            "status": "active",
+                            "last_payment_at": datetime.utcnow(),
+                            "updated_at": datetime.utcnow()
+                        }}
+                    )
+                    logger.info(f"[STRIPE WEBHOOK] Subscription renewed for coach {user['id']}")
+        
+        # ===== customer.subscription.created =====
+        elif event.type == "customer.subscription.created":
+            subscription = event.data.object
+            customer_email = getattr(subscription, 'customer_email', None) or subscription.get('metadata', {}).get('coach_email')
+            
+            logger.info(f"[STRIPE WEBHOOK] customer.subscription.created - ID: {subscription.id}")
+            
+            # Log subscription creation (actual activation happens in checkout.session.completed)
+            await db.stripe_events.insert_one({
+                "event_type": "subscription.created",
+                "subscription_id": subscription.id,
+                "customer_email": customer_email,
+                "status": subscription.status,
+                "created_at": datetime.utcnow()
+            })
+        
+        # ===== customer.subscription.updated =====
+        elif event.type == "customer.subscription.updated":
+            subscription = event.data.object
+            logger.info(f"[STRIPE WEBHOOK] customer.subscription.updated - ID: {subscription.id}, Status: {subscription.status}")
+            
+            # Update local subscription status
+            local_sub = await db.subscriptions.find_one({"stripe_subscription_id": subscription.id})
+            if local_sub:
+                new_status = "active" if subscription.status == "active" else subscription.status
+                await db.subscriptions.update_one(
+                    {"stripe_subscription_id": subscription.id},
+                    {"$set": {
+                        "status": new_status,
+                        "updated_at": datetime.utcnow()
+                    }}
+                )
+                logger.info(f"[STRIPE WEBHOOK] Local subscription updated to status: {new_status}")
+        
+        # ===== customer.subscription.deleted =====
+        elif event.type == "customer.subscription.deleted":
+            subscription = event.data.object
+            logger.info(f"[STRIPE WEBHOOK] customer.subscription.deleted - ID: {subscription.id}")
+            
+            # Deactivate local subscription
+            result = await db.subscriptions.update_one(
+                {"stripe_subscription_id": subscription.id},
+                {"$set": {
+                    "status": "canceled",
+                    "canceled_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            if result.modified_count > 0:
+                logger.info(f"[STRIPE WEBHOOK] Subscription {subscription.id} canceled")
+            else:
+                # Try finding by coach email
+                customer = await stripe.Customer.retrieve(subscription.customer)
+                if customer and customer.email:
+                    user = await db.users.find_one({"email": customer.email})
+                    if user:
+                        await db.subscriptions.update_one(
+                            {"coach_id": user["id"]},
+                            {"$set": {"status": "canceled", "canceled_at": datetime.utcnow()}}
+                        )
+                        logger.info(f"[STRIPE WEBHOOK] Subscription canceled for coach {user['id']}")
+        
+        # Return 200 OK to Stripe
+        return {"status": "ok", "received": True}
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"[STRIPE WEBHOOK] JSON decode error: {str(e)}")
+        return {"status": "error", "message": "Invalid JSON"}, 400
+    except Exception as e:
+        logger.error(f"[STRIPE WEBHOOK] Error processing webhook: {str(e)}")
+        # Still return 200 to prevent Stripe from retrying
+        return {"status": "error", "message": str(e)}
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
