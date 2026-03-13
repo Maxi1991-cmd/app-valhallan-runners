@@ -33,7 +33,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const { access_token, user } = response.data;
       await AsyncStorage.setItem('token', access_token);
       const subscription = user.subscription || null;
-      const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+      // Admin users are always active, or check subscription status
+      const isSubscriptionActive = user.is_admin || subscription?.is_active || subscription?.status === 'active' || subscription?.plan === 'admin';
       set({ user, token: access_token, isAuthenticated: true, subscription, isSubscriptionActive });
     } catch (error: any) {
       throw new Error(error.response?.data?.detail || 'Login failed');
@@ -76,7 +77,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const response = await authAPI.getMe();
         const user = response.data;
         const subscription = user.subscription || null;
-        const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+        // Admin users are always active
+        const isSubscriptionActive = user.is_admin || subscription?.is_active || subscription?.status === 'active' || subscription?.plan === 'admin';
         set({ user, token, isAuthenticated: true, isLoading: false, subscription, isSubscriptionActive });
       } else {
         set({ isLoading: false });
@@ -91,7 +93,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const response = await authAPI.getSubscription();
       const subscription = response.data;
-      const isSubscriptionActive = subscription?.is_active || subscription?.status === 'active';
+      // Admin users are always active
+      const isSubscriptionActive = subscription?.is_admin || subscription?.is_active || subscription?.status === 'active' || subscription?.plan === 'admin';
       set({ subscription, isSubscriptionActive });
     } catch (error) {
       console.error('Error refreshing subscription:', error);

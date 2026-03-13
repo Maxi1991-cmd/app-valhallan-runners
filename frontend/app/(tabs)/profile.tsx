@@ -295,24 +295,35 @@ export default function ProfileTab() {
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>{t('subscription.plan')}:</Text>
                 <Text style={styles.detailValue}>
-                  {subscription?.plan === 'trial' ? t('subscription.trialPlan') :
+                  {subscription?.plan === 'admin' ? 'Admin (Illimitato)' :
+                   subscription?.plan === 'trial' ? t('subscription.trialPlan') :
                    subscription?.plan === 'monthly' ? t('subscription.monthlyPlan') :
                    subscription?.plan === 'annual' ? t('subscription.annualPlan') : t('subscription.none')}
                 </Text>
               </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>{t('subscription.startDate')}:</Text>
-                <Text style={styles.detailValue}>{formatDate(subscription?.start_date)}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>{t('subscription.expiryDate')}:</Text>
-                <Text style={[
-                  styles.detailValue,
-                  !isSubscriptionActive && styles.expiredText
-                ]}>
-                  {formatDate(subscription?.end_date)}
-                </Text>
-              </View>
+              {subscription?.plan !== 'admin' && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>{t('subscription.startDate')}:</Text>
+                    <Text style={styles.detailValue}>{formatDate(subscription?.start_date)}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>{t('subscription.expiryDate')}:</Text>
+                    <Text style={[
+                      styles.detailValue,
+                      !isSubscriptionActive && styles.expiredText
+                    ]}>
+                      {formatDate(subscription?.end_date)}
+                    </Text>
+                  </View>
+                </>
+              )}
+              {subscription?.plan === 'admin' && (
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>{t('subscription.expiryDate')}:</Text>
+                  <Text style={[styles.detailValue, { color: '#4CAF50' }]}>Mai (Account Creator)</Text>
+                </View>
+              )}
             </View>
 
             <Button
