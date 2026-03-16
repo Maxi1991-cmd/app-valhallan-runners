@@ -32,7 +32,38 @@ export default function CreateAthlete() {
       Alert.alert(t('common.success'), t('athlete.athleteCreated'));
       router.back();
     } catch (error: any) {
-      Alert.alert(t('common.error'), error.response?.data?.detail || t('errors.generic'));
+      const errorMessage = error.response?.data?.detail || t('errors.generic');
+      const isSubscriptionError = error.response?.status === 403;
+      
+      if (isSubscriptionError) {
+        // Errore limite atleti - offri opzione di tornare indietro o andare all'abbonamento
+        Alert.alert(
+          t('common.error'),
+          errorMessage,
+          [
+            {
+              text: t('common.back'),
+              onPress: () => router.back(),
+              style: 'cancel'
+            },
+            {
+              text: t('subscription.manage'),
+              onPress: () => router.replace('/(tabs)/profile')
+            }
+          ]
+        );
+      } else {
+        Alert.alert(
+          t('common.error'),
+          errorMessage,
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back()
+            }
+          ]
+        );
+      }
     } finally {
       setLoading(false);
     }
