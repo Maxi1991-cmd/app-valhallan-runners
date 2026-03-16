@@ -75,10 +75,10 @@ export default function CreateAthlete() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* Header con pulsante indietro */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton} data-testid="back-button">
           <Ionicons name="arrow-back" size={24} color="#FFF" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('athlete.createAthlete')}</Text>
