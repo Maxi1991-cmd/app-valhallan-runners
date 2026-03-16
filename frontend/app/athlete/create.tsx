@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useDataStore } from '../../src/store/dataStore';
 import { Input } from '../../src/components/Input';
 import { Button } from '../../src/components/Button';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from '../../src/hooks/useTranslation';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CreateAthlete() {
   const router = useRouter();
@@ -19,6 +20,10 @@ export default function CreateAthlete() {
     birth_date: '',
     notes: '',
   });
+
+  const handleBack = () => {
+    router.back();
+  };
 
   const handleCreate = async () => {
     if (!form.name || !form.email) {
@@ -71,6 +76,15 @@ export default function CreateAthlete() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      {/* Header con pulsante indietro */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('athlete.createAthlete')}</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+      
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -136,6 +150,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F0F0F',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1A1A1A',
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFF',
+  },
+  headerSpacer: {
+    width: 40,
   },
   keyboardView: {
     flex: 1,
