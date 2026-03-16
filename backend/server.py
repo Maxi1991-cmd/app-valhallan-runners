@@ -511,14 +511,13 @@ def get_subscription_info(user: dict) -> Optional[dict]:
     }
 
 async def ensure_coach_has_subscription(user: dict) -> dict:
-    """Assegna abbonamento trial se il coach non ne ha uno"""
+    """Assegna piano free ai nuovi coach (1 atleta gratis, poi abbonamento)"""
     if user.get("role") == "coach" and not user.get("subscription"):
-        trial_end = (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d")
         subscription = {
-            "plan": "trial",
+            "plan": "free",
             "status": "active",
             "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
-            "end_date": trial_end
+            "end_date": None  # No expiration for free plan
         }
         await db.users.update_one(
             {"id": user["id"]},
@@ -592,14 +591,13 @@ async def register(user: UserCreate):
     user_dict["password"] = get_password_hash(user.password)
     user_dict["created_at"] = datetime.utcnow()
     
-    # Default subscription per coach: trial attivo per 30 giorni
+    # Piano free per nuovi coach: 1 atleta gratis, poi abbonamento
     if user_dict.get("role") == "coach":
-        trial_end = (datetime.utcnow() + timedelta(days=30)).strftime("%Y-%m-%d")
         user_dict["subscription"] = {
-            "plan": "trial",
+            "plan": "free",
             "status": "active",
             "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
-            "end_date": trial_end
+            "end_date": None  # Piano free non scade, ma limita a 1 atleta
         }
     
     await db.users.insert_one(user_dict)
@@ -628,7 +626,7 @@ async def login(credentials: UserLogin):
     if not user or not verify_password(credentials.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     
-    # Assegna abbonamento trial se il coach non ne ha uno
+    # Assegna piano free se il coach non ne ha uno
     user = await ensure_coach_has_subscription(user)
     
     access_token = create_access_token(data={"sub": user["id"]})

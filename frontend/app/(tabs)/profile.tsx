@@ -238,7 +238,8 @@ export default function ProfileTab() {
   const getSubscriptionStatusText = () => {
     if (!subscription || subscription.status === 'inactive') return t('profile.expired');
     if (subscription.status === 'expired') return t('profile.expired');
-    if (subscription.plan === 'trial') return t('profile.trial');
+    if (subscription.plan === 'trial') return t('profile.free');  // Legacy compatibility
+    if (subscription.plan === 'free') return t('profile.free');
     if (subscription.plan === 'monthly') return t('profile.active');
     if (subscription.plan === 'annual') return t('profile.active');
     return t('profile.active');
@@ -299,7 +300,7 @@ export default function ProfileTab() {
                 <Text style={styles.detailLabel}>{t('subscription.plan')}:</Text>
                 <Text style={styles.detailValue}>
                   {subscription?.plan === 'admin' ? 'Admin (Illimitato)' :
-                   subscription?.plan === 'trial' ? t('subscription.trialPlan') :
+                   subscription?.plan === 'trial' || subscription?.plan === 'free' ? t('subscription.freePlan') :
                    subscription?.plan === 'monthly' ? t('subscription.monthlyPlan') :
                    subscription?.plan === 'annual' ? t('subscription.annualPlan') : t('subscription.none')}
                 </Text>
