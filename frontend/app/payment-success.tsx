@@ -71,15 +71,8 @@ export default function PaymentSuccessScreen() {
 
   const handleRedirect = async () => {
     if (Platform.OS === 'web') {
-      // Su web, prova ad aprire il deep link
-      const deepLink = 'valhallan://dashboard';
-      
-      // Prova ad aprire l'app
-      try {
-        window.location.href = deepLink;
-      } catch (e) {
-        console.log('Deep link fallito');
-      }
+      // Su web, redirect alla dashboard web
+      window.location.href = '/';
     } else {
       // Su mobile, vai alla dashboard
       router.replace('/(tabs)');
@@ -88,8 +81,8 @@ export default function PaymentSuccessScreen() {
 
   const goToDashboard = () => {
     if (Platform.OS === 'web') {
-      // Su web, prova il deep link poi fallback
-      window.location.href = 'valhallan://dashboard';
+      // Su web, redirect alla home
+      window.location.href = '/';
     } else {
       router.replace('/(tabs)');
     }

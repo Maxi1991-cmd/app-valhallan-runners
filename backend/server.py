@@ -3196,6 +3196,18 @@ async def stripe_webhook_new(request: Request):
                                 "stripe_subscription_id": getattr(session, 'subscription', None)
                             }}
                         )
+                        # Sincronizza anche documento utente
+                        await db.users.update_one(
+                            {"id": coach_id},
+                            {"$set": {
+                                "subscription": {
+                                    "plan": plan_id,
+                                    "status": "active",
+                                    "start_date": existing.get('started_at').strftime("%Y-%m-%d") if existing.get('started_at') else datetime.utcnow().strftime("%Y-%m-%d"),
+                                    "end_date": new_expires.strftime("%Y-%m-%d")
+                                }
+                            }}
+                        )
                         logger.info(f"[STRIPE WEBHOOK] Subscription extended for coach {coach_id} until {new_expires}")
                     else:
                         # Create new subscription
@@ -3210,6 +3222,18 @@ async def stripe_webhook_new(request: Request):
                             "stripe_subscription_id": getattr(session, 'subscription', None)
                         }
                         await db.subscriptions.insert_one(new_subscription)
+                        # Sincronizza anche documento utente
+                        await db.users.update_one(
+                            {"id": coach_id},
+                            {"$set": {
+                                "subscription": {
+                                    "plan": plan_id,
+                                    "status": "active",
+                                    "start_date": datetime.utcnow().strftime("%Y-%m-%d"),
+                                    "end_date": expires_at.strftime("%Y-%m-%d")
+                                }
+                            }}
+                        )
                         logger.info(f"[STRIPE WEBHOOK] New subscription created for coach {coach_id}, expires: {expires_at}")
             else:
                 logger.warning(f"[STRIPE WEBHOOK] No transaction found for session: {session.id}")
