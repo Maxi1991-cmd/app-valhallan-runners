@@ -22,7 +22,7 @@ export default function CreateAthlete() {
   });
 
   const handleBack = () => {
-    router.back();
+    router.push('/(tabs)');
   };
 
   const handleCreate = async () => {
