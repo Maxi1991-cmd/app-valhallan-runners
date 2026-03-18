@@ -2284,12 +2284,21 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
         # Sort by due_date descending
         valid_payments.sort(key=lambda x: x[1], reverse=True)
         
-        # Get the most recent payment (regardless of paid status for notification logic)
-        latest_payment, latest_due_date = valid_payments[0]
+        # Find the most recent UNPAID payment (the one we need to notify about)
+        unpaid_payment = None
+        unpaid_due_date = None
+        for p, due in valid_payments:
+            if not p.get("paid"):
+                unpaid_payment = p
+                unpaid_due_date = due
+                break
         
-        # Skip if the latest payment is already paid
-        if latest_payment.get("paid"):
+        # Skip if all payments are paid
+        if not unpaid_payment:
             continue
+        
+        latest_payment = unpaid_payment
+        latest_due_date = unpaid_due_date
         
         days_until_due = (latest_due_date - today).days
         
