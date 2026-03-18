@@ -1,146 +1,172 @@
 <analysis>**original_problem_statement:**
-The user, a running coach, requested a mobile application to manage their athletes. The core features included a dual-role system (Coach/Athlete), program creation, workout tracking, a notification system, and a subscription model.
+The user, a running coach, requested a mobile application to manage their athletes. The core features include a dual-role system (Coach/Athlete), program creation, workout tracking, a notification system, and a subscription model.
 
-The latest user request clarified the business logic:
+PRODUCT REQUIREMENTS:
 1.  **Coach Freemium Model**:
-    *   **Free Plan**: Manage 1 athlete for free.
+    *   **Free Plan**: Manage 1 athlete for free. There is no free trial period.
     *   **Premium Plan**: Manage unlimited athletes, unlocked via a real Stripe subscription (monthly or annual options).
 2.  **Athlete Access**: Athlete accounts are always free.
-3.  **Payment Log**: The Payments section in an athlete's profile is not for in-app transactions but serves as a private log for the coach to record payments received externally (e.g., cash, bank transfer).
+3.  **Payment Log**: The Payments section in an athlete's profile is a private log for the coach to record payments received externally (e.g., cash, bank transfer). This log should allow for deleting entries.
+4.  **Admin User**: The user's primary account () should have permanent, non-expiring premium access.
+5.  **Notifications**: The system should send payment reminder notifications for athletes' private payments. The logic is: a first reminder 10 days before the due date of the most recent *unpaid* payment, then daily reminders from 3 days before until the due date. When a coach records a new payment, old reminders for that athlete should be cleared.
+6.  **Deep Linking**: After a successful Stripe payment, the user should be automatically redirected back into the mobile app to their dashboard.
 
 **User's preferred language**: Italian. The next agent MUST respond in Italian.
 
 **what currently exists?**
-A full-stack Expo (React Native) and FastAPI application. The internationalization (i18n) feature is fully implemented.
-
-A new Stripe integration has been partially implemented to support the coach's freemium subscription model. The backend has endpoints for creating Stripe checkout sessions and handling webhooks. The frontend coach profile has been updated to display monthly/annual subscription plans and redirect to Stripe for payment. The logic to block a free-tier coach from adding more than one athlete is also in place.
+A full-stack application using Expo (React Native) for the frontend and FastAPI for the backend. The app supports a Coach/Athlete model with a freemium plan for coaches (1 free athlete, unlimited with a premium subscription). Stripe is fully integrated for handling subscriptions using the user's provided keys and product IDs. A robust webhook system is in place to activate and manage subscriptions asynchronously. The user's account is configured as a permanent admin. The notification logic has been refactored to handle payment reminders based on the most recent unpaid payment. Deep linking is implemented for post-payment redirects.
 
 **Last working item**:
-- **Last item agent was working**: Implementing the Stripe subscription flow. The agent created the backend endpoints, the frontend UI for plan selection, and the redirect pages ( and ) for handling the return from Stripe's checkout.
+- **Last item agent was working**: Adding a feature to allow coaches to delete payment records for their athletes. The agent created the backend  endpoint and started implementing the frontend changes.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
-- **Which testing method agent to use?**: Frontend testing agent. This is a complex end-to-end flow. The test should verify that a coach is blocked from adding a second athlete, can subscribe via Stripe, is redirected correctly, and has their status updated upon successful payment, which then unblocks the athlete limit.
+- **Which testing method agent to use?**: both. First, use  to test the backend  endpoint. Then, use the frontend testing agent to verify the end-to-end flow: the delete button appears in the UI for each payment record in , clicking it prompts for confirmation, and upon confirming, the payment is removed and the list refreshes.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: (P0) Complete and Test Stripe Subscription Flow**
-  - **Description**: The Stripe integration for the coach's premium subscription is incomplete. The logic to handle a successful payment and update the coach's subscription status in the database after they return from the Stripe page is missing. The webhook also needs to be fully tested.
+- **Issue 1: (P0) Complete 'Delete Payment' Feature**
+  - **Description**: The backend endpoint  has been created, but the frontend implementation is incomplete. A delete button and the corresponding API call handler need to be added to the payment list view for each athlete.
   - **Next debug checklist**:
-    1.  Implement the logic in  to call a backend endpoint that verifies the Stripe session and updates the coach's  in the database.
-    2.  Ensure the user's authentication state (e.g., in Zustand) is refreshed to reflect their new premium status.
-    3.  Thoroughly test the  endpoint to handle asynchronous events from Stripe, such as  and , ensuring the database is reliably updated.
-    4.  Conduct an end-to-end test: as a free coach, fail to add a second athlete, subscribe via Stripe, land on the success page, and then successfully add a second athlete.
-  - **Why fix this issue and what will be achieved with the fix?**: This is the primary business requirement from the user. Completing it will enable the app's monetization model.
+    1.  Continue editing .
+    2.  Add a delete icon/button next to each payment record in the list.
+    3.  Implement the  function that calls the  endpoint.
+    4.  Upon successful deletion, refresh the payment list to reflect the change.
+    5.  Add a confirmation dialog () before deleting.
+  - **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct user request to manage athlete payment logs.
   - **Status**: IN PROGRESS
   - **Is recurring issue?**: N
   - **Should Test frontend/backend/both after fix?**: Both
 
-- **Issue 2: (P1) Back Button Error on Athlete Detail Page**
-  - **Description**: The user has repeatedly reported a runtime error when pressing the back button on the athlete detail page ().
-  - **Attempted fixes**: The agent refactored code to remove direct  imports and changed  to , but the user reported the issue persists.
+- **Issue 2: (P1) Back Button Navigation Errors**
+  - **Description**: The user has repeatedly reported errors or crashes when using back buttons, specifically on the athlete detail page () and the Add Athlete page (). The agent has attempted fixes by replacing  with direct pushes (e.g., ), but the underlying instability seems to persist.
+  - **Attempted fixes**: Replaced  with . The issue might be related to Expo Router's state management.
   - **Next debug checklist**:
-    1.  Navigate to the My Athletes list and click on an athlete.
-    2.  Press the newly added back button.
-    3.  Examine device console logs for runtime errors. The issue is likely related to Expo Router's state or a component losing its navigation context.
-  - **Why fix this issue and what will be achieved with the fix?**: Fixes a critical navigation bug that breaks the user flow.
-  - **Status**: TESTING PENDING
+    1.  Thoroughly review navigation logic in  and .
+    2.  Investigate potential race conditions or context loss in Expo Router.
+    3.  Consider wrapping router calls in  checks or using a more stable navigation pattern.
+  - **Why fix this issue and what will be achieved with the fix?**: Fixes critical, user-facing navigation bugs that break the core user flow.
+  - **Status**: IN PROGRESS
   - **Is recurring issue?**: Y
   - **Should Test frontend/backend/both after fix?**: Frontend
 
-- **Issue 3: (P2) Incorrect Expiry Date Display**
-  - **Description**: In the coach's My Athletes list, the payment expiry date displayed for an athlete is wrong. It should show the  of the most recently recorded payment, but it's showing an old, incorrect date.
-  - **Attempted fixes**: The backend logic in  was updated to find the most recent payment. Both backend and frontend were updated with robust date-parsing functions to handle multiple date formats (, ).
+- **Issue 3: (P2) Expo QR Code / Ngrok Tunnel Instability**
+  - **Description**: The user frequently reports being unable to test the app due to a 404 Not Found error when loading the preview or a cryptic error when scanning the QR code. The agent has resolved this multiple times by restarting the frontend service (frontend: ERROR (no such process)
+frontend: ERROR (no such process)), indicating a potential instability in the Expo/Ngrok tunneling service.
+  - **Attempted fixes**: Restarting the frontend service.
   - **Next debug checklist**:
-    1.  Inspect the  collection in MongoDB for a specific athlete (e.g., Michele Nicolella) to confirm the data and date formats.
-    2.  Call the  endpoint and verify the JSON response contains the correct .
-    3.  Trace the data flow in the frontend component () to ensure the correct date is displayed.
-  - **Why fix this issue and what will be achieved with the fix?**: Ensures the coach sees accurate financial information, which is critical for managing their athletes.
-  - **Status**: TESTING PENDING
+    1.  If the error occurs, immediately check  for Ngrok or Expo-related errors.
+    2.  As a standard procedure, restart the frontend and clear the cache ([10:06:25] Starting project at /app/frontend) if the issue appears.
+  - **Why fix this issue and what will be achieved with the fix?**: Resolves a major blocker that prevents the user from testing and providing feedback.
+  - **Status**: RECURRING
   - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: Both
+  - **Should Test frontend/backend/both after fix?**: N/A (Environment issue)
 
 **In progress Task List**:
-- **Task 1: (P0) Implement Freemium Model with Stripe**
-  - **Where to resume**: Focus on . Implement the logic to finalize the subscription activation after the user is redirected back from Stripe. Then, test the webhook.
-  - **What will be achieved with this?**: A complete, working subscription system for coaches.
+- **Task 1: (P0) Implement Frontend for 'Delete Payment'**
+  - **Where to resume**: .
+  - **What will be achieved with this?**: A complete, working feature for coaches to delete incorrect or outdated payment records.
   - **Status**: IN PROGRESS
   - **Should Test frontend/backend/both after fix?**: Both
   - **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks**:
-    - (P1) **Integrate workout/activity data into main analytics page**: Update the  endpoint in  to provide a complete performance overview.
+  - (P1) **Verify Notification Logic**: The notification logic was refactored to alert on the most recent UNPAID payment. This needs to be explicitly tested and verified by the user to ensure it meets their expectations.
+  - (P2) **Integrate workout/activity data into main analytics page**: Update the  endpoint in  to provide a complete performance overview.
 - **Future Tasks**:
-    - (P2) Implement real-time integration with fitness APIs (Garmin, Polar, Suunto).
+  - (P3) Implement real-time integration with fitness APIs (Garmin, Polar, Suunto).
 
 **Completed work in this session**
-- **Feature: Full App Internationalization**: Completed translation of all remaining hardcoded strings, making the entire app multilingual.
-- **Fix: Reactive Language Switching**: Fixed a bug where components would not re-render after a language change by making the  hook reactive.
-- **UI: Navigation and Cleanup**: Added a back button to the athlete detail page, removed the Connected Platforms section from the coach profile, and added a notification badge for unread notifications.
-- **Feature (In Progress): Stripe Integration Scaffolding**: Set up backend endpoints, frontend UI, and redirect pages for the Stripe subscription flow. Implemented the free-tier athlete limit.
-- **Fix: Date Logic and Display**: Refactored backend and frontend date handling for payment expiries and configured the athlete's payment view to show only the most recent payment.
+- **Stripe Integration**: Fully implemented the subscription flow using the user's real Stripe keys and Price IDs. Shifted from  to the direct  library for better control.
+- **Freemium Model**: Correctly implemented the 1 free athlete limit, removing the old 30-day trial logic.
+- **Webhook & Payment Verification**: Built a robust system using a dedicated webhook endpoint () for asynchronous subscription updates and a public verification endpoint () to handle post-payment redirects.
+- **Deep Linking**: Implemented automatic redirect from Stripe back to the mobile app using an intermediate HTML redirect page to ensure compatibility.
+- **Admin Role**: Created a special admin status for the user's account () which grants permanent premium access and is handled gracefully in the UI.
+- **Notification Logic**: Refactored the backend notification job to correctly identify the most recent *unpaid* payment, preventing erroneous alerts for paid or future-dated entries.
+- **UI & Bug Fixes**:
+  - Fixed incorrect subscription expiry dates by synchronizing the  and  collections and handling the  case.
+  - Updated subscription prices on the UI to match the user's request.
+  - Added a back button to the Add Athlete page.
+  - Improved the alert message when a free coach hits their athlete limit, providing navigation options.
 
 **Earlier issues found/mentioned but not fixed**
-- The main athlete analytics endpoint () in  is likely out of sync with all data sources and needs to be updated.
+- The main athlete analytics endpoint () remains unimplemented.
+
+**Known issue recurrence from previous fork**
+- **Back Button Error**: Persists despite multiple fixes.
+- **Incorrect Date Display**: Was fixed again in this session. The root cause is often data inconsistency between collections or improper handling of / values.
+- **Expo/Ngrok Instability**: A new recurring issue that emerged in this session.
 
 **Code Architecture**
-useTranslation
+
 
 **Key Technical Concepts**
-- **Frontend**: React Native, Expo Router, Zustand, .
+- **Frontend**: React Native, Expo Router, Zustand, Deep Linking ().
 - **Backend**: FastAPI, Pydantic, MongoDB.
-- **Integration**: Stripe for subscriptions.
-- **Architecture**: Freemium model enforced on the backend, with frontend redirection to Stripe for payment processing and webhooks for asynchronous updates.
+- **Integration**: Stripe (direct Python library usage).
+- **Architecture**: Freemium model enforced on the backend. Subscriptions are activated primarily via webhooks (), with the frontend redirect flow serving as a secondary verification path. Deep linking from web (Stripe) to mobile is handled via an intermediate HTML redirect page served by the backend.
 
 **key DB schema**
-- : Contains  ('free', 'active') and .
-- : Stores a log of payments with , , and  status. Note:  can be stored in multiple string formats.
+- : Contains  ('free', 'monthly', 'annual'),  ('free', 'monthly', 'annual'), , , and  (boolean).
+- : Stores payment logs with , , .
+- : Authoritative source for subscription status, with , ,  ('active', 'canceled'), .
 
 **changes in tech stack**
-- The  Python library was added to the backend.
+- The implementation shifted from using the  library to using the official  Python library directly. This was necessary to use the user's pre-existing Stripe Product/Price IDs.
 
 **All files of reference**
-- : Contains the new Stripe endpoints (, ) and the freemium enforcement logic.
-- : The UI for initiating the Stripe subscription.
-- : **Crucial file to resume work**. This page must handle the post-payment logic.
-- : The file containing the recurring back button error.
+- : Core backend logic. Contains all Stripe endpoints, webhooks, admin checks, and notification logic.
+- : Where the Delete Payment button needs to be implemented.
+- : Coach profile UI, initiates checkout.
+- : Where a back button was added.
+- : The new intermediate page for handling the auto-redirect to the mobile app's deep link.
+- : Contains the  for deep linking ().
 
 **Critical Info for New Agent**
-- **Finish the Stripe Flow**: Your top priority is to complete the Stripe integration. The user is redirected to Stripe, but the loop is not closed. You must implement the logic on the  page to update the coach's subscription status in the app's database and refresh their auth state. The webhook must also be tested.
-- **Address Recurring Bugs**: The user has repeatedly reported the broken back button and incorrect date display. These are high-priority user-facing bugs that must be fixed.
-- **Fragile Date Formatting**: The database contains dates as strings in multiple formats (, ). The agent added parsing functions, but this is a known source of bugs. Be cautious when handling dates.
+- **Stripe is Live**: The app uses the user's real Stripe keys. Be careful when interacting with Stripe endpoints.
+- **Admin Account**: The user's account () is hardcoded as an admin in . This account bypasses all subscription checks.
+- **Data Synchronization**: A key source of bugs has been data inconsistency between the  and  collections. The webhook logic now attempts to sync the  document upon subscription changes, but this is a fragile area.
+- **Navigation is Fragile**: Be cautious when modifying navigation. The user has repeatedly reported crashes related to . Prefer explicit routing like  where possible.
+- **Environment Instability**: If the user reports a 404 Not Found error, the first step is to restart the frontend service (frontend: ERROR (no such process)
+frontend: ERROR (no such process)).
 
 **documents and test reports created in this job**
-- None.
+- : Updated with the latest requirements.
+- : Contains results from a testing agent run early in the session. Note that many changes have been made since this test was run.
 
 **Last 10 User Messages and any pending HUMAN messages**
-- **User**: Clarified payment logic: Coach subscribes via Stripe; athlete payment log is a private record.
-- **User**: Approved the plan: Implement the 1-athlete limit for free coaches and integrate Stripe for premium.
-- **User**: Reported the back button error is still present and causes a crash.
-- **User**: Reported the payment expiry date shown in the athlete list is still incorrect.
-- **User**: Requested a badge for unread notifications.
-- **User**: Requested to remove the connected platforms section and to only show the latest valid payment for athletes.
-- **User**: Re-reported that athlete profiles show the wrong payment date.
-- **User**: Re-reported that tabs and other elements in the athlete profile are not being translated on language change, even though the fix was attempted.
-- **User**: Last pending message is a request to complete the implementation of the payment/notification system.
+1.  **User**: I created a new test coach profile and adding a second athlete fails. (This was a bug report that turned out to be the expected behavior after removing the free trial).
+2.  **User**: After the limit reached error, there's no way to go back. Add a back button. (Agent added it).
+3.  **User**: Still can't go back from the add athlete page. (Agent changed  to ).
+4.  **User**: Testing payment with a new coach profile. The redirect back to the app doesn't work, and the subscription status (plan, dates) isn't showing up in the profile. (Agent fixed redirect and data sync).
+5.  **User**: Now creating an athlete gives an error, and there are still notification issues for my main account (Massimiliano Nicolella). (Agent identified the limit reached error was correct and that notifications weren't firing because all payments were marked as paid).
+6.  **User**: Add the ability to delete a payment record from the athlete's payment list. (Agent started this task).
+7.  **User**: The notification logic is wrong. It should alert for the nearest unpaid payment. (Agent refactored the logic).
+8.  **User**: There's an error in the layout (). (Agent restarted Expo).
+9.  **User**: My main account has athletes with expired payments, but no notification is sent. (Agent found all payments were marked 'paid' and created test data to validate new logic).
+10. **User**: Add a delete payment button. (This is the current task).
 
 **Project Health Check:**
-- **Broken**: No, the app is runnable. However, it contains several high-priority bugs in navigation and data display, and the main requested feature (Stripe subscriptions) is incomplete.
+- **Broken**: No. The application is runnable but contains recurring, high-impact bugs in navigation and environment stability. An in-progress feature is half-complete.
+- **Mocked**: No.
 
 **3rd Party Integrations**
-- **Stripe**: For handling coach subscriptions. (In Progress)
-- **i18n-js & expo-localization**: For internationalization. (Implemented)
+- **Stripe**: Fully integrated with the official Python library for handling coach subscriptions using user-provided keys.
+- **i18n-js & expo-localization**: For internationalization.
 
 **Testing status**
-- **Testing agent used after significant changes**: NO
+- **Testing agent used after significant changes**: YES, but early in the session. Major changes (live Stripe keys, deep linking, admin role, notification refactor) were made *after* the last full test run. A new test run is recommended after the current feature is complete.
 - **Troubleshoot agent used after agent stuck in loop**: NO
 - **Test files created**: None.
-- **Known regressions**: The back button on the athlete detail page is reportedly crashing the app.
+- **Known regressions**: Navigation errors on the Add Athlete and Athlete Detail pages are recurring.
 
 **Credentials to test flow:**
-- A test Stripe key is available in .
+- **Stripe Keys**: Located in . Use  and .
+- **Coach Credentials**:
+  - Admin Coach:  (password is in the database, but this account has permanent premium).
+  - Test Coach:  (password is in the database, has an active subscription).
 
 **What agent forgot to execute**
-- The agent has not fully implemented or tested the Stripe webhook (), which is critical for maintaining correct subscription status.
-- The recurring issues with the back button and incorrect date display have been attempted but not definitively resolved and verified.
-- The long-standing task to update the main analytics endpoint () remains unaddressed.</analysis>
+- The agent has not finished the frontend implementation for the Delete Payment feature.
+- The agent has not fully resolved the recurring navigation bugs, though several attempts were made.
+- A full regression test has not been run after the latest major changes to Stripe, deep linking, and notifications.</analysis>

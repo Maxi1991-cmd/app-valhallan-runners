@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import os
 
 # Get backend URL from environment
-BACKEND_URL = "https://freemium-coach-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://coach-athlete-hub-11.preview.emergentagent.com/api"
 
 class RunCoachAPITester:
     def __init__(self):

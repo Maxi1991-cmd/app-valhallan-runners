@@ -76,7 +76,7 @@ export default function EditAthlete() {
       });
     } catch (error) {
       Alert.alert('Errore', 'Impossibile caricare atleta');
-      router.back();
+      router.push('/(tabs)');
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export default function EditAthlete() {
 
       await updateAthlete(id!, updateData);
       Alert.alert('Successo', 'Atleta aggiornato');
-      router.back();
+      router.push(`/athlete/${id}`);
     } catch (error: any) {
       Alert.alert('Errore', error.response?.data?.detail || 'Errore durante il salvataggio');
     } finally {

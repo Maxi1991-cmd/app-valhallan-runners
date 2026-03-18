@@ -104,7 +104,7 @@ export default function UploadActivity() {
       );
 
       Alert.alert('Successo', 'Attività caricata correttamente', [
-        { text: 'OK', onPress: () => router.back() },
+        { text: 'OK', onPress: () => router.push('/(tabs)') },
       ]);
     } catch (error: any) {
       console.error('Upload error:', error);
@@ -165,7 +165,7 @@ export default function UploadActivity() {
       });
 
       Alert.alert('Successo', 'Attività aggiunta', [
-        { text: 'OK', onPress: () => router.back() },
+        { text: 'OK', onPress: () => router.push('/(tabs)') },
       ]);
     } catch (error: any) {
       Alert.alert('Errore', error.response?.data?.detail || 'Errore durante il salvataggio');

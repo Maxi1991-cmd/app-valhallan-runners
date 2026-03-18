@@ -952,6 +952,32 @@ async def update_payment(athlete_id: str, payment_id: str, paid: bool, current_u
     
     return {"message": "Payment updated"}
 
+@api_router.delete("/athletes/{athlete_id}/payments/{payment_id}")
+async def delete_payment(athlete_id: str, payment_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a payment record from an athlete"""
+    if current_user["role"] != "coach":
+        raise HTTPException(status_code=403, detail="Only coaches can manage payments")
+    
+    athlete = await db.athletes.find_one({"id": athlete_id})
+    if not athlete or athlete["coach_id"] != current_user["id"]:
+        raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    # Remove payment from array
+    result = await db.athletes.update_one(
+        {"id": athlete_id},
+        {"$pull": {"payments": {"id": payment_id}}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    # Also delete any notifications related to this payment
+    await db.notifications.delete_many({
+        "related_data.payment_id": payment_id
+    })
+    
+    return {"message": "Payment deleted"}
+
 # ==================== TRAINING PROGRAM ROUTES ====================
 
 @api_router.post("/programs", response_model=TrainingProgram)
@@ -2615,7 +2641,7 @@ async def create_checkout_session(request: CreateCheckoutRequest, http_request: 
     stripe.api_key = stripe_api_key
     
     # Get the base URL for redirect
-    web_base = request.origin_url or "https://freemium-coach-2.preview.emergentagent.com"
+    web_base = request.origin_url or "https://coach-athlete-hub-11.preview.emergentagent.com"
     
     # Usa sempre la pagina frontend /payment-success che gestisce il deep link
     # Questo URL funziona sia su web che su mobile

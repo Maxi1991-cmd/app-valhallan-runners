@@ -83,7 +83,7 @@ export default function ActivityDetail() {
       
       if (!found) {
         Alert.alert('Errore', 'Attività non trovata');
-        router.back();
+        router.push('/(tabs)');
         return;
       }
       
@@ -120,7 +120,7 @@ export default function ActivityDetail() {
     } catch (error) {
       console.error('Error loading activity:', error);
       Alert.alert('Errore', 'Impossibile caricare attività');
-      router.back();
+      router.push('/(tabs)');
     } finally {
       setLoading(false);
     }
@@ -149,7 +149,7 @@ export default function ActivityDetail() {
       );
       
       Alert.alert('Successo', 'Attività terminata! Analisi dati aggiornate.');
-      router.back();
+      router.push('/(tabs)');
     } catch (error: any) {
       Alert.alert('Errore', error.response?.data?.detail || 'Impossibile terminare attività');
     } finally {

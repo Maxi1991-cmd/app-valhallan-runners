@@ -311,6 +311,33 @@ export default function AthleteDetail() {
     }
   };
 
+  const handleDeletePayment = (paymentId: string, paymentMonth: string) => {
+    Alert.alert(
+      'Elimina Pagamento',
+      `Sei sicuro di voler eliminare il pagamento di ${paymentMonth}?`,
+      [
+        { text: 'Annulla', style: 'cancel' },
+        {
+          text: 'Elimina',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const token = await AsyncStorage.getItem('token');
+              await axios.delete(
+                `${BASE_URL}/api/athletes/${id}/payments/${paymentId}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              Alert.alert('Successo', 'Pagamento eliminato');
+              loadAthlete();
+            } catch (error) {
+              Alert.alert('Errore', 'Impossibile eliminare il pagamento');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const athletePrograms = programs.filter((p) => p.athlete_id === id);
 
   if (loading) {
@@ -622,12 +649,12 @@ export default function AthleteDetail() {
           <Card title="Pagamenti Mensili" style={styles.card}>
             {athlete.payments && athlete.payments.length > 0 ? (
               athlete.payments.map((payment) => (
-                <TouchableOpacity
-                  key={payment.id}
-                  style={styles.paymentRow}
-                  onPress={() => handleTogglePayment(payment.id, payment.paid)}
-                >
-                  <View style={styles.paymentInfo}>
+                <View key={payment.id} style={styles.paymentRow}>
+                  <TouchableOpacity
+                    style={styles.paymentInfo}
+                    onPress={() => handleTogglePayment(payment.id, payment.paid)}
+                    data-testid={`toggle-payment-${payment.id}`}
+                  >
                     <Ionicons
                       name={payment.paid ? 'checkbox' : 'square-outline'}
                       size={24}
@@ -637,21 +664,30 @@ export default function AthleteDetail() {
                       <Text style={styles.paymentMonth}>{payment.month}</Text>
                       <Text style={styles.paymentDue}>Scadenza: {payment.due_date}</Text>
                     </View>
-                  </View>
-                  <View style={styles.paymentAmount}>
-                    <Text
-                      style={[
-                        styles.amountText,
-                        payment.paid && styles.amountPaid,
-                      ]}
+                  </TouchableOpacity>
+                  <View style={styles.paymentRight}>
+                    <View style={styles.paymentAmount}>
+                      <Text
+                        style={[
+                          styles.amountText,
+                          payment.paid && styles.amountPaid,
+                        ]}
+                      >
+                        €{payment.amount}
+                      </Text>
+                      {payment.paid && (
+                        <Text style={styles.paidDate}>Pagato: {payment.paid_date}</Text>
+                      )}
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deletePaymentBtn}
+                      onPress={() => handleDeletePayment(payment.id, payment.month)}
+                      data-testid={`delete-payment-${payment.id}`}
                     >
-                      €{payment.amount}
-                    </Text>
-                    {payment.paid && (
-                      <Text style={styles.paidDate}>Pagato: {payment.paid_date}</Text>
-                    )}
+                      <Ionicons name="trash-outline" size={20} color="#DC3545" />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                </View>
               ))
             ) : (
               <Text style={styles.emptyText}>Nessun pagamento registrato</Text>
@@ -1023,6 +1059,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 2,
+  },
+  paymentRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  deletePaymentBtn: {
+    padding: 8,
+    backgroundColor: 'rgba(220, 53, 69, 0.15)',
+    borderRadius: 8,
   },
   paymentAmount: {
     alignItems: 'flex-end',

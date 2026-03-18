@@ -35,7 +35,7 @@ export default function CreateAthlete() {
     try {
       await createAthlete(form);
       Alert.alert(t('common.success'), t('athlete.athleteCreated'));
-      router.back();
+      router.push('/(tabs)');
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || t('errors.generic');
       const isSubscriptionError = error.response?.status === 403;
@@ -48,7 +48,7 @@ export default function CreateAthlete() {
           [
             {
               text: t('common.back'),
-              onPress: () => router.back(),
+              onPress: () => router.push('/(tabs)'),
               style: 'cancel'
             },
             {
@@ -64,7 +64,7 @@ export default function CreateAthlete() {
           [
             {
               text: 'OK',
-              onPress: () => router.back()
+              onPress: () => router.push('/(tabs)')
             }
           ]
         );

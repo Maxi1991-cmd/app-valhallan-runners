@@ -8,7 +8,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://freemium-coach-2.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://coach-athlete-hub-11.preview.emergentagent.com')
 
 class TestHealthCheck:
     """Basic health check tests"""
@@ -162,7 +162,7 @@ class TestSubscriptionCheckout:
             headers=headers,
             json={
                 "plan_id": "monthly",
-                "origin_url": "https://freemium-coach-2.preview.emergentagent.com"
+                "origin_url": "https://coach-athlete-hub-11.preview.emergentagent.com"
             }
         )
         
@@ -188,7 +188,7 @@ class TestSubscriptionCheckout:
             headers=headers,
             json={
                 "plan_id": "annual",
-                "origin_url": "https://freemium-coach-2.preview.emergentagent.com"
+                "origin_url": "https://coach-athlete-hub-11.preview.emergentagent.com"
             }
         )
         
@@ -208,7 +208,7 @@ class TestSubscriptionCheckout:
             headers=headers,
             json={
                 "plan_id": "invalid_plan",
-                "origin_url": "https://freemium-coach-2.preview.emergentagent.com"
+                "origin_url": "https://coach-athlete-hub-11.preview.emergentagent.com"
             }
         )
         
@@ -220,7 +220,7 @@ class TestSubscriptionCheckout:
             f"{BASE_URL}/api/subscription/checkout",
             json={
                 "plan_id": "monthly",
-                "origin_url": "https://freemium-coach-2.preview.emergentagent.com"
+                "origin_url": "https://coach-athlete-hub-11.preview.emergentagent.com"
             }
         )
         assert response.status_code in [401, 403]
@@ -258,7 +258,7 @@ class TestCheckoutStatus:
             headers=headers,
             json={
                 "plan_id": "monthly",
-                "origin_url": "https://freemium-coach-2.preview.emergentagent.com"
+                "origin_url": "https://coach-athlete-hub-11.preview.emergentagent.com"
             }
         )
         
