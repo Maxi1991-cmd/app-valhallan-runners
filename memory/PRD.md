@@ -4,14 +4,15 @@
 Mobile application for running coaches to manage their athletes. Features dual-role system (Coach/Athlete), program creation, workout tracking, subscription model (freemium with Stripe), and notification system.
 
 ## Business Model (Freemium)
-- **Coach Free Plan**: Max 1 athlete, new coaches get 30-day trial
-- **Coach Premium Plan**: Unlimited athletes via Stripe subscription (monthly/annual)
+- **Coach Free Plan**: Max 1 athlete, no free trial period
+- **Coach Premium Plan**: Unlimited athletes via real Stripe subscription (monthly/annual)
 - **Athlete Access**: Always free
+- **Admin Account**: maxi1991@hotmail.it has permanent premium (is_admin flag)
 
 ## Tech Stack
 - **Frontend**: React Native, Expo SDK 54, Expo Router 6, Zustand, i18n-js, expo-localization
 - **Backend**: FastAPI, Pydantic, MongoDB
-- **Payments**: Stripe via emergentintegrations
+- **Payments**: Stripe (direct `stripe` Python library, NOT emergentintegrations)
 - **Languages Supported**: Italian (it), English (en-GB, en-US), Spanish (es), French (fr), German (de)
 
 ## Core Features
@@ -19,81 +20,76 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 2. **Program Management**: Create, edit, assign training programs
 3. **Workout Tracking**: Log workouts, activities, view history
 4. **Analytics**: Performance metrics, comparisons
-5. **Notifications**: Expiry alerts, updates
+5. **Notifications**: Payment reminders (10 days before, daily from 3 days before due date)
 6. **Subscription**: Coach freemium model with real Stripe integration
-7. **i18n**: Multi-language support with language selector
+7. **Payment Log**: Private log for coach to record external payments (with delete)
+8. **Deep Linking**: Post-Stripe payment redirect back to mobile app
+9. **i18n**: Multi-language support with language selector
 
 ## What's Been Implemented
 
-### March 10, 2025
-- ✅ **Completed Stripe Subscription Flow**
-  - Backend endpoints fully functional:
-    - `GET /api/subscription/plans` - returns monthly/annual plans
-    - `GET /api/subscription/status` - returns is_premium, athlete_count, athlete_limit
-    - `POST /api/subscription/checkout` - creates Stripe checkout session
-    - `GET /api/subscription/checkout/status/{session_id}` - verifies payment and activates subscription
-    - `POST /api/webhook/stripe` - handles Stripe webhooks
-  - Frontend success.tsx now properly updates Zustand state after payment
-  - Cancel.tsx page fully internationalized
-- ✅ **Fixed Back Button Bug**: Athlete detail page now uses `router.push('/(tabs)')` instead of `router.back()`
-- ✅ **Added Subscription Translations**: 19 new translation keys for subscription flow in IT, EN-GB, EN-US
-
-### March 3, 2025
-- ✅ Implemented payment expiry notification system
-  - Notifications sent 10 days before due date
-  - Daily notifications from 3 days before until due date
-  - Notifications sent to both coach and athlete
-  - Auto-triggered when coach opens app
-- ✅ Added endpoints: `/api/check-payment-expiries`, `/api/payment-expiries`
-- ✅ Added payment translations to IT and EN
+### February 2026
+- Completed 'Delete Payment' feature (backend + frontend)
+  - Backend: DELETE /api/athletes/{athlete_id}/payments/{payment_id}
+  - Frontend: Delete button with confirmation dialog in athlete/[id].tsx payments tab
+- Fixed recurring navigation bugs: replaced all router.back() with router.push('/(tabs)') across:
+  - athlete/create.tsx, athlete/edit/[id].tsx, activity/[id].tsx, activity/upload.tsx
+- Backend tests: 11/11 passed (payment CRUD, auth flow, freemium model)
 
 ### Previous Implementation
+- Full Stripe integration with real keys, webhooks, deep linking
+- Freemium model (1 free athlete, premium for unlimited)
+- Admin role for maxi1991@hotmail.it (permanent premium)
+- Notification logic for unpaid payments
 - Full authentication system (Coach/Athlete)
 - Program CRUD operations
-- Workout/Activity logging
+- Workout/Activity logging with feedback system
 - Calendar view
 - Analytics dashboard
-- Notification system
-- i18n base implementation with language selector
+- i18n implementation with 6 languages
 
 ## Known Issues
-
-### P0 - Critical
-- None
-
-### P1 - High Priority  
+### P1 - High Priority
 - Analytics endpoint `/api/analytics/athlete/{athlete_id}` needs data aggregation update
-- Verify date display for payment expiries in athlete list
+- Expo/Ngrok tunnel instability (occasional 404 errors, restart fixes it)
 
 ### P2 - Medium Priority
 - Real-time fitness API integration (Garmin, Polar, Suunto)
+
+## Key DB Schema
+- `users`: id, email, name, role, subscription (plan, status, start_date, end_date), is_admin, stripe_customer_id
+- `athletes`: id, coach_id, name, email, access_code, payments[], medical_certificate, biometrics
+- `payments` (embedded in athletes): id, month, amount, paid, due_date, paid_date
+- `programs`: id, coach_id, athlete_id, workouts[], name, start/end dates
+- `subscriptions`: user_id/coach_id, plan, status, current_period_end, expires_at
+- `notifications`: id, sender_id, recipient_id, title, message, notification_type, read
 
 ## File Structure
 ```
 /app
 ├── backend/
-│   ├── server.py (Updated: Stripe endpoints lines 2433-2665)
-│   └── .env (STRIPE_API_KEY configured)
+│   ├── server.py (All backend logic: auth, CRUD, Stripe, webhooks, notifications)
+│   └── .env (MONGO_URL, STRIPE keys)
 └── frontend/
+    ├── app.json (deep linking scheme: valhallanrunners)
     ├── app/
-    │   ├── subscription/
-    │   │   ├── success.tsx (UPDATED - verifies payment, updates Zustand)
-    │   │   └── cancel.tsx (UPDATED - i18n support)
-    │   ├── athlete/[id].tsx (FIXED - back button uses router.push)
-    │   └── (tabs)/profile.tsx (Stripe subscription UI)
+    │   ├── (tabs)/ (profile.tsx, _layout.tsx)
+    │   ├── athlete/ ([id].tsx - detail + payments + delete, create.tsx, edit/[id].tsx)
+    │   ├── activity/ ([id].tsx, upload.tsx)
+    │   ├── subscription/ (success.tsx, cancel.tsx)
+    │   ├── athlete-home.tsx (athlete dashboard)
+    │   └── payment-success.tsx (deep link redirect)
     └── src/
-        ├── i18n/locales/ (Updated subscription keys)
-        └── store/authStore.ts (refreshSubscription, loadUser)
+        ├── hooks/useSubscription.ts
+        ├── store/ (authStore.ts, dataStore.ts)
+        └── i18n/locales/
 ```
 
-## Testing Status (March 10, 2025)
-- ✅ Backend API: 16/16 tests passed (100%)
-- ✅ Frontend UI: All pages render correctly (100%)
-- ✅ Stripe checkout creates valid session
-- ✅ Freemium model: 1 athlete limit for free tier
-- ✅ Trial: 30 days for new coaches
-- ✅ Back button: No crash on athlete detail page
+## Testing Status (February 2026)
+- Backend: 11/11 tests passed (100%) - Payment CRUD, Auth, Freemium
+- Frontend: Navigation fixes applied (router.back -> router.push)
 
 ## Next Tasks (Prioritized)
-1. (P1) Update analytics endpoint with workout/activity data
-2. (P2) Real-time fitness API integration
+1. (P1) Verify notification logic for unpaid payments
+2. (P2) Integrate workout/activity data into analytics endpoint
+3. (P3) Real-time fitness API integration (Garmin, Polar, Suunto)
