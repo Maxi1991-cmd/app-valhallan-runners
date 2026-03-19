@@ -17,6 +17,7 @@ from bson import ObjectId
 import gpxpy
 import io
 import base64
+import qrcode
 
 # Stripe Integration
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
@@ -3379,6 +3380,63 @@ async def root():
 @api_router.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+
+# ==================== EXPO QR CODE ENDPOINT ====================
+from fastapi.responses import HTMLResponse
+
+@api_router.get("/expo-qr", response_class=HTMLResponse)
+async def expo_qr_code():
+    """Generate QR code page for Expo Go connection"""
+    try:
+        with open("/tmp/cf.log", "r") as f:
+            content = f.read()
+        import re
+        match = re.search(r'https://[a-z0-9-]+\.trycloudflare\.com', content)
+        if not match:
+            return HTMLResponse("<h1>Tunnel non attivo. Riavvia il servizio.</h1>", status_code=503)
+        cf_url = match.group(0)
+        cf_host = cf_url.replace("https://", "")
+    except FileNotFoundError:
+        return HTMLResponse("<h1>Tunnel non configurato.</h1>", status_code=503)
+
+    expo_url = f"exp://{cf_host}:443"
+    
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr.add_data(expo_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="white", back_color="#1a1a2e")
+    
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    qr_base64 = base64.b64encode(buf.getvalue()).decode()
+    
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valhallan Runners - Expo Go</title>
+<style>
+body {{ background: #1a1a2e; color: #fff; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }}
+.card {{ background: #16213e; border-radius: 20px; padding: 40px; text-align: center; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }}
+h1 {{ color: #FF6B35; font-size: 24px; margin-bottom: 8px; }}
+.subtitle {{ color: #aaa; margin-bottom: 24px; }}
+.qr {{ border-radius: 12px; margin: 20px 0; }}
+.url {{ background: #0f3460; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; color: #FF6B35; margin: 16px 0; }}
+.instructions {{ text-align: left; color: #ccc; font-size: 14px; line-height: 1.8; }}
+.step {{ color: #FF6B35; font-weight: bold; }}
+.badge {{ display: inline-block; background: #FF6B35; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 16px; }}
+</style></head><body>
+<div class="card">
+<div class="badge">EXPO GO</div>
+<h1>Valhallan Runners</h1>
+<p class="subtitle">Scansiona con Expo Go per aprire l'app</p>
+<img src="data:image/png;base64,{qr_base64}" width="250" height="250" class="qr" />
+<div class="url">{expo_url}</div>
+<div class="instructions">
+<p><span class="step">1.</span> Apri <b>Expo Go</b> sul tuo telefono</p>
+<p><span class="step">2.</span> Scansiona il QR code qui sopra</p>
+<p><span class="step">3.</span> L'app si caricherà automaticamente</p>
+</div>
+</div></body></html>"""
+    return HTMLResponse(html)
 
 # Include the router in the main app
 app.include_router(api_router)
