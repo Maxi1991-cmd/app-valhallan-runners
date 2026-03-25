@@ -3399,40 +3399,56 @@ async def expo_qr_code():
     except FileNotFoundError:
         return HTMLResponse("<h1>Tunnel non configurato.</h1>", status_code=503)
 
-    expo_url = f"exp://{cf_host}:443"
+    # Generate QR codes for both formats
+    expo_url = f"exp://{cf_host}"
     
-    qr = qrcode.QRCode(version=1, box_size=10, border=4)
-    qr.add_data(expo_url)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="white", back_color="#1a1a2e")
+    def make_qr(data):
+        qr = qrcode.QRCode(version=1, box_size=10, border=4)
+        qr.add_data(data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="white", back_color="#1a1a2e")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return base64.b64encode(buf.getvalue()).decode()
     
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    qr_base64 = base64.b64encode(buf.getvalue()).decode()
+    qr_exp = make_qr(expo_url)
+    qr_https = make_qr(cf_url)
     
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Valhallan Runners - Expo Go</title>
 <style>
-body {{ background: #1a1a2e; color: #fff; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }}
-.card {{ background: #16213e; border-radius: 20px; padding: 40px; text-align: center; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }}
+body {{ background: #1a1a2e; color: #fff; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }}
+.card {{ background: #16213e; border-radius: 20px; padding: 40px; text-align: center; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }}
 h1 {{ color: #FF6B35; font-size: 24px; margin-bottom: 8px; }}
 .subtitle {{ color: #aaa; margin-bottom: 24px; }}
-.qr {{ border-radius: 12px; margin: 20px 0; }}
-.url {{ background: #0f3460; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all; color: #FF6B35; margin: 16px 0; }}
-.instructions {{ text-align: left; color: #ccc; font-size: 14px; line-height: 1.8; }}
+.qr-section {{ display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }}
+.qr-box {{ text-align: center; }}
+.qr-box img {{ border-radius: 12px; }}
+.qr-label {{ font-size: 11px; color: #FF6B35; margin-top: 8px; font-weight: bold; }}
+.url {{ background: #0f3460; padding: 10px; border-radius: 8px; font-family: monospace; font-size: 11px; word-break: break-all; color: #FF6B35; margin: 8px 0; cursor: pointer; }}
+.url:hover {{ background: #1a4a80; }}
+.instructions {{ text-align: left; color: #ccc; font-size: 14px; line-height: 1.8; margin-top: 16px; }}
 .step {{ color: #FF6B35; font-weight: bold; }}
 .badge {{ display: inline-block; background: #FF6B35; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 16px; }}
+.alt {{ font-size: 12px; color: #888; margin-top: 12px; }}
 </style></head><body>
 <div class="card">
 <div class="badge">EXPO GO</div>
 <h1>Valhallan Runners</h1>
 <p class="subtitle">Scansiona con Expo Go per aprire l'app</p>
-<img src="data:image/png;base64,{qr_base64}" width="250" height="250" class="qr" />
-<div class="url">{expo_url}</div>
+<div class="qr-section">
+<div class="qr-box">
+<img src="data:image/png;base64,{qr_exp}" width="220" height="220" />
+<div class="qr-label">QR per Expo Go</div>
+<div class="url" onclick="navigator.clipboard.writeText('{expo_url}')">{expo_url}</div>
+</div>
+</div>
+<p class="alt">Se il QR non funziona, prova ad inserire l'URL manualmente in Expo Go:</p>
+<div class="url" onclick="navigator.clipboard.writeText('{cf_url}')" style="font-size:10px;">{cf_url}</div>
 <div class="instructions">
 <p><span class="step">1.</span> Apri <b>Expo Go</b> sul tuo telefono</p>
-<p><span class="step">2.</span> Scansiona il QR code qui sopra</p>
+<p><span class="step">2.</span> Scansiona il QR code oppure inserisci l'URL manualmente</p>
 <p><span class="step">3.</span> L'app si caricherà automaticamente</p>
 </div>
 </div></body></html>"""
