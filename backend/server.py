@@ -3400,7 +3400,7 @@ async def expo_qr_code():
         return HTMLResponse("<h1>Tunnel non configurato.</h1>", status_code=503)
 
     # Generate QR codes for both formats
-    expo_url = f"exp://{cf_host}"
+    expo_url = f"exps://{cf_host}"
     
     def make_qr(data):
         qr = qrcode.QRCode(version=1, box_size=10, border=4)
