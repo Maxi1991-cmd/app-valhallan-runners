@@ -2147,78 +2147,107 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
     for athlete in athletes:
         athlete_user = await db.users.find_one({"athlete_id": athlete["id"]})
         
-        for payment in athlete.get("payments", []):
-            if payment.get("paid"):
-                continue
-                
+        payments = athlete.get("payments", [])
+        if not payments:
+            continue
+        
+        # Find the most recent payment by due_date (paid or unpaid)
+        latest_payment = None
+        latest_due_date = None
+        for payment in payments:
             due_date = parse_date_safe(payment.get("due_date"))
-            if not due_date:
-                continue
+            if due_date:
+                if latest_due_date is None or due_date > latest_due_date:
+                    latest_due_date = due_date
+                    latest_payment = payment
+        
+        if not latest_payment or not latest_due_date:
+            continue
+        
+        days_until_due = (latest_due_date - today).days
+        is_paid = latest_payment.get("paid", False)
+        
+        # Notification logic:
+        # - PAID payment approaching due_date = period expiring, need renewal
+        # - UNPAID payment approaching due_date = payment overdue reminder
+        should_notify = False
+        if days_until_due == 10:
+            should_notify = True
+        elif 0 <= days_until_due <= 3:
+            should_notify = True
+        elif days_until_due < 0 and not is_paid:
+            # Only daily overdue reminders for UNPAID payments
+            should_notify = True
+        
+        if should_notify:
+            notification_key = f"payment_{latest_payment['id']}_{today.isoformat()}"
             
-            days_until_due = (due_date - today).days
+            # Check if notification was already sent today
+            existing = await db.notifications.find_one({
+                "related_data.notification_key": notification_key
+            })
             
-            # Check if we should send notification (10 days before OR 3 days to due date)
-            should_notify = False
-            if days_until_due == 10:
-                should_notify = True
-            elif 0 <= days_until_due <= 3:
-                should_notify = True
-            
-            if should_notify:
-                notification_key = f"payment_{payment['id']}_{today.isoformat()}"
+            if not existing:
+                # Build messages based on paid/unpaid status
+                if is_paid:
+                    # Paid payment expiring = renewal needed
+                    athlete_msg = f"L'abbonamento per {latest_payment['month']} (€{latest_payment['amount']}) scade tra {days_until_due} giorni ({latest_payment['due_date']}). Contatta il tuo coach per il rinnovo." if days_until_due > 0 else f"L'abbonamento per {latest_payment['month']} (€{latest_payment['amount']}) è scaduto il {latest_payment['due_date']}. Contatta il tuo coach per il rinnovo."
+                    coach_msg = f"L'abbonamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade tra {days_until_due} giorni ({latest_payment['due_date']}). Nuovo pagamento necessario." if days_until_due > 0 else f"L'abbonamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) è scaduto il {latest_payment['due_date']}. Rinnovo necessario."
+                    notif_title_athlete = f"Rinnovo in scadenza - {latest_payment['month']}"
+                    notif_title_coach = f"Rinnovo atleta in scadenza - {athlete['name']}"
+                else:
+                    # Unpaid payment reminder
+                    athlete_msg = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} scade tra {days_until_due} giorni ({latest_payment['due_date']}). Contatta il tuo coach." if days_until_due > 0 else f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} è scaduto il {latest_payment['due_date']}."
+                    coach_msg = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade tra {days_until_due} giorni." if days_until_due > 0 else f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) è scaduto."
+                    notif_title_athlete = f"Pagamento in scadenza - {latest_payment['month']}"
+                    notif_title_coach = f"Pagamento atleta in scadenza - {athlete['name']}"
                 
-                # Check if notification was already sent today
-                existing = await db.notifications.find_one({
-                    "related_data.notification_key": notification_key
-                })
-                
-                if not existing:
-                    # Send notification to ATHLETE
-                    if athlete_user:
-                        athlete_notification = {
-                            "id": str(uuid.uuid4()),
-                            "title": f"Pagamento in scadenza - {payment['month']}",
-                            "message": f"Il pagamento di €{payment['amount']} per {payment['month']} scade tra {days_until_due} giorni ({payment['due_date']}). Contatta il tuo coach." if days_until_due > 0 else f"Il pagamento di €{payment['amount']} per {payment['month']} è scaduto il {payment['due_date']}.",
-                            "notification_type": "payment_due",
-                            "recipient_id": athlete_user["id"],
-                            "sender_id": coach_id,
-                            "read": False,
-                            "related_data": {
-                                "payment_id": payment["id"],
-                                "athlete_id": athlete["id"],
-                                "athlete_name": athlete["name"],
-                                "amount": payment["amount"],
-                                "month": payment["month"],
-                                "due_date": payment["due_date"],
-                                "days_until_due": days_until_due,
-                                "notification_key": notification_key
-                            },
-                            "created_at": datetime.utcnow()
-                        }
-                        await db.notifications.insert_one(athlete_notification)
-                    
-                    # Send notification to COACH
-                    coach_notification = {
+                # Send notification to ATHLETE
+                if athlete_user:
+                    athlete_notification = {
                         "id": str(uuid.uuid4()),
-                        "title": f"Pagamento atleta in scadenza - {athlete['name']}",
-                        "message": f"Il pagamento di {athlete['name']} (€{payment['amount']} - {payment['month']}) scade tra {days_until_due} giorni." if days_until_due > 0 else f"Il pagamento di {athlete['name']} (€{payment['amount']} - {payment['month']}) è scaduto.",
+                        "title": notif_title_athlete,
+                        "message": athlete_msg,
                         "notification_type": "payment_due",
-                        "recipient_id": coach_id,
-                        "sender_id": None,
+                        "recipient_id": athlete_user["id"],
+                        "sender_id": coach_id,
                         "read": False,
                         "related_data": {
-                            "payment_id": payment["id"],
+                            "payment_id": latest_payment["id"],
                             "athlete_id": athlete["id"],
                             "athlete_name": athlete["name"],
-                            "amount": payment["amount"],
-                            "month": payment["month"],
-                            "due_date": payment["due_date"],
+                            "amount": latest_payment["amount"],
+                            "month": latest_payment["month"],
+                            "due_date": latest_payment["due_date"],
                             "days_until_due": days_until_due,
-                            "notification_key": f"coach_{notification_key}"
+                            "notification_key": notification_key
                         },
                         "created_at": datetime.utcnow()
                     }
-                    await db.notifications.insert_one(coach_notification)
+                    await db.notifications.insert_one(athlete_notification)
+                
+                # Send notification to COACH
+                coach_notification = {
+                    "id": str(uuid.uuid4()),
+                    "title": notif_title_coach,
+                    "message": coach_msg,
+                    "notification_type": "payment_due",
+                    "recipient_id": coach_id,
+                    "sender_id": None,
+                    "read": False,
+                    "related_data": {
+                        "payment_id": latest_payment["id"],
+                        "athlete_id": athlete["id"],
+                        "athlete_name": athlete["name"],
+                        "amount": latest_payment["amount"],
+                        "month": latest_payment["month"],
+                        "due_date": latest_payment["due_date"],
+                        "days_until_due": days_until_due,
+                        "notification_key": f"coach_{notification_key}"
+                    },
+                    "created_at": datetime.utcnow()
+                }
+                await db.notifications.insert_one(coach_notification)
     
     for athlete in athletes:
         # Check medical certificate
@@ -2293,7 +2322,7 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
     for athlete in athletes:
         athlete_user = await db.users.find_one({"athlete_id": athlete["id"]})
         
-        # Get payments and find the MOST RECENT unpaid one (latest due_date)
+        # Get payments and find the MOST RECENT one (latest due_date, paid or unpaid)
         payments = athlete.get("payments", [])
         if not payments:
             continue
@@ -2311,21 +2340,10 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
         # Sort by due_date descending
         valid_payments.sort(key=lambda x: x[1], reverse=True)
         
-        # Find the most recent UNPAID payment (the one we need to notify about)
-        unpaid_payment = None
-        unpaid_due_date = None
-        for p, due in valid_payments:
-            if not p.get("paid"):
-                unpaid_payment = p
-                unpaid_due_date = due
-                break
-        
-        # Skip if all payments are paid
-        if not unpaid_payment:
-            continue
-        
-        latest_payment = unpaid_payment
-        latest_due_date = unpaid_due_date
+        # Take the most recent payment (paid or unpaid)
+        latest_payment = valid_payments[0][0]
+        latest_due_date = valid_payments[0][1]
+        is_paid = latest_payment.get("paid", False)
         
         days_until_due = (latest_due_date - today).days
         
@@ -2346,8 +2364,8 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
             })
             if not existing_today:
                 should_notify = True
-        elif days_until_due < 0:
-            # Overdue - send daily reminder
+        elif days_until_due < 0 and not is_paid:
+            # Overdue - send daily reminder only for UNPAID
             today_key = f"{notification_key}_{today.isoformat()}"
             existing_today = await db.notifications.find_one({
                 "related_data.daily_key": today_key
@@ -2379,16 +2397,28 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
         
         # Create notification for ATHLETE
         if athlete_user:
-            if days_until_due > 0:
-                message = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} scade tra {days_until_due} giorni ({latest_payment['due_date']}). Contatta il tuo coach per il rinnovo."
-            elif days_until_due == 0:
-                message = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} scade OGGI ({latest_payment['due_date']}). Contatta il tuo coach."
+            if is_paid:
+                # Paid payment expiring = renewal notice
+                if days_until_due > 0:
+                    message = f"L'abbonamento per {latest_payment['month']} (€{latest_payment['amount']}) scade tra {days_until_due} giorni ({latest_payment['due_date']}). Contatta il tuo coach per il rinnovo."
+                elif days_until_due == 0:
+                    message = f"L'abbonamento per {latest_payment['month']} (€{latest_payment['amount']}) scade OGGI ({latest_payment['due_date']}). Contatta il tuo coach per il rinnovo."
+                else:
+                    message = f"L'abbonamento per {latest_payment['month']} (€{latest_payment['amount']}) è scaduto il {latest_payment['due_date']}. Contatta il tuo coach per il rinnovo."
+                athlete_title = f"Rinnovo in scadenza - {latest_payment['month']}"
             else:
-                message = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} è scaduto il {latest_payment['due_date']}. Contatta il tuo coach."
+                # Unpaid payment reminder
+                if days_until_due > 0:
+                    message = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} scade tra {days_until_due} giorni ({latest_payment['due_date']}). Contatta il tuo coach."
+                elif days_until_due == 0:
+                    message = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} scade OGGI ({latest_payment['due_date']}). Contatta il tuo coach."
+                else:
+                    message = f"Il pagamento di €{latest_payment['amount']} per {latest_payment['month']} è scaduto il {latest_payment['due_date']}. Contatta il tuo coach."
+                athlete_title = f"Pagamento in scadenza - {latest_payment['month']}"
             
             athlete_notification = {
                 "id": str(uuid.uuid4()),
-                "title": f"Pagamento in scadenza - {latest_payment['month']}",
+                "title": athlete_title,
                 "message": message,
                 "notification_type": "payment_due",
                 "recipient_id": athlete_user["id"],
@@ -2417,16 +2447,26 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
             })
         
         # Create notification for COACH
-        if days_until_due > 0:
-            coach_message = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade tra {days_until_due} giorni ({latest_payment['due_date']})."
-        elif days_until_due == 0:
-            coach_message = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade OGGI ({latest_payment['due_date']})."
+        if is_paid:
+            if days_until_due > 0:
+                coach_message = f"L'abbonamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade tra {days_until_due} giorni ({latest_payment['due_date']}). Nuovo pagamento necessario."
+            elif days_until_due == 0:
+                coach_message = f"L'abbonamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade OGGI ({latest_payment['due_date']}). Rinnovo necessario."
+            else:
+                coach_message = f"L'abbonamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) è scaduto il {latest_payment['due_date']}. Rinnovo necessario."
+            coach_title = f"Rinnovo atleta in scadenza - {athlete['name']}"
         else:
-            coach_message = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) è scaduto il {latest_payment['due_date']}."
+            if days_until_due > 0:
+                coach_message = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade tra {days_until_due} giorni ({latest_payment['due_date']})."
+            elif days_until_due == 0:
+                coach_message = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) scade OGGI ({latest_payment['due_date']})."
+            else:
+                coach_message = f"Il pagamento di {athlete['name']} (€{latest_payment['amount']} - {latest_payment['month']}) è scaduto il {latest_payment['due_date']}."
+            coach_title = f"Pagamento atleta in scadenza - {athlete['name']}"
         
         coach_notification = {
             "id": str(uuid.uuid4()),
-            "title": f"Pagamento atleta in scadenza - {athlete['name']}",
+            "title": coach_title,
             "message": coach_message,
             "notification_type": "payment_due",
             "recipient_id": coach_id,
