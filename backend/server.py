@@ -2145,7 +2145,7 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
     
     # Automatically check and send payment notifications
     for athlete in athletes:
-        athlete_user = await db.users.find_one({"athlete_id": athlete["id"]})
+        athlete_user = await db.users.find_one({"athlete_profile_id": athlete["id"], "role": "athlete"})
         
         payments = athlete.get("payments", [])
         if not payments:
@@ -2321,7 +2321,7 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
     athletes = await db.athletes.find({"coach_id": coach_id}).to_list(length=None)
     
     for athlete in athletes:
-        athlete_user = await db.users.find_one({"athlete_id": athlete["id"]})
+        athlete_user = await db.users.find_one({"athlete_profile_id": athlete["id"], "role": "athlete"})
         
         # Get payments and find the MOST RECENT one (latest due_date, paid or unpaid)
         payments = athlete.get("payments", [])
