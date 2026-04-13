@@ -245,6 +245,21 @@ export default function AthleteHomeScreen() {
     }
   };
 
+  const handleNotificationPress = async (notif: any) => {
+    // Mark as read
+    await markAsRead(notif.id);
+    // Close notifications modal
+    setShowNotificationsModal(false);
+    // Navigate to relevant section based on notification type
+    if (notif.notification_type === 'payment_due') {
+      setActiveTab('payments');
+    } else if (notif.notification_type === 'activity_assigned' || notif.notification_type === 'workout_feedback') {
+      setActiveTab('activities');
+    } else if (notif.notification_type === 'program_assigned') {
+      setActiveTab('programs');
+    }
+  };
+
   const deleteNotification = async (notifId: string) => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -1346,7 +1361,7 @@ export default function AthleteHomeScreen() {
                       styles.notifItem,
                       !notif.read && styles.notifItemUnread
                     ]}
-                    onPress={() => markAsRead(notif.id)}
+                    onPress={() => handleNotificationPress(notif)}
                     data-testid={`notification-${notif.id}`}
                   >
                     <View style={{ flex: 1 }}>

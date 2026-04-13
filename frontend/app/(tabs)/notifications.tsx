@@ -108,9 +108,9 @@ export default function NotificationsTab() {
 
   // Navigazione al contenuto correlato per le notifiche
   const handleNotificationPress = async (item: Notification) => {
-    // Elimina la notifica quando viene cliccata (letta)
+    // Mark as read when clicked (do NOT auto-delete)
     if (!item.read) {
-      await deleteNotification(item.id);
+      await markNotificationRead(item.id);
     }
 
     const relatedData = (item as any).related_data;
