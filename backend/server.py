@@ -2175,8 +2175,8 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
             should_notify = True
         elif 0 <= days_until_due <= 3:
             should_notify = True
-        elif days_until_due < 0 and not is_paid:
-            # Only daily overdue reminders for UNPAID payments
+        elif days_until_due < 0:
+            # Overdue: notify for both paid (renewal overdue) and unpaid (payment overdue)
             should_notify = True
         
         if should_notify:
@@ -2365,8 +2365,8 @@ async def check_payment_expiries(current_user: dict = Depends(get_current_user))
             })
             if not existing_today:
                 should_notify = True
-        elif days_until_due < 0 and not is_paid:
-            # Overdue - send daily reminder only for UNPAID
+        elif days_until_due < 0:
+            # Overdue - send daily reminder for both paid (renewal overdue) and unpaid
             today_key = f"{notification_key}_{today.isoformat()}"
             existing_today = await db.notifications.find_one({
                 "related_data.daily_key": today_key
