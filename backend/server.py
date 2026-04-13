@@ -2181,10 +2181,11 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
         
         if should_notify:
             notification_key = f"payment_{latest_payment['id']}_{today.isoformat()}"
+            coach_notification_key = f"coach_{notification_key}"
             
-            # Check if notification was already sent today
+            # Check if notification was already sent today (check both athlete and coach keys)
             existing = await db.notifications.find_one({
-                "related_data.notification_key": notification_key
+                "related_data.notification_key": {"$in": [notification_key, coach_notification_key]}
             })
             
             if not existing:
