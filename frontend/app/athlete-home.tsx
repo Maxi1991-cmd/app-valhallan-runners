@@ -94,6 +94,11 @@ export default function AthleteHomeScreen() {
   const [notifyExpirations, setNotifyExpirations] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
 
+  // Notifications state
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+
   // FAQ data for athlete
   const faqData = [
     {
@@ -215,9 +220,46 @@ export default function AthleteHomeScreen() {
     }
   };
 
+  const fetchNotifications = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const [notifsRes, countRes] = await Promise.all([
+        axios.get(`${BASE_URL}/api/notifications`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${BASE_URL}/api/notifications/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      setNotifications(notifsRes.data || []);
+      setUnreadCount(countRes.data?.count || 0);
+    } catch (error) {
+      console.log('Could not fetch notifications');
+    }
+  };
+
+  const markAsRead = async (notifId: string) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      await axios.put(`${BASE_URL}/api/notifications/${notifId}/read`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, read: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.log('Could not mark notification as read');
+    }
+  };
+
+  const deleteNotification = async (notifId: string) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      await axios.delete(`${BASE_URL}/api/notifications/${notifId}`, { headers: { Authorization: `Bearer ${token}` } });
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+      fetchNotifications();
+    } catch (error) {
+      console.log('Could not delete notification');
+    }
+  };
+
   useEffect(() => {
     fetchData();
     loadNotificationSettings();
+    fetchNotifications();
     // Load saved language preference
     AsyncStorage.getItem('userLanguage').then(lang => {
       if (lang) {
@@ -960,9 +1002,23 @@ export default function AthleteHomeScreen() {
                 {dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)}, {new Date().toLocaleDateString('it-IT')}
               </Text>
             </View>
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-              <Ionicons name="log-out-outline" size={24} color="#FF6B35" />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <TouchableOpacity
+                onPress={() => { fetchNotifications(); setShowNotificationsModal(true); }}
+                style={styles.notifBellBtn}
+                data-testid="athlete-notifications-bell"
+              >
+                <Ionicons name="notifications-outline" size={24} color="#FF6B35" />
+                {unreadCount > 0 && (
+                  <View style={styles.notifBadge}>
+                    <Text style={styles.notifBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+                <Ionicons name="log-out-outline" size={24} color="#FF6B35" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -1266,6 +1322,58 @@ export default function AthleteHomeScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
+      {/* Notifications Modal */}
+      <Modal visible={showNotificationsModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Notifiche</Text>
+              <TouchableOpacity onPress={() => setShowNotificationsModal(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={{ maxHeight: 500 }}>
+              {notifications.length === 0 ? (
+                <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+                  <Ionicons name="notifications-off-outline" size={48} color="#666" />
+                  <Text style={{ color: '#999', marginTop: 12, fontSize: 15 }}>Nessuna notifica</Text>
+                </View>
+              ) : (
+                notifications.map((notif) => (
+                  <TouchableOpacity
+                    key={notif.id}
+                    style={[
+                      styles.notifItem,
+                      !notif.read && styles.notifItemUnread
+                    ]}
+                    onPress={() => markAsRead(notif.id)}
+                    data-testid={`notification-${notif.id}`}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Ionicons
+                          name={notif.notification_type === 'payment_due' ? 'card-outline' : 'notifications-outline'}
+                          size={18}
+                          color={!notif.read ? '#FF6B35' : '#666'}
+                        />
+                        <Text style={[styles.notifTitle, !notif.read && { color: '#FF6B35' }]}>{notif.title}</Text>
+                      </View>
+                      <Text style={styles.notifMessage}>{notif.message}</Text>
+                      <Text style={styles.notifDate}>
+                        {new Date(notif.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                    </View>
+                    <TouchableOpacity onPress={() => deleteNotification(notif.id)} style={{ padding: 8 }}>
+                      <Ionicons name="trash-outline" size={18} color="#DC3545" />
+                    </TouchableOpacity>
+                  </TouchableOpacity>
+                ))
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Settings Modal for Athlete */}
       <Modal visible={showSettingsModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
@@ -1527,6 +1635,58 @@ const styles = StyleSheet.create({
   },
   logoutBtn: {
     padding: 8,
+  },
+  notifBellBtn: {
+    padding: 8,
+    position: 'relative',
+  },
+  notifBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    backgroundColor: '#DC3545',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#0F0F0F',
+  },
+  notifBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  notifItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#333',
+  },
+  notifItemUnread: {
+    backgroundColor: '#1E1A15',
+    borderLeftColor: '#FF6B35',
+  },
+  notifTitle: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  notifMessage: {
+    color: '#AAA',
+    fontSize: 13,
+    marginTop: 2,
+    lineHeight: 18,
+  },
+  notifDate: {
+    color: '#666',
+    fontSize: 11,
+    marginTop: 6,
   },
   tabsContainer: {
     flexDirection: 'row',
