@@ -1,7 +1,11 @@
 import React from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ProgramLayout() {
+  const router = useRouter();
+
   return (
     <Stack
       screenOptions={{
@@ -9,7 +13,14 @@ export default function ProgramLayout() {
         headerTintColor: '#FFF',
         headerTitleStyle: { fontWeight: '600' },
         contentStyle: { backgroundColor: '#0F0F0F' },
-        headerBackTitle: 'Indietro',
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/programs')}
+            style={{ paddingRight: 16, paddingVertical: 8 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFF" />
+          </TouchableOpacity>
+        ),
       }}
     >
       <Stack.Screen name="create" options={{ title: 'Programma' }} />
