@@ -2267,7 +2267,7 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
                         "urgent": days_until <= 7
                     })
         
-        # Check payments - show the next due date (from the most recent payment)
+        # Check payments - show warning only when notification criteria are met
         payments = athlete.get("payments", [])
         if payments:
             # Sort payments by due_date to find the most recent one
@@ -2281,8 +2281,19 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
             due_date = parse_date_safe(latest_payment.get("due_date"))
             if due_date:
                 days_until = (due_date - today).days
-                # Show warning if payment is upcoming (within 30 days) or overdue
-                if days_until <= 30:
+                is_paid = latest_payment.get("paid", False)
+                
+                # Show warning only when notification criteria are met:
+                # - 10 days before due date
+                # - 3 days or less before due date
+                # - Overdue (past due date)
+                show_warning = False
+                if days_until <= 10 and days_until >= 0:
+                    show_warning = True
+                elif days_until < 0:
+                    show_warning = True
+                
+                if show_warning:
                     warnings.append({
                         "type": "payment_due",
                         "athlete_id": athlete["id"],
@@ -2291,10 +2302,10 @@ async def check_expiries(current_user: dict = Depends(get_current_user)):
                         "month": latest_payment.get("month"),
                         "amount": latest_payment.get("amount"),
                         "due_date": latest_payment.get("due_date"),
-                        "paid": latest_payment.get("paid", False),
+                        "paid": is_paid,
                         "days_until": days_until,
                         "days_overdue": -days_until if days_until < 0 else 0,
-                        "urgent": days_until <= 7 and not latest_payment.get("paid", False)
+                        "urgent": days_until <= 3
                     })
     
     return {"warnings": warnings}
