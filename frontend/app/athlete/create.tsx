@@ -75,7 +75,14 @@ export default function CreateAthlete() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* Back Button */}
+      <View style={styles.backHeader}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)')}>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Text style={styles.backButtonText}>Indietro</Text>
+        </TouchableOpacity>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}

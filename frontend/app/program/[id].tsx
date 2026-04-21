@@ -359,7 +359,14 @@ export default function ProgramDetail() {
   const progress = program.workouts.length > 0 ? (completedCount / program.workouts.length) * 100 : 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* Back Button */}
+      <View style={styles.backHeader}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)/programs')}>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Text style={styles.backButtonText}>Indietro</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
