@@ -183,12 +183,6 @@ export default function ActivityDetail() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <View style={styles.backHeader}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)')}>
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
-          <Text style={styles.backButtonText}>Indietro</Text>
-        </TouchableOpacity>
-      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}

@@ -29,9 +29,10 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 ## What's Been Implemented
 
 ### April 2026
-- Added back buttons to 5 deep-linked pages: program/[id].tsx, program/create.tsx, activity/[id].tsx, activity/upload.tsx, athlete/edit/[id].tsx
-- Fixed missing imports (TouchableOpacity, Ionicons) in athlete/edit/[id].tsx that would have caused a crash
-- All back buttons use safe router.push('/(tabs)') navigation (not router.back())
+- **Fixed back button navigation**: Root cause was missing `_layout.tsx` (Stack navigator) in `program/` and `athlete/` directories. Custom JSX back buttons were hidden behind iOS status bar.
+  - Created `program/_layout.tsx`, `athlete/_layout.tsx`, `athlete/edit/_layout.tsx` with Stack navigators
+  - Removed redundant custom JSX back buttons from 7 pages
+  - All deep-linked pages now have native header with "Indietro" back button (same pattern as `activity/_layout.tsx`)
 - Replaced Ngrok with Cloudflare Tunnel (cloudflared) for Expo preview
 - Custom Expo QR Code endpoint at /api/expo-qr
 - Notification system: reminders trigger 10 days before due date, daily from 3 days, continue if expired
