@@ -28,6 +28,17 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 
 ## What's Been Implemented
 
+### April 2026
+- Added back buttons to 5 deep-linked pages: program/[id].tsx, program/create.tsx, activity/[id].tsx, activity/upload.tsx, athlete/edit/[id].tsx
+- Fixed missing imports (TouchableOpacity, Ionicons) in athlete/edit/[id].tsx that would have caused a crash
+- All back buttons use safe router.push('/(tabs)') navigation (not router.back())
+- Replaced Ngrok with Cloudflare Tunnel (cloudflared) for Expo preview
+- Custom Expo QR Code endpoint at /api/expo-qr
+- Notification system: reminders trigger 10 days before due date, daily from 3 days, continue if expired
+- Fixed notification deduplication bug
+- Added Notifications UI (bell icon + modal) to Athlete Dashboard
+- Fixed notification click behavior (mark as read, not delete)
+
 ### February 2026
 - Completed 'Delete Payment' feature (backend + frontend)
   - Backend: DELETE /api/athletes/{athlete_id}/payments/{payment_id}
@@ -51,10 +62,11 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 ## Known Issues
 ### P1 - High Priority
 - Analytics endpoint `/api/analytics/athlete/{athlete_id}` needs data aggregation update
-- Expo/Ngrok tunnel instability (occasional 404 errors, restart fixes it)
+- Expo tunnel: switched to cloudflared (DO NOT use ngrok)
 
 ### P2 - Medium Priority
 - Real-time fitness API integration (Garmin, Polar, Suunto)
+- server.py refactoring (3500+ lines, needs splitting into /routes/ and /services/)
 
 ## Key DB Schema
 - `users`: id, email, name, role, subscription (plan, status, start_date, end_date), is_admin, stripe_customer_id
@@ -90,6 +102,6 @@ Mobile application for running coaches to manage their athletes. Features dual-r
 - Frontend: Navigation fixes applied (router.back -> router.push)
 
 ## Next Tasks (Prioritized)
-1. (P1) Verify notification logic for unpaid payments
-2. (P2) Integrate workout/activity data into analytics endpoint
+1. (P1) Integrate workout/activity data into analytics endpoint `/api/analytics/athlete/{athlete_id}`
+2. (P2) Refactor server.py into modular routes/services
 3. (P3) Real-time fitness API integration (Garmin, Polar, Suunto)

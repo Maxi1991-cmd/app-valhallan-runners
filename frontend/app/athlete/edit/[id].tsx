@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useDataStore } from '../../../src/store/dataStore';
 import { athleteAPI } from '../../../src/services/api';
@@ -7,6 +7,7 @@ import { Input } from '../../../src/components/Input';
 import { Button } from '../../../src/components/Button';
 import { Card } from '../../../src/components/Card';
 import { LoadingScreen } from '../../../src/components/LoadingScreen';
+import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AthleteProfile } from '../../../src/types';
 
@@ -143,6 +144,12 @@ export default function EditAthlete() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      <View style={styles.backHeader}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)')}>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Text style={styles.backButtonText}>Indietro</Text>
+        </TouchableOpacity>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -319,6 +326,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F0F0F',
+  },
+  backHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   keyboardView: {
     flex: 1,

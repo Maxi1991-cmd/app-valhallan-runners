@@ -176,6 +176,12 @@ export default function UploadActivity() {
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
+      <View style={styles.backHeader}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.push('/(tabs)')}>
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Text style={styles.backButtonText}>Indietro</Text>
+        </TouchableOpacity>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -321,6 +327,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0F0F0F',
+  },
+  backHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  backButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   keyboardView: {
     flex: 1,
