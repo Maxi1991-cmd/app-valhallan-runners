@@ -149,7 +149,100 @@ export default function AnalyticsTab() {
                     <Text style={styles.statValue}>{analytics.avg_distance_per_activity} km</Text>
                     <Text style={styles.statLabel}>Media/Allenamento</Text>
                   </Card>
+                  {analytics.total_calories > 0 && (
+                    <Card style={styles.statCard}>
+                      <Ionicons name="flame" size={28} color="#FF5722" />
+                      <Text style={styles.statValue}>{analytics.total_calories}</Text>
+                      <Text style={styles.statLabel}>Calorie Totali</Text>
+                    </Card>
+                  )}
+                  {analytics.avg_heart_rate && (
+                    <Card style={styles.statCard}>
+                      <Ionicons name="heart" size={28} color="#E91E63" />
+                      <Text style={styles.statValue}>{analytics.avg_heart_rate} bpm</Text>
+                      <Text style={styles.statLabel}>FC Media</Text>
+                    </Card>
+                  )}
                 </View>
+
+                {/* Program Progress */}
+                {analytics.program_progress?.length > 0 && (
+                  <Card title="Progresso Programmi" style={styles.progressCard}>
+                    {analytics.program_progress.map((prog: any, idx: number) => (
+                      <View key={idx} style={styles.programRow}>
+                        <View style={styles.programInfo}>
+                          <Text style={styles.programName} numberOfLines={1}>{prog.name}</Text>
+                          <Text style={styles.programCount}>
+                            {prog.completed_workouts}/{prog.total_workouts}
+                          </Text>
+                        </View>
+                        <View style={styles.programBarContainer}>
+                          <View style={[styles.programBar, { width: `${prog.progress_pct}%` }]} />
+                        </View>
+                        <Text style={styles.programPct}>{prog.progress_pct}%</Text>
+                      </View>
+                    ))}
+                  </Card>
+                )}
+
+                {/* Activity Type Distribution */}
+                {analytics.type_distribution && Object.keys(analytics.type_distribution).length > 0 && (
+                  <Card title="Tipo Allenamento" style={styles.typeCard}>
+                    <View style={styles.typeList}>
+                      {Object.entries(analytics.type_distribution).map(([type, count]: [string, any]) => {
+                        const typeLabels: Record<string, string> = {
+                          running: 'Corsa', easy: 'Facile', tempo: 'Tempo',
+                          interval: 'Ripetute', long_run: 'Lungo', recovery: 'Recupero',
+                          fartlek: 'Fartlek', hill: 'Salite', race: 'Gara',
+                          cycling: 'Ciclismo', swimming: 'Nuoto', walking: 'Camminata',
+                          trail: 'Trail', other: 'Altro',
+                        };
+                        const typeColors: Record<string, string> = {
+                          running: '#FF6B35', easy: '#4CAF50', tempo: '#FF9800',
+                          interval: '#F44336', long_run: '#2196F3', recovery: '#9C27B0',
+                          fartlek: '#FF5722', hill: '#795548', race: '#E91E63',
+                          cycling: '#00BCD4', swimming: '#3F51B5', walking: '#8BC34A',
+                          trail: '#795548', other: '#607D8B',
+                        };
+                        const total = Object.values(analytics.type_distribution).reduce(
+                          (a: number, b: any) => a + (b as number), 0
+                        ) as number;
+                        const pct = total > 0 ? ((count as number) / total) * 100 : 0;
+                        return (
+                          <View key={type} style={styles.typeRow}>
+                            <View style={styles.typeInfo}>
+                              <View style={[styles.typeDot, { backgroundColor: typeColors[type] || '#666' }]} />
+                              <Text style={styles.typeName}>{typeLabels[type] || type}</Text>
+                            </View>
+                            <View style={styles.typeBarContainer}>
+                              <View style={[styles.typeBar, { width: `${pct}%`, backgroundColor: typeColors[type] || '#666' }]} />
+                            </View>
+                            <Text style={styles.typeCount}>{count as number}</Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </Card>
+                )}
+
+                {/* Weekly Distance Trend */}
+                {analytics.weekly_trend?.length > 0 && (
+                  <Card title="Distanza Settimanale" style={styles.weeklyCard}>
+                    {analytics.weekly_trend.slice(-8).map((item: any, index: number) => {
+                      const maxDist = Math.max(...analytics.weekly_trend.map((w: any) => w.distance_km));
+                      const barPct = maxDist > 0 ? (item.distance_km / maxDist) * 100 : 0;
+                      return (
+                        <View key={index} style={styles.weeklyRow}>
+                          <Text style={styles.weeklyDate}>{item.week.slice(5)}</Text>
+                          <View style={styles.weeklyBarContainer}>
+                            <View style={[styles.weeklyBar, { width: `${barPct}%` }]} />
+                          </View>
+                          <Text style={styles.weeklyValue}>{item.distance_km} km</Text>
+                        </View>
+                      );
+                    })}
+                  </Card>
+                )}
 
                 {/* Biometrics */}
                 {analytics.biometrics && (
@@ -455,6 +548,126 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#4CAF50',
+  },
+  // Program Progress
+  progressCard: {
+    marginBottom: 12,
+  },
+  programRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  programInfo: {
+    width: 100,
+  },
+  programName: {
+    fontSize: 13,
+    color: '#CCC',
+    fontWeight: '500',
+  },
+  programCount: {
+    fontSize: 11,
+    color: '#666',
+    marginTop: 2,
+  },
+  programBarContainer: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#333',
+    borderRadius: 4,
+    marginHorizontal: 10,
+    overflow: 'hidden',
+  },
+  programBar: {
+    height: '100%',
+    backgroundColor: '#FF6B35',
+    borderRadius: 4,
+  },
+  programPct: {
+    width: 40,
+    textAlign: 'right',
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#FF6B35',
+  },
+  // Type Distribution
+  typeCard: {
+    marginBottom: 12,
+  },
+  typeList: {
+    gap: 10,
+  },
+  typeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  typeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: 90,
+  },
+  typeDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 8,
+  },
+  typeName: {
+    fontSize: 12,
+    color: '#CCC',
+  },
+  typeBarContainer: {
+    flex: 1,
+    height: 8,
+    backgroundColor: '#333',
+    borderRadius: 4,
+    marginHorizontal: 10,
+    overflow: 'hidden',
+  },
+  typeBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  typeCount: {
+    width: 30,
+    textAlign: 'right',
+    fontSize: 12,
+    color: '#999',
+  },
+  // Weekly Trend
+  weeklyCard: {
+    marginBottom: 12,
+  },
+  weeklyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  weeklyDate: {
+    width: 50,
+    fontSize: 12,
+    color: '#999',
+  },
+  weeklyBarContainer: {
+    flex: 1,
+    height: 10,
+    backgroundColor: '#333',
+    borderRadius: 5,
+    marginHorizontal: 10,
+    overflow: 'hidden',
+  },
+  weeklyBar: {
+    height: '100%',
+    backgroundColor: '#2196F3',
+    borderRadius: 5,
+  },
+  weeklyValue: {
+    width: 60,
+    textAlign: 'right',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2196F3',
   },
   emptyContainer: {
     alignItems: 'center',

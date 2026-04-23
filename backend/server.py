@@ -1917,6 +1917,11 @@ async def get_athlete_analytics(
     total_distance = sum(a.get("distance_km", 0) or 0 for a in activities)
     total_duration = sum(a.get("duration_minutes", 0) or 0 for a in activities)
     total_activities = len(activities)
+    total_calories = sum(a.get("calories", 0) or 0 for a in activities)
+    
+    # Average heart rate
+    hr_values = [a.get("avg_heart_rate") for a in activities if a.get("avg_heart_rate")]
+    avg_heart_rate = round(sum(hr_values) / len(hr_values)) if hr_values else None
     
     # Heart rate zones distribution
     hr_zones = {"zone1": 0, "zone2": 0, "zone3": 0, "zone4": 0, "zone5": 0}
@@ -1937,6 +1942,39 @@ async def get_athlete_analytics(
             else:
                 hr_zones["zone5"] += 1
     
+    # Activity type distribution
+    type_distribution = {}
+    for a in activities:
+        atype = a.get("activity_type", "other")
+        type_distribution[atype] = type_distribution.get(atype, 0) + 1
+    
+    # Weekly distance trend (group by week)
+    weekly_distance = {}
+    for a in sorted(activities, key=lambda x: x.get("date", "")):
+        date_str = a.get("date", "")
+        if date_str:
+            try:
+                d = datetime.strptime(date_str[:10], "%Y-%m-%d")
+                week_start = (d - timedelta(days=d.weekday())).strftime("%Y-%m-%d")
+                weekly_distance[week_start] = weekly_distance.get(week_start, 0) + (a.get("distance_km", 0) or 0)
+            except (ValueError, TypeError):
+                pass
+    weekly_trend = [{"week": k, "distance_km": round(v, 2)} for k, v in weekly_distance.items()]
+    
+    # Program progress
+    program_progress = []
+    for program in programs:
+        workouts = program.get("workouts", [])
+        total_w = len(workouts)
+        completed_w = sum(1 for w in workouts if w.get("completed"))
+        if total_w > 0:
+            program_progress.append({
+                "name": program.get("name", ""),
+                "total_workouts": total_w,
+                "completed_workouts": completed_w,
+                "progress_pct": round((completed_w / total_w) * 100)
+            })
+    
     # Pace trend (last 10 activities)
     pace_trend = []
     for a in sorted(activities, key=lambda x: x.get("date", ""))[-10:]:
@@ -1951,8 +1989,13 @@ async def get_athlete_analytics(
         "total_distance_km": round(total_distance, 2),
         "total_duration_minutes": total_duration,
         "total_activities": total_activities,
+        "total_calories": total_calories,
         "avg_distance_per_activity": round(total_distance / max(total_activities, 1), 2),
+        "avg_heart_rate": avg_heart_rate,
         "heart_rate_zones": hr_zones,
+        "type_distribution": type_distribution,
+        "weekly_trend": weekly_trend,
+        "program_progress": program_progress,
         "pace_trend": pace_trend,
         "biometrics": athlete.get("biometrics", {})
     }
