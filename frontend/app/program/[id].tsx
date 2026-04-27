@@ -307,7 +307,7 @@ export default function ProgramDetail() {
           <h2>Allenamenti</h2>
           ${workoutsHtml}
           <div style="margin-top: 32px; text-align: center; color: #999; font-size: 12px;">
-            Generato da RunCoach Pro
+            Generato da StrideX
           </div>
         </body>
       </html>

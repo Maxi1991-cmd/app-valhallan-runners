@@ -387,7 +387,7 @@ export default function ProfileTab() {
           style={styles.logoutButton}
         />
 
-        <Text style={styles.versionText}>Valhallan Runners v1.0.0</Text>
+        <Text style={styles.versionText}>StrideX v1.0.0</Text>
       </ScrollView>
 
       {/* Language Modal */}

@@ -42,7 +42,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # Create the main app
-app = FastAPI(title="RunCoach Pro API")
+app = FastAPI(title="StrideX API")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -3012,7 +3012,7 @@ async def stripe_redirect_success(session_id: str):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Pagamento Completato - Valhallan Runners</title>
+        <title>Pagamento Completato - StrideX</title>
         <style>
             body {{
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -3128,7 +3128,7 @@ async def stripe_redirect_cancel():
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Pagamento Annullato - Valhallan Runners</title>
+        <title>Pagamento Annullato - StrideX</title>
         <style>
             body {{
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -3470,7 +3470,7 @@ async def stripe_webhook_new(request: Request):
 
 @api_router.get("/")
 async def root():
-    return {"message": "RunCoach Pro API", "status": "running"}
+    return {"message": "StrideX API", "status": "running"}
 
 @api_router.get("/health")
 async def health_check():
@@ -3511,7 +3511,7 @@ async def expo_qr_code():
     
     html = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Valhallan Runners - Expo Go</title>
+<title>StrideX - Expo Go</title>
 <style>
 body {{ background: #1a1a2e; color: #fff; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }}
 .card {{ background: #16213e; border-radius: 20px; padding: 40px; text-align: center; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }}
@@ -3530,7 +3530,7 @@ h1 {{ color: #FF6B35; font-size: 24px; margin-bottom: 8px; }}
 </style></head><body>
 <div class="card">
 <div class="badge">EXPO GO</div>
-<h1>Valhallan Runners</h1>
+<h1>StrideX</h1>
 <p class="subtitle">Scansiona con Expo Go per aprire l'app</p>
 <div class="qr-section">
 <div class="qr-box">
