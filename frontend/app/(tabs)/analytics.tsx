@@ -58,7 +58,7 @@ export default function AnalyticsTab() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#FF6B35"
+            tintColor="#7CFC00"
           />
         }
       >
@@ -127,7 +127,7 @@ export default function AnalyticsTab() {
                 {/* Summary Cards */}
                 <View style={styles.statsGrid}>
                   <Card style={styles.statCard}>
-                    <Ionicons name="footsteps" size={28} color="#FF6B35" />
+                    <Ionicons name="footsteps" size={28} color="#7CFC00" />
                     <Text style={styles.statValue}>{analytics.total_distance_km} km</Text>
                     <Text style={styles.statLabel}>Distanza Totale</Text>
                   </Card>
@@ -198,7 +198,7 @@ export default function AnalyticsTab() {
                           trail: 'Trail', other: 'Altro',
                         };
                         const typeColors: Record<string, string> = {
-                          running: '#FF6B35', easy: '#4CAF50', tempo: '#FF9800',
+                          running: '#7CFC00', easy: '#4CAF50', tempo: '#FF9800',
                           interval: '#F44336', long_run: '#2196F3', recovery: '#9C27B0',
                           fartlek: '#FF5722', hill: '#795548', race: '#E91E63',
                           cycling: '#00BCD4', swimming: '#3F51B5', walking: '#8BC34A',
@@ -249,7 +249,7 @@ export default function AnalyticsTab() {
                   <Card title="Dati Biometrici" style={styles.biometricsCard}>
                     <View style={styles.biometricsGrid}>
                       <View style={styles.biometricItem}>
-                        <Ionicons name="heart" size={20} color="#FF6B35" />
+                        <Ionicons name="heart" size={20} color="#7CFC00" />
                         <Text style={styles.biometricValue}>
                           {analytics.biometrics.heart_rate_max || '--'}
                         </Text>
@@ -401,8 +401,8 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   athleteChipActive: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
+    borderColor: '#7CFC00',
   },
   athleteChipText: {
     color: '#999',
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   periodButtonActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   periodButtonText: {
     color: '#999',
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   },
   programBar: {
     height: '100%',
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
     borderRadius: 4,
   },
   programPct: {
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontSize: 13,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#7CFC00',
   },
   // Type Distribution
   typeCard: {

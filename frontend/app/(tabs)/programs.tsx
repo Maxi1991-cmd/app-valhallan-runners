@@ -91,7 +91,7 @@ export default function ProgramsTab() {
 
         {item.goal && (
           <Text style={styles.goalText} numberOfLines={2}>
-            <Ionicons name="flag" size={12} color="#FF6B35" /> {item.goal}
+            <Ionicons name="flag" size={12} color="#7CFC00" /> {item.goal}
           </Text>
         )}
 
@@ -145,7 +145,7 @@ export default function ProgramsTab() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#FF6B35"
+            tintColor="#7CFC00"
           />
         }
         ListEmptyComponent={
@@ -215,14 +215,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   statusBadge: {
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 12,
   },
   statusText: {
     fontSize: 12,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '500',
   },
   goalText: {

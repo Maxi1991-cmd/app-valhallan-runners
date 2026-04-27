@@ -686,7 +686,7 @@ export default function AthleteHomeScreen() {
             style={styles.editButton}
             onPress={() => openEditModal(workout)}
           >
-            <Ionicons name="pencil" size={16} color="#FF6B35" />
+            <Ionicons name="pencil" size={16} color="#7CFC00" />
             <Text style={styles.editButtonText}>{t('athleteHome.actions.editOnce')}</Text>
           </TouchableOpacity>
         )}
@@ -836,7 +836,7 @@ export default function AthleteHomeScreen() {
                         style={styles.historyEditBtn}
                         onPress={() => openEditModal(w)}
                       >
-                        <Ionicons name="pencil" size={16} color="#FF6B35" />
+                        <Ionicons name="pencil" size={16} color="#7CFC00" />
                         <Text style={styles.historyEditText}>{t('athleteHome.modify')}</Text>
                       </TouchableOpacity>
                     ) : (
@@ -863,7 +863,7 @@ export default function AthleteHomeScreen() {
                 onPress={() => setShowSettingsModal(true)}
               >
                 <View style={styles.settingsInfo}>
-                  <Ionicons name="notifications-outline" size={22} color="#FF6B35" />
+                  <Ionicons name="notifications-outline" size={22} color="#7CFC00" />
                   <Text style={styles.settingsText}>{t('navigation.notifications')}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
@@ -873,7 +873,7 @@ export default function AthleteHomeScreen() {
                 onPress={() => setShowLanguageModal(true)}
               >
                 <View style={styles.settingsInfo}>
-                  <Ionicons name="globe-outline" size={22} color="#FF6B35" />
+                  <Ionicons name="globe-outline" size={22} color="#7CFC00" />
                   <Text style={styles.settingsText}>{t('settings.language')}</Text>
                 </View>
                 <View style={styles.languageCurrentRow}>
@@ -893,7 +893,7 @@ export default function AthleteHomeScreen() {
                 onPress={() => setShowPrivacyModal(true)}
               >
                 <View style={styles.settingsInfo}>
-                  <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
+                  <Ionicons name="lock-closed-outline" size={22} color="#7CFC00" />
                   <Text style={styles.settingsText}>{t('profile.privacy')}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
@@ -903,7 +903,7 @@ export default function AthleteHomeScreen() {
                 onPress={() => { setExpandedFaq(null); setShowSupportModal(true); }}
               >
                 <View style={styles.settingsInfo}>
-                  <Ionicons name="help-circle-outline" size={22} color="#FF6B35" />
+                  <Ionicons name="help-circle-outline" size={22} color="#7CFC00" />
                   <Text style={styles.settingsText}>{t('profile.support')}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#666" />
@@ -1005,7 +1005,7 @@ export default function AthleteHomeScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF6B35" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7CFC00" />
         }
       >
         {/* Header */}
@@ -1023,7 +1023,7 @@ export default function AthleteHomeScreen() {
                 style={styles.notifBellBtn}
                 data-testid="athlete-notifications-bell"
               >
-                <Ionicons name="notifications-outline" size={24} color="#FF6B35" />
+                <Ionicons name="notifications-outline" size={24} color="#7CFC00" />
                 {unreadCount > 0 && (
                   <View style={styles.notifBadge}>
                     <Text style={styles.notifBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -1031,7 +1031,7 @@ export default function AthleteHomeScreen() {
                 )}
               </TouchableOpacity>
               <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-                <Ionicons name="log-out-outline" size={24} color="#FF6B35" />
+                <Ionicons name="log-out-outline" size={24} color="#7CFC00" />
               </TouchableOpacity>
             </View>
           </View>
@@ -1054,7 +1054,7 @@ export default function AthleteHomeScreen() {
               <Ionicons 
                 name={tab.icon as any} 
                 size={16} 
-                color={activeTab === tab.key ? '#FF6B35' : '#666'} 
+                color={activeTab === tab.key ? '#7CFC00' : '#666'} 
               />
               <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
                 {tab.label}
@@ -1369,9 +1369,9 @@ export default function AthleteHomeScreen() {
                         <Ionicons
                           name={notif.notification_type === 'payment_due' ? 'card-outline' : 'notifications-outline'}
                           size={18}
-                          color={!notif.read ? '#FF6B35' : '#666'}
+                          color={!notif.read ? '#7CFC00' : '#666'}
                         />
-                        <Text style={[styles.notifTitle, !notif.read && { color: '#FF6B35' }]}>{notif.title}</Text>
+                        <Text style={[styles.notifTitle, !notif.read && { color: '#7CFC00' }]}>{notif.title}</Text>
                       </View>
                       <Text style={styles.notifMessage}>{notif.message}</Text>
                       <Text style={styles.notifDate}>
@@ -1404,7 +1404,7 @@ export default function AthleteHomeScreen() {
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
-                <Ionicons name="fitness-outline" size={24} color="#FF6B35" />
+                <Ionicons name="fitness-outline" size={24} color="#7CFC00" />
                 <View style={styles.notificationSettingText}>
                   <Text style={styles.notificationSettingTitle}>{t('settings.notifications.assignedWorkoutEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
@@ -1415,14 +1415,14 @@ export default function AthleteHomeScreen() {
               <Switch
                 value={notifyAssignedWorkouts}
                 onValueChange={setNotifyAssignedWorkouts}
-                trackColor={{ false: '#333', true: '#FF6B3550' }}
-                thumbColor={notifyAssignedWorkouts ? '#FF6B35' : '#666'}
+                trackColor={{ false: '#333', true: '#7CFC0050' }}
+                thumbColor={notifyAssignedWorkouts ? '#7CFC00' : '#666'}
               />
             </View>
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
-                <Ionicons name="alarm-outline" size={24} color="#FF6B35" />
+                <Ionicons name="alarm-outline" size={24} color="#7CFC00" />
                 <View style={styles.notificationSettingText}>
                   <Text style={styles.notificationSettingTitle}>{t('settings.notifications.reminderEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
@@ -1433,14 +1433,14 @@ export default function AthleteHomeScreen() {
               <Switch
                 value={notifyDailyReminder}
                 onValueChange={setNotifyDailyReminder}
-                trackColor={{ false: '#333', true: '#FF6B3550' }}
-                thumbColor={notifyDailyReminder ? '#FF6B35' : '#666'}
+                trackColor={{ false: '#333', true: '#7CFC0050' }}
+                thumbColor={notifyDailyReminder ? '#7CFC00' : '#666'}
               />
             </View>
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
-                <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
+                <Ionicons name="calendar-outline" size={24} color="#7CFC00" />
                 <View style={styles.notificationSettingText}>
                   <Text style={styles.notificationSettingTitle}>{t('settings.notifications.expiryEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
@@ -1451,8 +1451,8 @@ export default function AthleteHomeScreen() {
               <Switch
                 value={notifyExpirations}
                 onValueChange={setNotifyExpirations}
-                trackColor={{ false: '#333', true: '#FF6B3550' }}
-                thumbColor={notifyExpirations ? '#FF6B35' : '#666'}
+                trackColor={{ false: '#333', true: '#7CFC0050' }}
+                thumbColor={notifyExpirations ? '#7CFC00' : '#666'}
               />
             </View>
 
@@ -1509,7 +1509,7 @@ export default function AthleteHomeScreen() {
                   {lang.name}
                 </Text>
                 {selectedLanguage === lang.code && (
-                  <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
+                  <Ionicons name="checkmark-circle" size={24} color="#7CFC00" />
                 )}
               </TouchableOpacity>
             ))}
@@ -1531,7 +1531,7 @@ export default function AthleteHomeScreen() {
             <ScrollView style={styles.privacyContent}>
               <View style={styles.privacySection}>
                 <View style={styles.privacyIconContainer}>
-                  <Ionicons name="person-outline" size={28} color="#FF6B35" />
+                  <Ionicons name="person-outline" size={28} color="#7CFC00" />
                 </View>
                 <Text style={styles.privacyQuestion}>{t('athleteHome.privacyPersonal')}</Text>
                 <Text style={styles.privacyAnswer}>
@@ -1543,7 +1543,7 @@ export default function AthleteHomeScreen() {
 
               <View style={styles.privacySection}>
                 <View style={styles.privacyIconContainer}>
-                  <Ionicons name="fitness-outline" size={28} color="#FF6B35" />
+                  <Ionicons name="fitness-outline" size={28} color="#7CFC00" />
                 </View>
                 <Text style={styles.privacyQuestion}>{t('athleteHome.privacyWorkout')}</Text>
                 <Text style={styles.privacyAnswer}>
@@ -1587,7 +1587,7 @@ export default function AthleteHomeScreen() {
                     <Ionicons 
                       name={expandedFaq === index ? "chevron-up" : "chevron-down"} 
                       size={20} 
-                      color="#FF6B35" 
+                      color="#7CFC00" 
                     />
                   </TouchableOpacity>
                   {expandedFaq === index && (
@@ -1603,7 +1603,7 @@ export default function AthleteHomeScreen() {
                 onPress={() => Linking.openURL('mailto:valhallanrunners@gmail.com')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="mail-outline" size={20} color="#FF6B35" />
+                <Ionicons name="mail-outline" size={20} color="#7CFC00" />
                 <View style={styles.supportFooterTextContainer}>
                   <Text style={styles.supportFooterText}>{t('athleteHome.contactSupport')}</Text>
                   <Text style={styles.supportEmail}>valhallanrunners@gmail.com</Text>
@@ -1685,7 +1685,7 @@ const styles = StyleSheet.create({
   },
   notifItemUnread: {
     backgroundColor: '#1E1A15',
-    borderLeftColor: '#FF6B35',
+    borderLeftColor: '#7CFC00',
   },
   notifTitle: {
     color: '#FFF',
@@ -1728,7 +1728,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeTabText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
   },
   sectionTitle: {
     fontSize: 18,
@@ -1827,7 +1827,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#333',
   },
   editButtonText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 13,
     fontWeight: '500',
   },
@@ -2012,7 +2012,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fatigueBtnActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   fatigueBtnText: {
     color: '#999',
@@ -2034,7 +2034,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   painOptionActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   painOptionText: {
     color: '#999',
@@ -2092,7 +2092,7 @@ const styles = StyleSheet.create({
   viewSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#7CFC00',
     marginBottom: 10,
   },
   viewData: {
@@ -2140,7 +2140,7 @@ const styles = StyleSheet.create({
   },
   actualDataTitle: {
     fontSize: 12,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
     marginBottom: 6,
   },
@@ -2197,11 +2197,11 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     borderRadius: 8,
   },
   historyEditText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -2403,7 +2403,7 @@ const styles = StyleSheet.create({
   },
   supportEmail: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
     marginTop: 4,
     textDecorationLine: 'underline',
@@ -2429,7 +2429,7 @@ const styles = StyleSheet.create({
   languageOptionActive: {
     backgroundColor: '#2A2A2A',
     borderWidth: 1,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
   },
   languageFlag: {
     fontSize: 28,
@@ -2440,7 +2440,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   languageNameActive: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
   },
 });

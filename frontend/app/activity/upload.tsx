@@ -381,8 +381,8 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   athleteChipActive: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
+    borderColor: '#7CFC00',
   },
   athleteChipText: {
     color: '#999',
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modeButtonActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   modeText: {
     color: '#999',
@@ -458,7 +458,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   typeChipActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   typeChipText: {
     color: '#999',

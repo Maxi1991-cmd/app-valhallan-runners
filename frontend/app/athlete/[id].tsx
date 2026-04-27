@@ -361,7 +361,7 @@ export default function AthleteDetail() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#FF6B35"
+            tintColor="#7CFC00"
           />
         }
       >
@@ -428,7 +428,7 @@ export default function AthleteDetail() {
             <Card title="Dati Biometrici" style={styles.card}>
               <View style={styles.biometricsGrid}>
                 <View style={styles.biometricItem}>
-                  <Ionicons name="heart" size={24} color="#FF6B35" />
+                  <Ionicons name="heart" size={24} color="#7CFC00" />
                   <Text style={styles.biometricValue}>
                     {athlete.biometrics?.heart_rate_max || '--'}
                   </Text>
@@ -539,7 +539,7 @@ export default function AthleteDetail() {
                         style={styles.activityActionBtn}
                         onPress={() => openEditActivity(activity)}
                       >
-                        <Ionicons name="pencil" size={18} color="#FF6B35" />
+                        <Ionicons name="pencil" size={18} color="#7CFC00" />
                       </TouchableOpacity>
                       <TouchableOpacity 
                         style={styles.activityActionBtn}
@@ -868,7 +868,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   backButtonText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -883,7 +883,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -931,7 +931,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   tabButtonActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   tabText: {
     color: '#999',
@@ -1072,7 +1072,7 @@ const styles = StyleSheet.create({
   amountText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FF6B35',
+    color: '#7CFC00',
   },
   amountPaid: {
     color: '#4CAF50',
@@ -1129,7 +1129,7 @@ const styles = StyleSheet.create({
   },
   accessCodeContainer: {
     marginTop: 16,
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',
@@ -1142,7 +1142,7 @@ const styles = StyleSheet.create({
   accessCode: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#FF6B35',
+    color: '#7CFC00',
     letterSpacing: 4,
   },
   // Storico Allenamenti styles
@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   workoutDateText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 11,
     fontWeight: '600',
   },
@@ -1234,7 +1234,7 @@ const styles = StyleSheet.create({
   },
   modifiedText: {
     fontSize: 10,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontStyle: 'italic',
   },
   // Stili per le attività
@@ -1348,7 +1348,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   typeChipActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   typeChipText: {
     color: '#999',

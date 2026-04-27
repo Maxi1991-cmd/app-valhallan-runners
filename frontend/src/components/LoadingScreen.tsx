@@ -8,7 +8,7 @@ interface LoadingScreenProps {
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ message }) => {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#FF6B35" />
+      <ActivityIndicator size="large" color="#7CFC00" />
       {message && <Text style={styles.message}>{message}</Text>}
     </View>
   );

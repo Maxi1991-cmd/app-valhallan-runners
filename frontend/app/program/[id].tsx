@@ -269,7 +269,7 @@ export default function ProgramDetail() {
       .map(
         (w) => `
         <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-          <div style="color: #FF6B35; font-weight: bold;">${w.day}</div>
+          <div style="color: #7CFC00; font-weight: bold;">${w.day}</div>
           <div style="font-size: 18px; font-weight: bold; margin: 4px 0;">${w.title}</div>
           <div style="color: #666;">${w.description}</div>
           <div style="margin-top: 8px; font-size: 12px; color: #999;">
@@ -291,7 +291,7 @@ export default function ProgramDetail() {
           <meta charset="UTF-8">
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 20px; }
-            h1 { color: #FF6B35; }
+            h1 { color: #7CFC00; }
             .header { margin-bottom: 24px; }
             .meta { color: #666; margin-bottom: 8px; }
           </style>
@@ -373,7 +373,7 @@ export default function ProgramDetail() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#FF6B35"
+            tintColor="#7CFC00"
           />
         }
       >
@@ -390,7 +390,7 @@ export default function ProgramDetail() {
           </Text>
           {program.goal && (
             <View style={styles.goalContainer}>
-              <Ionicons name="flag" size={14} color="#FF6B35" />
+              <Ionicons name="flag" size={14} color="#7CFC00" />
               <Text style={styles.goalText}>{program.goal}</Text>
             </View>
           )}
@@ -464,7 +464,7 @@ export default function ProgramDetail() {
                   style={styles.workoutActionBtn}
                   onPress={() => openEditWorkoutModal(workout)}
                 >
-                  <Ionicons name="pencil" size={18} color="#FF6B35" />
+                  <Ionicons name="pencil" size={18} color="#7CFC00" />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.workoutActionBtn}
@@ -530,7 +530,7 @@ export default function ProgramDetail() {
             {workout.feedback_sent && workout.athlete_feedback && (
               <View style={styles.feedbackSection}>
                 <Text style={styles.feedbackTitle}>
-                  <Ionicons name="chatbubble-ellipses" size={14} color="#FF6B35" /> Feedback Atleta
+                  <Ionicons name="chatbubble-ellipses" size={14} color="#7CFC00" /> Feedback Atleta
                 </Text>
                 {workout.athlete_feedback.fatigue_level && (
                   <Text style={styles.feedbackText}>
@@ -876,12 +876,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     marginTop: 12,
-    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    backgroundColor: 'rgba(124, 252, 0, 0.1)',
     padding: 10,
     borderRadius: 8,
   },
   goalText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 14,
     fontWeight: '500',
     flex: 1,
@@ -962,7 +962,7 @@ const styles = StyleSheet.create({
   },
   workoutDay: {
     fontSize: 12,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
   },
   workoutTitle: {
@@ -1011,17 +1011,17 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   feedbackSection: {
-    backgroundColor: 'rgba(255, 107, 53, 0.1)',
+    backgroundColor: 'rgba(124, 252, 0, 0.1)',
     padding: 12,
     borderRadius: 8,
     marginTop: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#FF6B35',
+    borderLeftColor: '#7CFC00',
   },
   feedbackTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#7CFC00',
     marginBottom: 8,
   },
   feedbackText: {
@@ -1088,7 +1088,7 @@ const styles = StyleSheet.create({
   },
   modalSubtitle: {
     fontSize: 16,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
     marginBottom: 20,
   },
@@ -1118,7 +1118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#252525',
   },
   feelingButtonActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   feelingText: {
     fontSize: 10,
@@ -1178,7 +1178,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   typeChipActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   typeChipText: {
     color: '#999',
@@ -1253,7 +1253,7 @@ const styles = StyleSheet.create({
     minWidth: 55,
   },
   feelingOptionActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   feelingEmoji: {
     fontSize: 20,

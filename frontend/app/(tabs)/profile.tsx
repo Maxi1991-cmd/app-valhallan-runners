@@ -342,14 +342,14 @@ export default function ProfileTab() {
         <Card title={t('profile.settings')} style={styles.settingsCard}>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowNotificationsModal(true)}>
             <View style={styles.settingInfo}>
-              <Ionicons name="notifications-outline" size={22} color="#FF6B35" />
+              <Ionicons name="notifications-outline" size={22} color="#7CFC00" />
               <Text style={styles.settingText}>{t('navigation.notifications')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowLanguageModal(true)}>
             <View style={styles.settingInfo}>
-              <Ionicons name="globe-outline" size={22} color="#FF6B35" />
+              <Ionicons name="globe-outline" size={22} color="#7CFC00" />
               <Text style={styles.settingText}>{t('settings.language')}</Text>
             </View>
             <View style={styles.languageCurrentRow}>
@@ -366,14 +366,14 @@ export default function ProfileTab() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingRow} onPress={() => setShowPrivacyModal(true)}>
             <View style={styles.settingInfo}>
-              <Ionicons name="lock-closed-outline" size={22} color="#FF6B35" />
+              <Ionicons name="lock-closed-outline" size={22} color="#7CFC00" />
               <Text style={styles.settingText}>{t('profile.privacy')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingRow} onPress={() => { setExpandedFaq(null); setShowSupportModal(true); }}>
             <View style={styles.settingInfo}>
-              <Ionicons name="help-circle-outline" size={22} color="#FF6B35" />
+              <Ionicons name="help-circle-outline" size={22} color="#7CFC00" />
               <Text style={styles.settingText}>{t('profile.support')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#666" />
@@ -432,7 +432,7 @@ export default function ProfileTab() {
                   {lang.name}
                 </Text>
                 {selectedLanguage === lang.code && (
-                  <Ionicons name="checkmark-circle" size={24} color="#FF6B35" />
+                  <Ionicons name="checkmark-circle" size={24} color="#7CFC00" />
                 )}
               </TouchableOpacity>
             ))}
@@ -503,7 +503,7 @@ export default function ProfileTab() {
                   <Ionicons 
                     name={plan.id === 'annual' ? "star" : "calendar-outline"} 
                     size={24} 
-                    color={plan.id === 'annual' ? "#FFD700" : "#FF6B35"} 
+                    color={plan.id === 'annual' ? "#FFD700" : "#7CFC00"} 
                   />
                   <View style={styles.planDetails}>
                     <Text style={styles.planName}>{plan.name}</Text>
@@ -513,7 +513,7 @@ export default function ProfileTab() {
                   </View>
                 </View>
                 {processingPayment ? (
-                  <ActivityIndicator color="#FF6B35" />
+                  <ActivityIndicator color="#7CFC00" />
                 ) : (
                   <Ionicons name="chevron-forward" size={20} color="#666" />
                 )}
@@ -547,7 +547,7 @@ export default function ProfileTab() {
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
-                <Ionicons name="chatbubble-ellipses-outline" size={24} color="#FF6B35" />
+                <Ionicons name="chatbubble-ellipses-outline" size={24} color="#7CFC00" />
                 <View style={styles.notificationSettingText}>
                   <Text style={styles.notificationSettingTitle}>{t('settings.notifications.feedbackEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
@@ -558,14 +558,14 @@ export default function ProfileTab() {
               <Switch
                 value={notifyAthleteFeedback}
                 onValueChange={setNotifyAthleteFeedback}
-                trackColor={{ false: '#333', true: '#FF6B3550' }}
-                thumbColor={notifyAthleteFeedback ? '#FF6B35' : '#666'}
+                trackColor={{ false: '#333', true: '#7CFC0050' }}
+                thumbColor={notifyAthleteFeedback ? '#7CFC00' : '#666'}
               />
             </View>
 
             <View style={styles.notificationSettingRow}>
               <View style={styles.notificationSettingInfo}>
-                <Ionicons name="calendar-outline" size={24} color="#FF6B35" />
+                <Ionicons name="calendar-outline" size={24} color="#7CFC00" />
                 <View style={styles.notificationSettingText}>
                   <Text style={styles.notificationSettingTitle}>{t('settings.notifications.expiryEnabled')}</Text>
                   <Text style={styles.notificationSettingDesc}>
@@ -576,8 +576,8 @@ export default function ProfileTab() {
               <Switch
                 value={notifyExpirations}
                 onValueChange={setNotifyExpirations}
-                trackColor={{ false: '#333', true: '#FF6B3550' }}
-                thumbColor={notifyExpirations ? '#FF6B35' : '#666'}
+                trackColor={{ false: '#333', true: '#7CFC0050' }}
+                thumbColor={notifyExpirations ? '#7CFC00' : '#666'}
               />
             </View>
 
@@ -611,7 +611,7 @@ export default function ProfileTab() {
             <ScrollView style={styles.privacyContent}>
               <View style={styles.privacySection}>
                 <View style={styles.privacyIconContainer}>
-                  <Ionicons name="person-outline" size={28} color="#FF6B35" />
+                  <Ionicons name="person-outline" size={28} color="#7CFC00" />
                 </View>
                 <Text style={styles.privacyQuestion}>{t('privacy.whoCanSee')}</Text>
                 <Text style={styles.privacyAnswer}>
@@ -623,7 +623,7 @@ export default function ProfileTab() {
 
               <View style={styles.privacySection}>
                 <View style={styles.privacyIconContainer}>
-                  <Ionicons name="fitness-outline" size={28} color="#FF6B35" />
+                  <Ionicons name="fitness-outline" size={28} color="#7CFC00" />
                 </View>
                 <Text style={styles.privacyQuestion}>Chi può vedere i dati allenamento?</Text>
                 <Text style={styles.privacyAnswer}>
@@ -672,7 +672,7 @@ export default function ProfileTab() {
                     <Ionicons 
                       name={expandedFaq === index ? "chevron-up" : "chevron-down"} 
                       size={20} 
-                      color="#FF6B35" 
+                      color="#7CFC00" 
                     />
                   </TouchableOpacity>
                   {expandedFaq === index && (
@@ -688,7 +688,7 @@ export default function ProfileTab() {
                 onPress={() => Linking.openURL('mailto:valhallanrunners@gmail.com')}
                 activeOpacity={0.7}
               >
-                <Ionicons name="mail-outline" size={20} color="#FF6B35" />
+                <Ionicons name="mail-outline" size={20} color="#7CFC00" />
                 <View style={styles.supportFooterTextContainer}>
                   <Text style={styles.supportFooterText}>Hai altre domande o suggerimenti? Contattaci a</Text>
                   <Text style={styles.supportEmail}>valhallanrunners@gmail.com</Text>
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -739,20 +739,20 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   roleBadge: {
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     paddingVertical: 6,
     paddingHorizontal: 16,
     borderRadius: 16,
     marginTop: 12,
   },
   roleText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 14,
     fontWeight: '600',
   },
   subscriptionCard: {
     marginBottom: 16,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
     borderWidth: 1,
   },
   subscriptionHeader: {
@@ -952,12 +952,12 @@ const styles = StyleSheet.create({
   },
   planOptionActive: {
     borderWidth: 2,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
   },
   planPrice: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FF6B35',
+    color: '#7CFC00',
     marginTop: 4,
   },
   statusBanner: {
@@ -1144,7 +1144,7 @@ const styles = StyleSheet.create({
   },
   supportEmail: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
     marginTop: 4,
     textDecorationLine: 'underline',
@@ -1170,7 +1170,7 @@ const styles = StyleSheet.create({
   languageOptionActive: {
     backgroundColor: '#2A2A2A',
     borderWidth: 1,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
   },
   languageFlag: {
     fontSize: 28,
@@ -1181,7 +1181,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   languageNameActive: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
   },
 });

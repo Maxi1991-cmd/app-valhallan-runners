@@ -382,8 +382,8 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   athleteChipActive: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
+    borderColor: '#7CFC00',
   },
   athleteChipText: {
     color: '#999',

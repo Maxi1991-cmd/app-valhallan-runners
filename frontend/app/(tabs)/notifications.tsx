@@ -84,11 +84,11 @@ export default function NotificationsTab() {
       case 'workout_completed':
         return '#4CAF50';
       case 'workout_feedback':
-        return '#FF6B35';
+        return '#7CFC00';
       case 'workout_modified':
         return '#FF9800';
       default:
-        return '#FF6B35';
+        return '#7CFC00';
     }
   };
 
@@ -357,7 +357,7 @@ export default function NotificationsTab() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#FF6B35"
+            tintColor="#7CFC00"
           />
         }
         ListHeaderComponent={
@@ -388,7 +388,7 @@ export default function NotificationsTab() {
             {feedbackModal.data && (
               <View style={styles.feedbackContent}>
                 <View style={styles.feedbackHeader}>
-                  <Ionicons name="person-circle" size={40} color="#FF6B35" />
+                  <Ionicons name="person-circle" size={40} color="#7CFC00" />
                   <View style={styles.feedbackHeaderText}>
                     <Text style={styles.feedbackAthleteName}>{feedbackModal.data.athleteName}</Text>
                     <Text style={styles.feedbackWorkoutTitle}>{feedbackModal.data.workoutTitle}</Text>
@@ -400,7 +400,7 @@ export default function NotificationsTab() {
                   {feedbackModal.data.feedback?.fatigue_level && (
                     <View style={styles.feedbackRow}>
                       <View style={styles.feedbackIconContainer}>
-                        <Ionicons name="fitness" size={20} color="#FF6B35" />
+                        <Ionicons name="fitness" size={20} color="#7CFC00" />
                       </View>
                       <View>
                         <Text style={styles.feedbackLabel}>Livello Fatica</Text>
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B35',
+    color: '#7CFC00',
     marginBottom: 12,
     textTransform: 'uppercase',
   },
@@ -483,8 +483,8 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   unreadCard: {
-    borderColor: '#FF6B35',
-    backgroundColor: 'rgba(255, 107, 53, 0.05)',
+    borderColor: '#7CFC00',
+    backgroundColor: 'rgba(124, 252, 0, 0.05)',
   },
   urgentCard: {
     borderColor: '#DC3545',
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
   },
   tapHint: {
     fontSize: 10,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontStyle: 'italic',
   },
   rightActions: {
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   deleteButton: {
     padding: 6,
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
   },
   feedbackWorkoutTitle: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: '#7CFC00',
     marginTop: 2,
   },
   feedbackDate: {
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },

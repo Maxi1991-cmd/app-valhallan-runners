@@ -58,7 +58,7 @@ export default function Register() {
           </TouchableOpacity>
 
           <View style={styles.header}>
-            <Ionicons name="fitness" size={60} color="#FF6B35" />
+            <Ionicons name="fitness" size={60} color="#7CFC00" />
             <Text style={styles.title}>{t('auth.register')}</Text>
             <Text style={styles.subtitle}>{t('auth.coachDesc')}</Text>
           </View>
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   loginLinkBold: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
   },
 });

@@ -81,7 +81,7 @@ export default function AthletesTab() {
 
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Ionicons name="heart" size={16} color="#FF6B35" />
+            <Ionicons name="heart" size={16} color="#7CFC00" />
             <Text style={styles.statText}>
               {item.biometrics?.heart_rate_max || '--'} {t('units.bpmMax')}
             </Text>
@@ -125,7 +125,7 @@ export default function AthletesTab() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#FF6B35"
+            tintColor="#7CFC00"
           />
         }
         ListEmptyComponent={
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
     justifyContent: 'center',
     alignItems: 'center',
   },

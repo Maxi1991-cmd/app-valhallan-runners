@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
       activeOpacity={0.8}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? '#FF6B35' : '#FFF'} />
+        <ActivityIndicator color={variant === 'outline' ? '#7CFC00' : '#FFF'} />
       ) : (
         <Text style={textStyles}>{title}</Text>
       )}
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   outlineText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
   },
   smallText: {
     fontSize: 14,

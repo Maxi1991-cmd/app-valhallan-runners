@@ -181,7 +181,7 @@ export default function CalendarTab() {
         if (workout.completed) {
           dotColor = '#4CAF50'; // Verde - Completato
         } else if (workout.date >= today) {
-          dotColor = '#FF6B35'; // Arancione - Da fare
+          dotColor = '#7CFC00'; // Arancione - Da fare
         } else {
           dotColor = '#DC3545'; // Rosso - Non effettuato (scaduto)
         }
@@ -202,12 +202,12 @@ export default function CalendarTab() {
       marked[selectedDate] = {
         ...marked[selectedDate],
         selected: true,
-        selectedColor: '#FF6B35',
+        selectedColor: '#7CFC00',
       };
     } else {
       marked[selectedDate] = {
         selected: true,
-        selectedColor: '#FF6B35',
+        selectedColor: '#7CFC00',
       };
     }
     
@@ -350,7 +350,7 @@ export default function CalendarTab() {
 
       <ScrollView
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FF6B35" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7CFC00" />
         }
       >
         {viewMode === 'month' ? (
@@ -364,14 +364,14 @@ export default function CalendarTab() {
                 backgroundColor: '#0F0F0F',
                 calendarBackground: '#0F0F0F',
                 textSectionTitleColor: '#999',
-                selectedDayBackgroundColor: '#FF6B35',
+                selectedDayBackgroundColor: '#7CFC00',
                 selectedDayTextColor: '#FFF',
-                todayTextColor: '#FF6B35',
+                todayTextColor: '#7CFC00',
                 dayTextColor: '#FFF',
                 textDisabledColor: '#444',
-                dotColor: '#FF6B35',
+                dotColor: '#7CFC00',
                 monthTextColor: '#FFF',
-                arrowColor: '#FF6B35',
+                arrowColor: '#7CFC00',
               }}
               style={styles.calendar}
             />
@@ -477,7 +477,7 @@ export default function CalendarTab() {
             <Text style={styles.legendText}>{t('calendar.legend.completed')}</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#FF6B35' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#7CFC00' }]} />
             <Text style={styles.legendText}>{t('calendar.legend.pending')}</Text>
           </View>
           <View style={styles.legendItem}>
@@ -524,7 +524,7 @@ export default function CalendarTab() {
                       ? '#4CAF50' 
                       : selectedWorkout.date < format(new Date(), 'yyyy-MM-dd') 
                         ? '#DC3545' 
-                        : '#FF6B35' 
+                        : '#7CFC00' 
                   }]}>
                     {selectedWorkout.completed 
                       ? t('workout.completed')
@@ -543,7 +543,7 @@ export default function CalendarTab() {
                     <View style={styles.modalStats}>
                       {selectedWorkout.duration_minutes && (
                         <View style={styles.modalStat}>
-                          <Ionicons name="time" size={20} color="#FF6B35" />
+                          <Ionicons name="time" size={20} color="#7CFC00" />
                           <Text style={styles.modalStatValue}>{selectedWorkout.duration_minutes} {t('units.min')}</Text>
                         </View>
                       )}
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   toggleActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   toggleText: {
     color: '#999',
@@ -657,8 +657,8 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   athleteChipActive: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
+    borderColor: '#7CFC00',
   },
   athleteChipText: {
     color: '#999',
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   weekDayHeaderActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   weekDayName: {
     fontSize: 11,
@@ -871,7 +871,7 @@ const styles = StyleSheet.create({
   },
   weekRowToday: {
     borderWidth: 1,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
   },
   weekDayLeft: {
     width: 70,
@@ -882,7 +882,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#252525',
   },
   weekDayLeftActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   weekDayNameHorizontal: {
     fontSize: 11,
@@ -890,7 +890,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   weekDayNameToday: {
-    color: '#FF6B35',
+    color: '#7CFC00',
   },
   weekDayNumberHorizontal: {
     fontSize: 22,
@@ -899,7 +899,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   weekDayNumberToday: {
-    color: '#FF6B35',
+    color: '#7CFC00',
   },
   weekDayMonth: {
     fontSize: 10,
@@ -947,8 +947,8 @@ const styles = StyleSheet.create({
   },
   standaloneTag: {
     fontSize: 9,
-    color: '#FF6B35',
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    color: '#7CFC00',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,

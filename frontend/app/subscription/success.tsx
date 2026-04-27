@@ -89,7 +89,7 @@ export default function SubscriptionSuccessScreen() {
       <View style={styles.content}>
         {status === 'loading' && (
           <>
-            <ActivityIndicator size="large" color="#FF6B35" />
+            <ActivityIndicator size="large" color="#7CFC00" />
             <Text style={styles.title}>{t('subscription.verifyingPayment') || 'Verifica pagamento in corso...'}</Text>
           </>
         )}

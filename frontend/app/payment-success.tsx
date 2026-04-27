@@ -170,8 +170,8 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 4,
-    borderColor: 'rgba(255, 107, 53, 0.3)',
-    borderTopColor: '#FF6B35',
+    borderColor: 'rgba(124, 252, 0, 0.3)',
+    borderTopColor: '#7CFC00',
   },
   checkmarkContainer: {
     marginBottom: 24,
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   countdown: {
     fontSize: 14,
-    color: '#FF6B35',
+    color: '#7CFC00',
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 8,

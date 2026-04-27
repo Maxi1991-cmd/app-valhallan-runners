@@ -202,7 +202,7 @@ export default function ActivityDetail() {
                 <Ionicons 
                   name={activity.activity_type === 'running' ? 'walk' : activity.activity_type === 'cycling' ? 'bicycle' : 'fitness'} 
                   size={20} 
-                  color="#FF6B35" 
+                  color="#7CFC00" 
                 />
                 <Text style={styles.typeText}>{getActivityTypeLabel(activity.activity_type)}</Text>
               </View>
@@ -241,7 +241,7 @@ export default function ActivityDetail() {
               <View style={styles.feedbackContent}>
                 {activity.athlete_feedback.fatigue_level && (
                   <View style={styles.feedbackRow}>
-                    <Ionicons name="fitness" size={18} color="#FF6B35" />
+                    <Ionicons name="fitness" size={18} color="#7CFC00" />
                     <Text style={styles.feedbackLabel}>Fatica:</Text>
                     <Text style={styles.feedbackValue}>{activity.athlete_feedback.fatigue_level}/10</Text>
                   </View>
@@ -451,13 +451,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(255, 107, 53, 0.15)',
+    backgroundColor: 'rgba(124, 252, 0, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   typeText: {
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
   feedbackCard: {
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
   },
   feedbackContent: {
     gap: 12,

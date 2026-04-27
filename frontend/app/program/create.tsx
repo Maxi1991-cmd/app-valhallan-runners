@@ -480,8 +480,8 @@ const styles = StyleSheet.create({
     borderColor: '#333',
   },
   athleteChipActive: {
-    backgroundColor: '#FF6B35',
-    borderColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
+    borderColor: '#7CFC00',
   },
   athleteChipText: {
     color: '#999',
@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   typeChipActive: {
-    backgroundColor: '#FF6B35',
+    backgroundColor: '#7CFC00',
   },
   typeChipText: {
     color: '#999',
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   workoutDay: {
     fontSize: 12,
-    color: '#FF6B35',
+    color: '#7CFC00',
     fontWeight: '600',
   },
   workoutTitle: {
@@ -555,7 +555,7 @@ const styles = StyleSheet.create({
   newWorkoutCard: {
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#FF6B35',
+    borderColor: '#7CFC00',
   },
   submitButton: {
     marginBottom: 40,
