@@ -16,20 +16,13 @@ export default function LoginScreen() {
   const { login, athleteLogin, isAuthenticated, isLoading, loadUser, user } = useAuthStore();
   const { t } = useTranslation();
   const [role, setRole] = useState<RoleType>('select');
-  
-  // Coach login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // Athlete login
   const [athleteEmail, setAthleteEmail] = useState('');
   const [accessCode, setAccessCode] = useState('');
-  
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadUser();
-  }, []);
+  useEffect(() => { loadUser(); }, []);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
@@ -42,166 +35,104 @@ export default function LoginScreen() {
   }, [isAuthenticated, user, isLoading]);
 
   const handleCoachLogin = async () => {
-    if (!email || !password) {
-      Alert.alert(t('common.error'), t('auth.loginError'));
-      return;
-    }
+    if (!email || !password) { Alert.alert(t('common.error'), t('auth.loginError')); return; }
     setLoading(true);
-    try {
-      await login(email, password);
-    } catch (error: any) {
-      Alert.alert(t('common.error'), error.message);
-    } finally {
-      setLoading(false);
-    }
+    try { await login(email, password); } catch (error: any) { Alert.alert(t('common.error'), error.message); } finally { setLoading(false); }
   };
 
   const handleAthleteLogin = async () => {
-    if (!athleteEmail || !accessCode) {
-      Alert.alert(t('common.error'), t('auth.loginError'));
-      return;
-    }
+    if (!athleteEmail || !accessCode) { Alert.alert(t('common.error'), t('auth.loginError')); return; }
     setLoading(true);
-    try {
-      await athleteLogin(athleteEmail, accessCode);
-    } catch (error: any) {
-      Alert.alert(t('common.error'), error.message);
-    } finally {
-      setLoading(false);
-    }
+    try { await athleteLogin(athleteEmail, accessCode); } catch (error: any) { Alert.alert(t('common.error'), error.message); } finally { setLoading(false); }
   };
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Image
-          source={require('../assets/images/stridex-logo.png')}
-          style={styles.loadingLogo}
-          resizeMode="contain"
-        />
+        <Image source={require('../assets/images/stridex-text-logo.png')} style={{ width: 180, height: 62 }} resizeMode="contain" />
       </View>
     );
   }
 
-  // Role selection screen
+  // === ROLE SELECTION ===
   if (role === 'select') {
     return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.selectScrollContent}>
-          {/* Logo */}
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../assets/images/stridex-logo.png')}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.poweredBy}>Powered by Valhallan Runners</Text>
-          </View>
-
-          {/* Motivational Quote */}
-          <View style={styles.quoteContainer}>
-            <Text style={styles.quoteText}>Non temere la fatica.</Text>
-            <Text style={styles.quoteText}>Temi di non provarci.</Text>
-          </View>
-
-          <Text style={styles.selectTitle}>Scegli chi vuoi essere oggi</Text>
-
-          {/* Coach Card */}
-          <TouchableOpacity
-            style={styles.roleCard}
-            onPress={() => setRole('coach')}
-            data-testid="role-coach-btn"
-          >
-            <View style={[styles.roleIconContainer, styles.coachIconBg]}>
-              <Ionicons name="shield-checkmark" size={28} color="#FFB300" />
+      <View style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.selectScroll} showsVerticalScrollIndicator={false}>
+            {/* Logo */}
+            <View style={styles.logoWrap}>
+              <Image source={require('../assets/images/stridex-text-logo.png')} style={styles.heroLogo} resizeMode="contain" />
+              <Text style={styles.poweredBy}>Powered by Valhallan Runners</Text>
             </View>
-            <View style={styles.roleInfo}>
-              <Text style={styles.roleName}>Coach</Text>
-              <Text style={styles.roleDescription}>Guida. Programma. Fai crescere i tuoi atleti.</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={22} color="#7CFC00" />
-          </TouchableOpacity>
 
-          {/* Athlete Card */}
-          <TouchableOpacity
-            style={styles.roleCard}
-            onPress={() => setRole('athlete')}
-            data-testid="role-athlete-btn"
-          >
-            <View style={[styles.roleIconContainer, styles.athleteIconBg]}>
-              <Ionicons name="accessibility" size={28} color="#7CFC00" />
+            {/* Quote */}
+            <View style={styles.quoteWrap}>
+              <Text style={styles.quoteLine}>Non temere la fatica.</Text>
+              <Text style={styles.quoteLine}>Temi di non provarci.</Text>
             </View>
-            <View style={styles.roleInfo}>
-              <Text style={styles.roleName}>Atleta</Text>
-              <Text style={styles.roleDescription}>Allenati. Resisti. Migliora ogni giorno.</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={22} color="#7CFC00" />
-          </TouchableOpacity>
 
-          {/* Footer */}
-          <View style={styles.footer}>
-            <View style={styles.footerLine} />
-            <Text style={styles.footerText}>VALHALLAN RUNNERS</Text>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+            <Text style={styles.chooseText}>Scegli chi vuoi essere oggi</Text>
+
+            {/* Coach Card */}
+            <TouchableOpacity style={styles.glowCard} onPress={() => setRole('coach')} activeOpacity={0.8} data-testid="role-coach-btn">
+              <View style={styles.glowCardInner}>
+                <View style={[styles.iconRing, { borderColor: 'rgba(255,179,0,0.5)', backgroundColor: 'rgba(255,179,0,0.08)' }]}>  
+                  <Ionicons name="shield-checkmark" size={26} color="#FFB300" />
+                </View>
+                <View style={styles.cardTextWrap}>
+                  <Text style={styles.cardTitle}>Coach</Text>
+                  <Text style={styles.cardDesc}>Guida. Programma. Fai crescere i tuoi atleti.</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#7CFC00" />
+              </View>
+            </TouchableOpacity>
+
+            {/* Athlete Card */}
+            <TouchableOpacity style={styles.glowCard} onPress={() => setRole('athlete')} activeOpacity={0.8} data-testid="role-athlete-btn">
+              <View style={styles.glowCardInner}>
+                <View style={[styles.iconRing, { borderColor: 'rgba(124,252,0,0.4)', backgroundColor: 'rgba(124,252,0,0.06)' }]}>
+                  <Ionicons name="accessibility" size={26} color="#7CFC00" />
+                </View>
+                <View style={styles.cardTextWrap}>
+                  <Text style={styles.cardTitle}>Atleta</Text>
+                  <Text style={styles.cardDesc}>Allenati. Resisti. Migliora ogni giorno.</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#7CFC00" />
+              </View>
+            </TouchableOpacity>
+
+            {/* Footer */}
+            <View style={styles.footerWrap}>
+              <View style={styles.footerDivider} />
+              <Text style={styles.footerBrand}>VALHALLAN RUNNERS</Text>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
     );
   }
 
-  // Coach Login
+  // === COACH LOGIN ===
   if (role === 'coach') {
     return (
       <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardView}
-        >
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            <TouchableOpacity style={styles.backButton} onPress={() => setRole('select')}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.loginScroll}>
+            <TouchableOpacity style={styles.backRow} onPress={() => setRole('select')}>
               <Ionicons name="arrow-back" size={24} color="#FFF" />
-              <Text style={styles.backText}>{t('common.back')}</Text>
+              <Text style={styles.backLabel}>{t('common.back')}</Text>
             </TouchableOpacity>
-
-            <View style={styles.loginLogoContainer}>
-              <Image
-                source={require('../assets/images/stridex-logo.png')}
-                style={styles.loginLogo}
-                resizeMode="contain"
-              />
-              <Text style={styles.loginTitle}>Accesso Coach</Text>
+            <View style={styles.loginLogoWrap}>
+              <Image source={require('../assets/images/stridex-text-logo.png')} style={{ width: 150, height: 52 }} resizeMode="contain" />
+              <Text style={styles.loginHeading}>Accesso Coach</Text>
             </View>
-
             <Card style={styles.formCard}>
-              <Input
-                label={t('auth.email')}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="coach@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-              <Input
-                label={t('auth.password')}
-                value={password}
-                onChangeText={setPassword}
-                placeholder="--------"
-                secureTextEntry
-              />
-
-              <Button
-                title={loading ? t('common.loading') : t('auth.login')}
-                onPress={handleCoachLogin}
-                disabled={loading}
-                style={styles.loginButton}
-              />
-
-              <TouchableOpacity
-                style={styles.registerLink}
-                onPress={() => router.push('/register')}
-              >
-                <Text style={styles.registerText}>
-                  {t('auth.noAccount')} <Text style={styles.registerTextBold}>{t('auth.register')}</Text>
-                </Text>
+              <Input label={t('auth.email')} value={email} onChangeText={setEmail} placeholder="coach@email.com" keyboardType="email-address" autoCapitalize="none" />
+              <Input label={t('auth.password')} value={password} onChangeText={setPassword} placeholder="--------" secureTextEntry />
+              <Button title={loading ? t('common.loading') : t('auth.login')} onPress={handleCoachLogin} disabled={loading} style={styles.loginBtn} />
+              <TouchableOpacity style={styles.regLink} onPress={() => router.push('/register')}>
+                <Text style={styles.regText}>{t('auth.noAccount')} <Text style={styles.regBold}>{t('auth.register')}</Text></Text>
               </TouchableOpacity>
             </Card>
           </ScrollView>
@@ -210,60 +141,28 @@ export default function LoginScreen() {
     );
   }
 
-  // Athlete Login
+  // === ATHLETE LOGIN ===
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <TouchableOpacity style={styles.backButton} onPress={() => setRole('select')}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.loginScroll}>
+          <TouchableOpacity style={styles.backRow} onPress={() => setRole('select')}>
             <Ionicons name="arrow-back" size={24} color="#FFF" />
-            <Text style={styles.backText}>{t('common.back')}</Text>
+            <Text style={styles.backLabel}>{t('common.back')}</Text>
           </TouchableOpacity>
-
-          <View style={styles.loginLogoContainer}>
-            <Image
-              source={require('../assets/images/stridex-logo.png')}
-              style={styles.loginLogo}
-              resizeMode="contain"
-            />
-            <Text style={styles.loginTitle}>Accesso Atleta</Text>
-            <Text style={styles.loginSubtitle}>Allenati. Resisti. Migliora ogni giorno.</Text>
+          <View style={styles.loginLogoWrap}>
+            <Image source={require('../assets/images/stridex-text-logo.png')} style={{ width: 150, height: 52 }} resizeMode="contain" />
+            <Text style={styles.loginHeading}>Accesso Atleta</Text>
+            <Text style={styles.loginSub}>Allenati. Resisti. Migliora ogni giorno.</Text>
           </View>
-
           <Card style={styles.formCard}>
-            <Input
-              label={t('auth.email')}
-              value={athleteEmail}
-              onChangeText={setAthleteEmail}
-              placeholder="atleta@email.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            <Input
-              label={t('auth.accessCode')}
-              value={accessCode}
-              onChangeText={(text) => setAccessCode(text.toUpperCase())}
-              placeholder={t('auth.accessCodePlaceholder')}
-              autoCapitalize="characters"
-              maxLength={6}
-            />
-
-            <View style={styles.codeHint}>
+            <Input label={t('auth.email')} value={athleteEmail} onChangeText={setAthleteEmail} placeholder="atleta@email.com" keyboardType="email-address" autoCapitalize="none" />
+            <Input label={t('auth.accessCode')} value={accessCode} onChangeText={(t) => setAccessCode(t.toUpperCase())} placeholder={t('auth.accessCodePlaceholder')} autoCapitalize="characters" maxLength={6} />
+            <View style={styles.hintRow}>
               <Ionicons name="information-circle" size={16} color="#7CFC00" />
-              <Text style={styles.codeHintText}>
-                {t('auth.athleteAccessInfo')}
-              </Text>
+              <Text style={styles.hintText}>{t('auth.athleteAccessInfo')}</Text>
             </View>
-
-            <Button
-              title={loading ? t('common.loading') : t('auth.login')}
-              onPress={handleAthleteLogin}
-              disabled={loading}
-              style={styles.loginButton}
-            />
+            <Button title={loading ? t('common.loading') : t('auth.login')} onPress={handleAthleteLogin} disabled={loading} style={styles.loginBtn} />
           </Card>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -272,190 +171,69 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0D0D0D',
-  },
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: '#0D0D0D',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingLogo: {
-    width: 160,
-    height: 160,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-  },
-  selectScrollContent: {
-    flexGrow: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  // Back button
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 20,
-  },
-  backText: {
-    color: '#FFF',
-    fontSize: 16,
-  },
-  // Logo section
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  logoImage: {
-    width: 200,
-    height: 120,
-    marginBottom: 8,
-  },
-  poweredBy: {
-    fontSize: 13,
-    color: '#888',
-    letterSpacing: 0.5,
-  },
-  // Quote
-  quoteContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  quoteText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#FFF',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    lineHeight: 30,
-  },
-  // Select title
-  selectTitle: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    marginBottom: 20,
-    letterSpacing: 0.5,
-  },
-  // Role cards
-  roleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(30, 30, 30, 0.85)',
-    borderRadius: 16,
-    padding: 18,
+  container: { flex: 1, backgroundColor: '#0A0A0A' },
+  safeArea: { flex: 1 },
+  loadingContainer: { flex: 1, backgroundColor: '#0A0A0A', justifyContent: 'center', alignItems: 'center' },
+
+  // === SELECT SCREEN ===
+  selectScroll: { flexGrow: 1, paddingHorizontal: 28, justifyContent: 'center', paddingVertical: 40 },
+  logoWrap: { alignItems: 'center', marginBottom: 36 },
+  heroLogo: { width: 220, height: 76, marginBottom: 10 },
+  poweredBy: { fontSize: 13, color: '#777', letterSpacing: 0.3 },
+  quoteWrap: { alignItems: 'center', marginBottom: 20 },
+  quoteLine: { fontSize: 21, fontWeight: '700', color: '#FFFFFF', textAlign: 'center', fontStyle: 'italic', lineHeight: 30 },
+  chooseText: { fontSize: 13, color: '#888', textAlign: 'center', marginBottom: 22, letterSpacing: 0.4 },
+
+  // Glow cards
+  glowCard: {
     marginBottom: 14,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(124, 252, 0, 0.15)',
+    borderColor: 'rgba(124,252,0,0.18)',
+    backgroundColor: 'rgba(18,18,18,0.92)',
+    // shadow for glow effect
+    shadowColor: '#7CFC00',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  roleIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  glowCardInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  iconRing: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
   },
-  coachIconBg: {
-    backgroundColor: 'rgba(255, 179, 0, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 179, 0, 0.3)',
-  },
-  athleteIconBg: {
-    backgroundColor: 'rgba(124, 252, 0, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(124, 252, 0, 0.25)',
-  },
-  roleInfo: {
-    flex: 1,
-  },
-  roleName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#FFF',
-  },
-  roleDescription: {
-    fontSize: 13,
-    color: '#AAA',
-    marginTop: 3,
-  },
+  cardTextWrap: { flex: 1 },
+  cardTitle: { fontSize: 17, fontWeight: '700', color: '#FFF' },
+  cardDesc: { fontSize: 12.5, color: '#AAA', marginTop: 3 },
+
   // Footer
-  footer: {
-    alignItems: 'center',
-    marginTop: 40,
-    paddingBottom: 10,
-  },
-  footerLine: {
-    width: 60,
-    height: 2,
-    backgroundColor: 'rgba(124, 252, 0, 0.4)',
-    marginBottom: 12,
-    borderRadius: 1,
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#666',
-    letterSpacing: 3,
-    fontWeight: '600',
-  },
-  // Login screens
-  loginLogoContainer: {
-    alignItems: 'center',
-    marginVertical: 24,
-  },
-  loginLogo: {
-    width: 140,
-    height: 80,
-    marginBottom: 12,
-  },
-  loginTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFF',
-  },
-  loginSubtitle: {
-    fontSize: 13,
-    color: '#999',
-    marginTop: 6,
-  },
-  formCard: {
-    marginTop: 16,
-  },
-  loginButton: {
-    marginTop: 16,
-  },
-  registerLink: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  registerText: {
-    color: '#999',
-    fontSize: 14,
-  },
-  registerTextBold: {
-    color: '#7CFC00',
-    fontWeight: '600',
-  },
-  codeHint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#1A1A1A',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  codeHintText: {
-    color: '#999',
-    fontSize: 12,
-    flex: 1,
-  },
+  footerWrap: { alignItems: 'center', marginTop: 44, paddingBottom: 8 },
+  footerDivider: { width: 50, height: 2, backgroundColor: 'rgba(124,252,0,0.35)', borderRadius: 1, marginBottom: 10 },
+  footerBrand: { fontSize: 11, color: '#555', letterSpacing: 3.5, fontWeight: '600' },
+
+  // === LOGIN SCREENS ===
+  loginScroll: { flexGrow: 1, padding: 24 },
+  backRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 20 },
+  backLabel: { color: '#FFF', fontSize: 16 },
+  loginLogoWrap: { alignItems: 'center', marginVertical: 20 },
+  loginHeading: { fontSize: 22, fontWeight: '700', color: '#FFF', marginTop: 12 },
+  loginSub: { fontSize: 13, color: '#888', marginTop: 4 },
+  formCard: { marginTop: 12 },
+  loginBtn: { marginTop: 16 },
+  regLink: { marginTop: 20, alignItems: 'center' },
+  regText: { color: '#999', fontSize: 14 },
+  regBold: { color: '#7CFC00', fontWeight: '600' },
+  hintRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#151515', padding: 12, borderRadius: 8, marginTop: 8 },
+  hintText: { color: '#999', fontSize: 12, flex: 1 },
 });
