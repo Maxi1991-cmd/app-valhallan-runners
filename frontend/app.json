@@ -18,6 +18,7 @@
         "backgroundColor": "#000"
       },
       "edgeToEdgeEnabled": true,
+      "package": "com.valhallanrunners.stridex",
       "package": "com.valhallan.runners",
       "intentFilters": [
         {
