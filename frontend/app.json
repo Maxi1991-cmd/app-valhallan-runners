@@ -19,7 +19,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.valhallanrunners.stridex",
-      "package": "com.valhallan.runners",
       "intentFilters": [
         {
           "action": "VIEW",
@@ -29,7 +28,10 @@
               "scheme": "valhallan"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -54,6 +56,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "92ccb017-8826-4c9e-a363-5cdac8eaa2a9"
+      }
+    },
+    "owner": "madmax.91"
   }
 }
