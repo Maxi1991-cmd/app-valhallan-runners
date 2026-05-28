@@ -19,6 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.valhallanrunners.stridex",
+      "versionCode": 2,
       "intentFilters": [
         {
           "action": "VIEW",
