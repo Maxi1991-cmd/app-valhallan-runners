@@ -2,7 +2,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:8001';
+const PRODUCTION_BACKEND_URL = 'https://coach-athlete-hub-11.preview.emergentagent.com';
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || PRODUCTION_BACKEND_URL;
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
