@@ -1,15 +1,19 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
-const PRODUCTION_BACKEND_URL = 'https://coach-athlete-hub-11.preview.emergentagent.com';
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL || PRODUCTION_BACKEND_URL;
+// Production backend URL - hardcoded for reliability in standalone builds
+const BASE_URL = 'https://coach-athlete-hub-11.preview.emergentagent.com';
+
+console.log('[StrideX API] Backend:', BASE_URL);
 
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 15000,
 });
 
 // Add token to requests
