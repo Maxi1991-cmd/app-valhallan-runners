@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 // Production backend URL - hardcoded for reliability in standalone builds
-const BASE_URL = 'https://coach-athlete-hub-11.preview.emergentagent.com';
+const BASE_URL = 'https://app-valhallan-runners-production.up.railway.app';
 
 console.log('[StrideX API] Backend:', BASE_URL);
 
